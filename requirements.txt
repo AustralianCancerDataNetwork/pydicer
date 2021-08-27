@@ -1,0 +1,3 @@
+pydicom >= 2.0.0
+SimpleITK >= 2.0.0
+platipy >= 0.1.2
