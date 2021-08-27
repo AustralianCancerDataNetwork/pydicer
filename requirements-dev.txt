@@ -1,0 +1,5 @@
+pylint
+black
+sphinx
+pytest
+
