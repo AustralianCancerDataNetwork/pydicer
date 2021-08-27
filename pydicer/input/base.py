@@ -4,7 +4,7 @@ import abc
 from pathlib import Path
 
 
-class InputBase:
+class InputBase(abc.ABC):
     def __init__(self, working_directory=None):
         """
         Base class for input modules.
