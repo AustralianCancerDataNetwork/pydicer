@@ -1,5 +1,5 @@
 import zipfile
-import urllib
+import urllib.request
 import tempfile
 
 from pathlib import Path
