@@ -21,7 +21,7 @@ class PreprocessData:
         """
         Function to preprocess information regarding the data located in an Input working directory
 
-        Returns: res_dict (Dict): keys are series UIDs. For each series; we have 5 lower keys:
+        Returns: res_dict (dict): keys are series UIDs. For each series; we have 5 lower keys:
             - the hashed patient ID
             - the hashed study UID
             - a list of dicts that has 2 keys (path to file, slice location)
