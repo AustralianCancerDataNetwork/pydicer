@@ -39,5 +39,3 @@ class ConvertData:
                 )
                 output_dir.parent.mkdir(exist_ok=True, parents=True)
                 sitk.WriteImage(series, str(output_dir))
-
-        return
