@@ -20,6 +20,6 @@ class InputBase(abc.ABC):
         self.working_directory = Path(working_directory)
 
     @abc.abstractmethod
-    def fetch_data():
+    def fetch_data(self):
 
         pass
