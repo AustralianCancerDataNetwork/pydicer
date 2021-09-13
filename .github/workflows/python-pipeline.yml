@@ -1,0 +1,43 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+# Pipeline that checks branches that have been pushed to "Main" OR are the source branch in a newly created pull request into "Main"
+# Fails the test if there are Python syntax errors or undefined names OR pytest fails
+
+name: Pydicer Pytest and Pylint Validaiton 
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Python modules via pip
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pylint pytest
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    - name: Lint with Pylint
+      run: |
+        pylint --disable=all --enable=F,E,unreachable,duplicate-key,unnecessary-semicolon, \
+        global-variable-not-assigned,unused-variable,binary-op-exception, \
+        bad-format-string,anomalous-backslash-in-string,bad-open-mode pydicer
+    - name: Pytest validation
+      run: |
+        pytest
