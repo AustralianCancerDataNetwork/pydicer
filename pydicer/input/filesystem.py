@@ -1,14 +1,16 @@
-from pydicer.input.web import WebInput
+from pydicer.input.base import InputBase
+from pydicer.input.base import InputBase
 
 
-class TestInput(WebInput):
+class FilesystemInput(InputBase):
+
     def __init__(self, working_directory=None):
         """
-        A test input class to download example data from zenodo
+        Class for inputing files from the file system
 
         Args:
             working_directory (str|pathlib.Path, optional): The working directory in which to
             store the data fetched. Defaults to a temp directory.
         """
+
         super().__init__(working_directory)
-        self.data_url = "https://zenodo.org/record/5276878/files/HNSCC.zip"
