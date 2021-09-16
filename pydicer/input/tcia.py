@@ -20,7 +20,7 @@ def run_endpoint(url, query_parameters):
 
     Args:
         url (str): url of the series to be downloaded and generate its DICOMS
-        query_parameters (dict): dciotnary of query parameters to be passed into the api
+        query_parameters (dict): dictionary of query parameters to be passed into the api
         endpoint request.
 
     Returns:
@@ -49,7 +49,7 @@ class TCIAInput(InputBase):
         self.prefix_url = "https://services.cancerimagingarchive.net/services/v4/TCIA"
         self.series_instance_uid = series_instance_uid
 
-    def fetch_data(self, output_zip_file):
+    def fetch_data(self, output_zip_file="tcia_input_zipfile.zip"):
         """
         Function to download the Series instance UID from TCIA and write locally
 
@@ -63,6 +63,14 @@ class TCIAInput(InputBase):
             self.working_directory.mkdir(exist_ok=True, parents=True)
             file = os.path.join(self.working_directory, output_zip_file)
             resp = run_endpoint(serviceUrl, query_parameters)
+
+            # If series instance uid doesn't exist in TCIA, return
+            if not resp.chunked:
+                print(
+                    "Error: The Series Instance UID provided does not exist, please confirm that it"
+                    " is correct..."
+                )
+                return
 
             # Chunks to be read by, used by TCIA's official python API client example
             CHUNK = 256 * 10240
