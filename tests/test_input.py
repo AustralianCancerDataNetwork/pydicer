@@ -22,8 +22,6 @@ def test_input_invalid_working_dir_():
     # Assert path to DICOMs does not exist
     assert not os.path.isdir(invalid_filesystem_input.working_directory)
 
-# Uncomment to test the TestInput class, will download zenodo zipfile and run tests!
-""" 
 def test_test_input():
 
     test_input = TestInput()
@@ -35,4 +33,3 @@ def test_test_input():
     assert os.path.isdir(output_directory.joinpath("HNSCC-01-0019"))
     assert os.path.isdir(output_directory.joinpath("HNSCC-01-0176"))
     assert os.path.isdir(output_directory.joinpath("HNSCC-01-0199"))
-"""
