@@ -61,7 +61,7 @@ class TCIAInput(InputBase):
         query_parameters = {"SeriesInstanceUID": self.series_instance_uid}
         try:
             self.working_directory.mkdir(exist_ok=True, parents=True)
-            file = os.path.join(self.working_directory, output_zip_file)
+            file = self.working_directory.joinpath(output_zip_file)
             resp = run_endpoint(serviceUrl, query_parameters)
 
             # If series instance uid doesn't exist in TCIA, return
