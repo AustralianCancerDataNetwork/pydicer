@@ -1,7 +1,7 @@
 from pydicer.input.base import InputBase
 
 
-class FilesystemInput(InputBase):
+class FileSystemInput(InputBase):
     def __init__(self, directory):
         """
         Class for inputing files from the file system
