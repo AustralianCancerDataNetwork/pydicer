@@ -1,8 +1,6 @@
-import pydicom
-import SimpleITK as sitk
-from platipy.dicom.io.crawl import safe_sort_dicom_image_list
-from pathlib import Path
 import hashlib
+from pathlib import Path
+import SimpleITK as sitk
 
 
 class ConvertData:
