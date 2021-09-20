@@ -7,7 +7,7 @@ class FilesystemInput(InputBase):
         Class for inputing files from the file system
 
         Args:
-            directory (str|pathlib.Path): The working directory in which to find DICOM files.
+            directory (str|pathlib.Path): The directory in which to find DICOM files.
         """
 
         super().__init__(directory)
