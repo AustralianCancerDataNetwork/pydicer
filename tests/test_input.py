@@ -1,3 +1,5 @@
+import pytest
+
 from pydicer.input.web import WebInput, download_and_extract_zip_file
 from pydicer.input.test import TestInput
 from pydicer.input.filesystem import FilesystemInput
@@ -8,7 +10,7 @@ def test_input_valid_working_dir_():
     # Assert path to DICOMs exists
     assert valid_test_input.working_directory.is_dir()
 
-    valid_filesystem_input = FilesystemInput()
+    valid_filesystem_input = FilesystemInput(valid_test_input.working_directory)
     # Assert path to DICOMs exists
     assert valid_filesystem_input.working_directory.is_dir()
 
@@ -18,9 +20,8 @@ def test_input_invalid_working_dir_():
     # Assert path to DICOMs does not exist
     assert not invalid_test_input.working_directory.is_dir()
 
-    invalid_filesystem_input = FilesystemInput(working_directory="NOT_VALID_PATH")
-    # Assert path to DICOMs does not exist
-    assert not invalid_filesystem_input.working_directory.is_dir()
+    with pytest.raises(Exception):
+        FilesystemInput("NOT_VALID_PATH")
 
 
 def test_test_input():
