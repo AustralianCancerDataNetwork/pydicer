@@ -1,9 +1,11 @@
+import pytest
 import os
 import pytest
 
 from pydicer.input.web import WebInput, download_and_extract_zip_file
 from pydicer.input.test import TestInput
 from pydicer.input.filesystem import FilesystemInput
+from pydicer.input.pacs import DICOMPACSInput
 from pydicer.input.tcia import TCIAInput
 from pydicer.input.pacs import DICOMPACSInput
 
