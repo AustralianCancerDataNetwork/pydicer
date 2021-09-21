@@ -79,5 +79,5 @@ class DICOMPACSInput(InputBase):
                         if not s:
                             continue  # Again, safe to skip this if None
 
-                            # Download the series
+                        # Download the series
                         self.dicom_connector.download_series(s.SeriesInstanceUID)
