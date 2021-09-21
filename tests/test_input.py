@@ -1,8 +1,10 @@
+import pytest
 import os
 
 from pydicer.input.web import WebInput, download_and_extract_zip_file
 from pydicer.input.test import TestInput
 from pydicer.input.filesystem import FilesystemInput
+from pydicer.input.pacs import DICOMPACSInput
 from pydicer.input.tcia import TCIAInput
 
 
@@ -80,3 +82,24 @@ def test_test_input():
     assert output_directory.joinpath("HNSCC-01-0019").is_dir()
     assert output_directory.joinpath("HNSCC-01-0176").is_dir()
     assert output_directory.joinpath("HNSCC-01-0199").is_dir()
+
+
+def test_dicom_pacs_invalid_host():
+
+    # Using this public DICOM PACS for testing, not sure how reliable this one is to provide this
+    # data consistently
+    with pytest.raises(ConnectionError):
+        DICOMPACSInput("INCORRECT_HOST", 1234)
+
+
+def test_dicom_pacs_fetch():
+
+    # Using this public DICOM PACS for testing, not sure how reliable this one is to provide this
+    # data consistently. Downloading some General Miroscopy data here, which doesn't really matter
+    # because this is just to check that data is being downloaded.
+    pacs_input = DICOMPACSInput("www.dicomserver.co.uk", 11112, "DCMQUERY")
+    pacs_input.fetch_data("PAT004", modalities=["GM"])
+
+    assert pacs_input.working_directory.is_dir()
+
+    assert len([p for p in pacs_input.working_directory.glob("*/*")]) > 0
