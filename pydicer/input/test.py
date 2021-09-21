@@ -10,5 +10,7 @@ class TestInput(WebInput):
             working_directory (str|pathlib.Path, optional): The working directory in which to
             store the data fetched. Defaults to a temp directory.
         """
-        super().__init__(working_directory)
-        self.data_url = "https://zenodo.org/record/5276878/files/HNSCC.zip"
+
+        data_url = "https://zenodo.org/record/5276878/files/HNSCC.zip"
+
+        super().__init__(data_url, working_directory)
