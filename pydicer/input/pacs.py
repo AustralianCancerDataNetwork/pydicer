@@ -65,6 +65,8 @@ class DICOMPACSInput(InputBase):
                 if not study:
                     continue  # These lists often contain a None study, so just skip that
 
+                print(study.ModalitiesInStudy)
+
                 for modality in modalities:
                     dataset = pydicom.Dataset()
                     dataset.StudyInstanceUID = study.StudyInstanceUID
