@@ -1,11 +1,12 @@
+import os
+
 from pydicer.input.web import WebInput, download_and_extract_zip_file
 from pydicer.input.test import TestInput
 from pydicer.input.filesystem import FilesystemInput
 from pydicer.input.tcia import TCIAInput
-import os
 
 
-def test_input_valid_working_dir_():
+def test_input_valid_working_dir():
     valid_test_input = WebInput(data_url="")
     # Assert path to DICOMs exists
     assert valid_test_input.working_directory.is_dir()
@@ -14,36 +15,22 @@ def test_input_valid_working_dir_():
     # Assert path to DICOMs exists
     assert valid_filesystem_input.working_directory.is_dir()
 
-    valid_tcia_input = TCIAInput(series_instance_uid="")
+    valid_tcia_input = TCIAInput(collection="", patient_ids=[], modalities=[])
     # Assert path to DICOMs exists
-    assert os.path.isdir(valid_tcia_input.working_directory)
+    assert valid_tcia_input.working_directory.is_dir()
 
 
-def test_input_invalid_working_dir_():
-    invalid_test_input = WebInput(data_url="", working_directory="NOT_VALID_PATH")
-    # Assert path to DICOMs does not exist
-    assert not invalid_test_input.working_directory.is_dir()
-
-    invalid_filesystem_input = FilesystemInput(working_directory="NOT_VALID_PATH")
-    # Assert path to DICOMs does not exist
-    assert not invalid_filesystem_input.working_directory.is_dir()
-
-    invalid_work_dir_tcia_input = TCIAInput(
-        series_instance_uid="1.3.6.1.4.1.14519.5.2.1.7695.4001.306204232344341694648035234440",
-        working_directory="NOT_VALID_PATH",
-    )
-    # Assert path to DICOMs does not exist
-    assert not invalid_work_dir_tcia_input.working_directory.is_dir()
-
-    invalid_series_uid_tcia_input = TCIAInput(series_instance_uid="NOT_VALID_SERIES_UID")
-    invalid_series_uid_tcia_input.fetch_data()
-    # Assert path to DICOMs does exist, but it contains no files
-    assert invalid_series_uid_tcia_input.working_directory.is_dir()
+def assert_invalid_tcia_input(invalid_tcia_input):
+    """
+    Assert path to DICOMs does exist, but it contains no files
+    """
+    invalid_tcia_input.fetch_data()
+    assert invalid_tcia_input.working_directory.is_dir()
     assert (
         len(
             [
                 name
-                for name in os.listdir(invalid_series_uid_tcia_input.working_directory)
+                for name in os.listdir(invalid_tcia_input.working_directory)
                 if os.path.isfile(name)
             ]
         )
@@ -51,11 +38,42 @@ def test_input_invalid_working_dir_():
     )
 
 
+def test_input_invalid_working_dir():
+    invalid_test_input = WebInput(data_url="", working_directory="INVALID_PATH")
+    # Assert path to DICOMs does not exist
+    assert not invalid_test_input.working_directory.is_dir()
+
+    invalid_filesystem_input = FilesystemInput(working_directory="INVALID_PATH")
+    # Assert path to DICOMs does not exist
+    assert not invalid_filesystem_input.working_directory.is_dir()
+
+    invalid_work_dir_tcia_input = TCIAInput(
+        collection="TCGA-GBM",
+        patient_ids=["TCGA-08-0244"],
+        modalities=["MR"],
+        working_directory="INVALID_PATH",
+    )
+    # Assert path to DICOMs does not exist
+    assert not invalid_work_dir_tcia_input.working_directory.is_dir()
+
+
+def test_tcia_input():
+    invalid_collection_tcia_input = TCIAInput(
+        collection="INVALID_COLLECTION", patient_ids=[], modalities=[]
+    )
+    invalid_patient_id_tcia_input = TCIAInput(
+        collection="TCGA-GBM", patient_ids=["INVALID_PATIENT_ID"], modalities=[]
+    )
+
+    assert_invalid_tcia_input(invalid_collection_tcia_input)
+    assert_invalid_tcia_input(invalid_patient_id_tcia_input)
+
+
 def test_test_input():
 
     test_input = TestInput()
 
-    download_and_extract_zip_file(test_input.data_url, test_input.working_directory)
+    test_input.fetch_data()
     output_directory = test_input.working_directory.joinpath("HNSCC")
 
     # Assert that the 3 directories now exist on the system filepath
