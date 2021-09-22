@@ -102,4 +102,4 @@ def test_dicom_pacs_fetch():
 
     assert pacs_input.working_directory.is_dir()
 
-    assert list(pacs_input.working_directory.glob("*/*")) > 0
+    assert len(list(pacs_input.working_directory.glob("*/*"))) > 0
