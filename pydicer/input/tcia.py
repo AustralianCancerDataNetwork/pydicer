@@ -1,11 +1,3 @@
-import os
-import zipfile
-import tempfile
-import urllib.request, urllib.error, urllib.parse
-import urllib.request, urllib.parse, urllib.error
-import json
-
-from pathlib import Path
 from platipy.dicom.download import tcia
 
 from pydicer.input.base import InputBase
@@ -19,11 +11,11 @@ class TCIAInput(InputBase):
         Args:
             collection (str): The TCIA collection to fetch from
             patient_ids (list, optional): The patient IDs to fetch. If not set all patients are
-                                        fetched
-            modalities (list, optional): A list of strings defining the modalites to fetch. Will fetch
-                                        all modalities available if not specified.
-            working_directory (str): (str|pathlib.Path, optional): The working directory in which to
-            store the data fetched. Defaults to a temp directory.
+                fetched
+            modalities (list, optional): A list of strings defining the modalites to fetch. Will
+                                        fetch all modalities available if not specified.
+            working_directory (str): (str|pathlib.Path, optional): The working directory in which
+                to store the data fetched. Defaults to a temp directory.
         """
         super().__init__(working_directory)
         self.collection = collection

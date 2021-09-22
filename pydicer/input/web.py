@@ -46,7 +46,7 @@ class WebInput(InputBase):
     def fetch_data(self):
         """Download the data."""
 
-        num_files = [f for f in self.working_directory.glob("*")]
+        num_files = list(self.working_directory.glob("*"))
         if len(num_files) > 0:
             print("Warning: Directory not empty, won't download files")
             return

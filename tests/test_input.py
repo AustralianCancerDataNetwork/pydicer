@@ -46,9 +46,8 @@ def test_input_invalid_working_dir():
     # Assert path to DICOMs does not exist
     assert not invalid_test_input.working_directory.is_dir()
 
-    invalid_filesystem_input = FileSystemInput(working_directory="INVALID_PATH")
-    # Assert path to DICOMs does not exist
-    assert not invalid_filesystem_input.working_directory.is_dir()
+    with pytest.raises(FileNotFoundError):
+        FileSystemInput("INVALID_PATH")
 
     invalid_work_dir_tcia_input = TCIAInput(
         collection="TCGA-GBM",
@@ -103,4 +102,4 @@ def test_dicom_pacs_fetch():
 
     assert pacs_input.working_directory.is_dir()
 
-    assert len([p for p in pacs_input.working_directory.glob("*/*")]) > 0
+    assert list(pacs_input.working_directory.glob("*/*")) > 0
