@@ -8,6 +8,13 @@ from pydicer.input.base import InputBase
 
 
 def download_and_extract_zip_file(zip_url, output_directory):
+    """Downloads a zip file from the URL specified and extracts the contents to the output
+    directory.
+
+    Args:
+        zip_url (str): The URL of the zip file.
+        output_directory (str|pathlib.Path): The path in which to extract the contents.
+    """
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_file = Path(temp_dir).joinpath("tmp.zip")
@@ -37,4 +44,11 @@ class WebInput(InputBase):
         self.data_url = data_url
 
     def fetch_data(self):
+        """Download the data."""
+
+        files_in_directory = list(self.working_directory.glob("*"))
+        if len(files_in_directory) > 0:
+            print("Warning: Directory not empty, won't download files")
+            return
+
         download_and_extract_zip_file(self.data_url, self.working_directory)

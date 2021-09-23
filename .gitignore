@@ -131,3 +131,5 @@ dmypy.json
 # Nifti
 *.nii.gz
 *.dcm
+
+testdata/
