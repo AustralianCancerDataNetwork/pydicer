@@ -1,9 +1,10 @@
-import pytest
 import os
 
-from pydicer.input.web import WebInput, download_and_extract_zip_file
+import pytest
+
+from pydicer.input.web import WebInput
 from pydicer.input.test import TestInput
-from pydicer.input.filesystem import FilesystemInput
+from pydicer.input.filesystem import FileSystemInput
 from pydicer.input.pacs import DICOMPACSInput
 from pydicer.input.tcia import TCIAInput
 
@@ -13,7 +14,7 @@ def test_input_valid_working_dir():
     # Assert path to DICOMs exists
     assert valid_test_input.working_directory.is_dir()
 
-    valid_filesystem_input = FilesystemInput()
+    valid_filesystem_input = FileSystemInput(valid_test_input.working_directory)
     # Assert path to DICOMs exists
     assert valid_filesystem_input.working_directory.is_dir()
 
@@ -45,9 +46,8 @@ def test_input_invalid_working_dir():
     # Assert path to DICOMs does not exist
     assert not invalid_test_input.working_directory.is_dir()
 
-    invalid_filesystem_input = FilesystemInput(working_directory="INVALID_PATH")
-    # Assert path to DICOMs does not exist
-    assert not invalid_filesystem_input.working_directory.is_dir()
+    with pytest.raises(FileNotFoundError):
+        FileSystemInput("INVALID_PATH")
 
     invalid_work_dir_tcia_input = TCIAInput(
         collection="TCGA-GBM",
@@ -102,4 +102,4 @@ def test_dicom_pacs_fetch():
 
     assert pacs_input.working_directory.is_dir()
 
-    assert len([p for p in pacs_input.working_directory.glob("*/*")]) > 0
+    assert len(list(pacs_input.working_directory.glob("*/*"))) > 0

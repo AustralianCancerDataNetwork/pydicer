@@ -18,4 +18,3 @@ class InputBase(abc.ABC):
             working_directory = tempfile.mkdtemp()
 
         self.working_directory = Path(working_directory)
-

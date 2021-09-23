@@ -1,4 +1,3 @@
-from pathlib import Path
 import pydicom
 import numpy as np
 
@@ -64,7 +63,9 @@ class PreprocessData:
                 temp_dict = {"path": file, "slice_location": slice_location}
 
                 res_dict[ds.SeriesInstanceUID]["files"].append(temp_dict)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
+                # Broad except ok here, since we will put these file into a
+                # quarantine location for further inspection.
                 print(e)
 
         for _, value in res_dict.items():
