@@ -1,6 +1,11 @@
 import pydicom
 import numpy as np
 
+from pydicer.constants import (
+    RT_STRUCTURE_STORAGE_UID,
+    CT_IMAGE_STORAGE_UID,
+)
+
 
 class PreprocessData:
     """
@@ -43,32 +48,71 @@ class PreprocessData:
 
         for file in files:
             ds = pydicom.read_file(file, force=True)
+
+            linked_series_uid = {}
+
             try:
+
+                dicom_type_uid = ds.SOPClassUID
+
                 if ds.SeriesInstanceUID not in res_dict:
                     res_dict[ds.SeriesInstanceUID] = {
                         "patient_id": ds.PatientID,
                         "study_id": ds.StudyInstanceUID,
                         "files": [],
                         "modality": ds.Modality,
-                        "linked_series_uid": "",
+                        "sop_class_uid": dicom_type_uid,
                     }
 
-                image_position = np.array(ds.ImagePositionPatient, dtype=float)
-                image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
+                if dicom_type_uid == RT_STRUCTURE_STORAGE_UID:
 
-                image_plane_normal = np.cross(image_orientation[:3], image_orientation[3:])
+                    try:
+                        referenced_series_uid = (
+                            ds.ReferencedFrameOfReferenceSequence[0]
+                            .RTReferencedStudySequence[0]
+                            .RTReferencedSeriesSequence[0]
+                            .SeriesInstanceUID
+                        )
+                        linked_series_uid["referenced_series_uid"] = referenced_series_uid
+                    except AttributeError:
+                        # Check other tags for a linked DICOM
+                        # e.g. ds.ReferencedFrameOfReferenceSequence[0].FrameOfReferenceUID
+                        # Potentially, we should check each referenced
+                        referenced_frame_of_reference_uid = ds.ReferencedFrameOfReferenceSequence[
+                            0
+                        ].FrameOfReferenceUID
+                        linked_series_uid[
+                            "referenced_frame_of_reference_uid"
+                        ] = referenced_frame_of_reference_uid
 
-                slice_location = (image_position * image_plane_normal)[2]
+                    res_dict[ds.SeriesInstanceUID]["files"].append(file)
 
-                temp_dict = {"path": file, "slice_location": slice_location}
+                elif dicom_type_uid == CT_IMAGE_STORAGE_UID:
 
-                res_dict[ds.SeriesInstanceUID]["files"].append(temp_dict)
+                    image_position = np.array(ds.ImagePositionPatient, dtype=float)
+                    image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
+
+                    image_plane_normal = np.cross(image_orientation[:3], image_orientation[3:])
+
+                    slice_location = (image_position * image_plane_normal)[2]
+
+                    temp_dict = {"path": file, "slice_location": slice_location}
+
+                    res_dict[ds.SeriesInstanceUID]["files"].append(temp_dict)
+
+                    for _, value in res_dict.items():
+                        value["files"].sort(key=lambda x: x["slice_location"])
+
+                else:
+                    raise ValueError("Could not determine DICOM type.")
+
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
                 print(e)
 
-        for _, value in res_dict.items():
-            value["files"].sort(key=lambda x: x["slice_location"])
+            # Include any linked DICOM series
+            # This is a dictionary holding potential matching series
+            res_dict[ds.SeriesInstanceUID]["linked_series_uid"] = linked_series_uid
 
         return res_dict
