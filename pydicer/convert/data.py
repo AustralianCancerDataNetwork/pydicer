@@ -1,6 +1,7 @@
 import hashlib
 from pathlib import Path
 import SimpleITK as sitk
+from pydicer.convert.convert_pt import convert_dicom_to_nifty_pt
 
 
 class ConvertData:
@@ -33,7 +34,37 @@ class ConvertData:
                 series_uid_hash = hash_sha.hexdigest()[:6]
 
                 output_dir = self.output_directory.joinpath(
-                    file_dic["patient_id"], study_id_hash, "images", f"CT_{series_uid_hash}.nii.gz"
+                    file_dic["patient_id"],
+                    study_id_hash,
+                    "images",
+                    f"CT_{series_uid_hash}.nii.gz",
                 )
                 output_dir.parent.mkdir(exist_ok=True, parents=True)
                 sitk.WriteImage(series, str(output_dir))
+
+            elif file_dic["modality"] == "PT":
+                all_files = file_dic["files"]
+
+                sitk_writer = sitk.ImageFileWriter()
+                sitk_writer.SetImageIO("NiftiImageIO")
+
+                hash_sha.update(file_dic["study_id"].encode("UTF-8"))
+                study_id_hash = hash_sha.hexdigest()[:6]
+
+                hash_sha.update(series_uid.encode("UTF-8"))
+                series_uid_hash = hash_sha.hexdigest()[:6]
+
+                output_dir = self.output_directory.joinpath(
+                    file_dic["patient_id"],
+                    study_id_hash,
+                    "images",
+                    f"PT_{series_uid_hash}.nii.gz",
+                )
+                output_dir.parent.mkdir(exist_ok=True, parents=True)
+
+                convert_dicom_to_nifty_pt(
+                    all_files,
+                    str(output_dir),
+                    modality="PT",
+                    sitk_writer=sitk_writer,
+                )
