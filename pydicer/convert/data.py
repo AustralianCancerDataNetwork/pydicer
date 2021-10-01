@@ -1,6 +1,9 @@
+import logging
 import hashlib
 from pathlib import Path
 import SimpleITK as sitk
+
+logger = logging.getLogger(__name__)
 
 
 class ConvertData:
@@ -36,4 +39,5 @@ class ConvertData:
                     file_dic["patient_id"], study_id_hash, "images", f"CT_{series_uid_hash}.nii.gz"
                 )
                 output_dir.parent.mkdir(exist_ok=True, parents=True)
+                logger.debug("Writing converted series with UID %s to %s", series_uid, output_dir)
                 sitk.WriteImage(series, str(output_dir))

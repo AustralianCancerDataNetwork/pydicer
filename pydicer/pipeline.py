@@ -1,8 +1,12 @@
+import logging
+
 from pathlib import Path
 
 from pydicer.input.test import TestInput
 from pydicer.preprocess.data import PreprocessData
 from pydicer.convert.data import ConvertData
+
+logger = logging.getLogger(__name__)
 
 
 def run(input_object, output_directory="."):
@@ -36,6 +40,9 @@ def run_test(directory="./testdata"):
         directory (str, optional): Path to store test data. Defaults to "./testdata".
     """
 
+    logging.basicConfig(format="%(name)s\t%(levelname)s\t%(message)s", level=logging.DEBUG)
+
+    logger.info("Running Pipeline with Test Input")
     directory = Path(directory)
     directory.mkdir(exist_ok=True, parents=True)
 

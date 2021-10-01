@@ -1,5 +1,9 @@
+import logging
+
 import pydicom
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 class PreprocessData:
@@ -66,7 +70,7 @@ class PreprocessData:
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
-                print(e)
+                logger.error("Error parsing file %s: %s", file, e)
 
         for _, value in res_dict.items():
             value["files"].sort(key=lambda x: x["slice_location"])
