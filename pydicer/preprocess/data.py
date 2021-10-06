@@ -39,7 +39,7 @@ class PreprocessData:
                     "study_id": "",
                     "files": [],
                     "modality": "",
-                    "linked_series_uid": ""
+                    "linked_series_uid": {}
                 }
             }
         """
@@ -100,9 +100,6 @@ class PreprocessData:
 
                     res_dict[ds.SeriesInstanceUID]["files"].append(temp_dict)
 
-                    for _, value in res_dict.items():
-                        value["files"].sort(key=lambda x: x["slice_location"])
-
                 else:
                     raise ValueError("Could not determine DICOM type.")
 
@@ -114,5 +111,17 @@ class PreprocessData:
             # Include any linked DICOM series
             # This is a dictionary holding potential matching series
             res_dict[ds.SeriesInstanceUID]["linked_series_uid"] = linked_series_uid
+
+        # Sort the files for each series by the slice_location (if available)
+        for _, value in res_dict.items():
+
+            if len(value["files"]) == 0:
+                continue
+
+            if not isinstance(value["files"][0], dict):
+                continue
+
+            if "slice_location" in value["files"][0]:
+                value["files"].sort(key=lambda x: x["slice_location"])
 
         return res_dict
