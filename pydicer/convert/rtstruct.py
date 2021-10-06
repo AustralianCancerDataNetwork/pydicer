@@ -1,8 +1,10 @@
 from pathlib import Path
 import pydicom
 import SimpleITK as sitk
+from matplotlib import cm
 
 from platipy.dicom.io.rtstruct_to_nifti import transform_point_set_from_dicom_struct
+from platipy.imaging.utils.io import write_nrrd_structure_set
 
 
 def convert_rtstruct(
@@ -74,3 +76,24 @@ def convert_rtstruct(
 
     if image_output_path is not None:
         sitk.WriteImage(dicom_image, str(image_output_path))
+
+
+def write_nrrd_from_mask_directory(mask_directory, output_file, color_map=cm.get_cmap("rainbow")):
+    """Produce a NRRD file from a directory of masks in Nifti format
+
+    Args:
+        mask_directory (pathlib.Path|str): Path object of directory containing masks
+        output_file (pathlib.Path|str): The output NRRD file to write to.
+        color_map (matplotlib.colors.Colormap | dict, optional): Colormap to use for output.
+            Defaults to cm.get_cmap("rainbow").
+    """
+
+    if isinstance(mask_directory, str):
+        mask_directory = Path(mask_directory)
+
+    masks = {
+        p.name.replace(".nii.gz", ""): sitk.ReadImage(str(p))
+        for p in mask_directory.glob("*.nii.gz")
+    }
+
+    write_nrrd_structure_set(masks, output_file=output_file, color_map=color_map)
