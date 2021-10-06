@@ -78,7 +78,7 @@ def convert_rtstruct(
         sitk.WriteImage(dicom_image, str(image_output_path))
 
 
-def write_nrrd_from_mask_directory(mask_directory, output_file, color_map=cm.get_cmap("rainbow")):
+def write_nrrd_from_mask_directory(mask_directory, output_file, colormap=cm.get_cmap("rainbow")):
     """Produce a NRRD file from a directory of masks in Nifti format
 
     Args:
@@ -96,4 +96,4 @@ def write_nrrd_from_mask_directory(mask_directory, output_file, color_map=cm.get
         for p in mask_directory.glob("*.nii.gz")
     }
 
-    write_nrrd_structure_set(masks, output_file=output_file, color_map=color_map)
+    write_nrrd_structure_set(masks, output_file=output_file, colormap=colormap)
