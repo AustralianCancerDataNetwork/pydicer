@@ -26,8 +26,8 @@ class PreprocessData:
         Function to preprocess information regarding the data located in an Input working directory
 
         Returns: res_dict (dict): keys are series UIDs. For each series; we have 5 lower keys:
-            - the hashed patient ID
-            - the hashed study UID
+            - the patient ID
+            - the study UID
             - a list of dicts that has 2 keys (path to file, slice location)
             - the series modality
             - the series UID that it is linked to
@@ -49,7 +49,7 @@ class PreprocessData:
         for file in files:
             ds = pydicom.read_file(file, force=True)
 
-            linked_series_uid = {}
+            linked_series_uid = {"referenced_series_uid": ""}
 
             try:
 
