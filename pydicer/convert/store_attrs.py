@@ -1,4 +1,5 @@
 import hashlib
+import pickle
 
 
 def hash_id(identifier):
@@ -43,3 +44,28 @@ class StoreDicomAttrs:
         self.hash_linked_series_id = hash_id(linked_series_id)
         self.sop_class_id = sop_class_id
         self.files = files
+
+    def export_attrs(self, export_type, output_path, file_extension="json"):
+        dic = {
+            "patient_id": self.patient_id,
+            "modality": self.modality,
+            "study_uid": self.study_id,
+            "hashed_study_uid": self.hash_study_id,
+            "series_uid": self.series_id,
+            "hashed_series_uid": self.hash_series_id,
+            "linked_series_uid": self.linked_series_id,
+            "hashed_linked_series_uid": self.hash_linked_series_id,
+            "sop_class_id": self.sop_class_id,
+            "dicom_files": self.files,
+        }
+        if export_type == "ct":
+            filename = f"{self.modality}_{self.hash_series_id}"
+        elif export_type == "struct":
+            filename = f"{self.modality}_{self.hash_series_id}_{self.hash_linked_series_id}"
+
+        if file_extension == "pickle":
+            filename += ".p"
+            with open(output_path.joinpath(filename), "wb") as outfile:
+                pickle.dump(dic, outfile)
+        else:
+            print("No Attribute export method other than pickle has been implemented yet...")

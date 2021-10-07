@@ -52,6 +52,16 @@ class ConvertData:
                 output_file.parent.mkdir(exist_ok=True, parents=True)
                 sitk.WriteImage(series, str(output_file))
 
+                output_path = self.output_directory.joinpath(
+                    series_attrs.patient_id,
+                    series_attrs.hash_study_id,
+                    "images"
+                )
+                export_type = "ct"
+                
+                # Save the series attibutes to file
+                series_attrs.export_attrs(export_type, output_path)
+
             elif series_attrs.sop_class_id == RT_STRUCTURE_STORAGE_UID:
 
                 # Get the linked image
@@ -77,6 +87,13 @@ class ConvertData:
                     spacing=None,
                 )
 
+                output_path = self.output_directory.joinpath(
+                    series_attrs.patient_id,
+                    series_attrs.hash_study_id,
+                    "structures",
+                )
+                export_type = "struct"
+
                 # TODO Make generation of NRRD file optional, as well as the colormap configurable
                 nrrd_file = self.output_directory.joinpath(
                     series_attrs.patient_id,
@@ -86,5 +103,6 @@ class ConvertData:
                 )
                 write_nrrd_from_mask_directory(output_dir, nrrd_file)
             
-            # Save the series attibutes to file
+                # Save the series attibutes to file
+                series_attrs.export_attrs(export_type, output_path)
 
