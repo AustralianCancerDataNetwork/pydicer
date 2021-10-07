@@ -49,6 +49,7 @@ class ConvertData:
                 )
                 output_file.parent.mkdir(exist_ok=True, parents=True)
                 sitk.WriteImage(series, str(output_file))
+                logger.debug("Writing CT Image Series to: %s", output_file)
 
             elif file_dic["sop_class_uid"] == RT_STRUCTURE_STORAGE_UID:
 

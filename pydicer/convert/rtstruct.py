@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 import pydicom
 import SimpleITK as sitk
@@ -5,6 +6,8 @@ from matplotlib import cm
 
 from platipy.dicom.io.rtstruct_to_nifti import transform_point_set_from_dicom_struct
 from platipy.imaging.utils.io import write_nrrd_structure_set
+
+logger = logging.getLogger(__name__)
 
 
 def convert_rtstruct(
@@ -20,7 +23,7 @@ def convert_rtstruct(
     The masks are stored as NIFTI files in the output directory
 
     Args:
-        dcm_img_list (str|pathlib.Path): Path to the reference DICOM image series
+        dcm_img_list (list): List of DICOM paths (as str) to use as the reference image series.
         dcm_rt_file (str|pathlib.Path): Path to the DICOM RTSTRUCT file
         prefix (str, optional): The prefix to give the output files. Defaults to "Struct_".
         output_dir (str|pathlib.Path, optional): Path to the output directory. Defaults to ".".
@@ -29,10 +32,8 @@ def convert_rtstruct(
         spacing (list, optional): Values of image spacing to override. Defaults to None.
     """
 
-    # logger.debug("Converting RTStruct: {0}".format(dcm_rt_file))
-    # logger.debug("Using image series: {0}".format(dcm_img_list))
-    # logger.debug("Output file prefix: {0}".format(prefix))
-    # logger.debug("Output directory: {0}".format(output_dir))
+    logger.debug("Converting RTStruct: %s", dcm_rt_file)
+    logger.debug("Output file prefix: %s", prefix)
 
     dicom_image = sitk.ReadImage(dcm_img_list)
     dicom_struct = pydicom.read_file(dcm_rt_file, force=True)
@@ -52,24 +53,22 @@ def convert_rtstruct(
             output_img = output_dir.joinpath(output_img)
 
         image_output_path = output_img
-
-        # logger.debug("Image series to be converted to: {0}".format(image_output_path))
+        logger.debug("Image series to be converted to: %s", image_output_path)
 
     if spacing:
 
         if isinstance(spacing, str):
             spacing = [float(i) for i in spacing.split(",")]
-
-        # logger.debug("Overriding image spacing with: {0}".format(spacing))
+        logger.debug("Overriding image spacing with: %s", spacing)
 
     struct_list, struct_name_sequence = transform_point_set_from_dicom_struct(
         dicom_image, dicom_struct, spacing
     )
-    # logger.debug("Converted all structures. Writing output.")
+
     for struct_index, struct_image in enumerate(struct_list):
         out_name = f"{prefix}{struct_name_sequence[struct_index]}.nii.gz"
         out_name = output_dir.joinpath(out_name)
-        # logger.debug(f"Writing file to: {output_dir}")
+        logger.debug("Writing file to: %s", out_name)
         sitk.WriteImage(struct_image, str(out_name))
 
     if image_output_path is not None:
@@ -95,3 +94,4 @@ def write_nrrd_from_mask_directory(mask_directory, output_file, colormap=cm.get_
     }
 
     write_nrrd_structure_set(masks, output_file=output_file, colormap=colormap)
+    logger.debug("Writing NRRD Structure Set to: %s", output_file)
