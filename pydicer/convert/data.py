@@ -1,8 +1,8 @@
-import hashlib
 from pathlib import Path
 import SimpleITK as sitk
 
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
+from pydicer.convert.store_attrs import StoreDicomAttrs
 
 from pydicer.constants import (
     RT_STRUCTURE_STORAGE_UID,
@@ -29,39 +29,40 @@ class ConvertData:
 
         for series_uid, file_dic in self.preprocess_dic.items():
 
-            hash_sha = hashlib.sha256()
-            hash_sha.update(file_dic["study_id"].encode("UTF-8"))
-            study_id_hash = hash_sha.hexdigest()[:6]
+            series_attrs = StoreDicomAttrs(
+                file_dic["patient_id"],
+                file_dic["modality"],
+                file_dic["study_id"],
+                series_uid,
+                file_dic["linked_series_uid"]["referenced_series_uid"],
+                file_dic["sop_class_uid"],
+                file_dic["files"],
+            )
 
-            hash_sha = hashlib.sha256()
-            hash_sha.update(series_uid.encode("UTF-8"))
-            series_uid_hash = hash_sha.hexdigest()[:6]
-
-            if file_dic["sop_class_uid"] == CT_IMAGE_STORAGE_UID:
-                series_files = [str(x["path"]) for x in file_dic["files"]]
+            if series_attrs.sop_class_id == CT_IMAGE_STORAGE_UID:
+                series_files = [str(x["path"]) for x in series_attrs.files]
                 series = sitk.ReadImage(series_files)
 
                 output_file = self.output_directory.joinpath(
-                    file_dic["patient_id"], study_id_hash, "images", f"CT_{series_uid_hash}.nii.gz"
+                    series_attrs.patient_id,
+                    series_attrs.hash_study_id,
+                    "images",
+                    f"CT_{series_attrs.hash_series_id}.nii.gz",
                 )
                 output_file.parent.mkdir(exist_ok=True, parents=True)
                 sitk.WriteImage(series, str(output_file))
 
-            elif file_dic["sop_class_uid"] == RT_STRUCTURE_STORAGE_UID:
+            elif series_attrs.sop_class_id == RT_STRUCTURE_STORAGE_UID:
 
                 # Get the linked image
-                linked_uid = file_dic["linked_series_uid"]["referenced_series_uid"]
+                linked_uid = series_attrs.linked_series_id
                 linked_dicom_dict = self.preprocess_dic[linked_uid]
 
-                hash_sha = hashlib.sha256()
-                hash_sha.update(linked_uid.encode("UTF-8"))
-                linked_uid_hash = hash_sha.hexdigest()[:6]
-
                 output_dir = self.output_directory.joinpath(
-                    file_dic["patient_id"],
-                    study_id_hash,
+                    series_attrs.patient_id,
+                    series_attrs.hash_study_id,
                     "structures",
-                    f"{series_uid_hash}_{linked_uid_hash}",
+                    f"{series_attrs.hash_series_id}_{series_attrs.hash_linked_series_id}",
                 )
                 output_dir.mkdir(exist_ok=True, parents=True)
 
@@ -69,7 +70,7 @@ class ConvertData:
 
                 convert_rtstruct(
                     img_file_list,
-                    file_dic["files"][0],
+                    series_attrs.files[0],
                     prefix="",
                     output_dir=output_dir,
                     output_img=None,
@@ -78,9 +79,12 @@ class ConvertData:
 
                 # TODO Make generation of NRRD file optional, as well as the colormap configurable
                 nrrd_file = self.output_directory.joinpath(
-                    file_dic["patient_id"],
-                    study_id_hash,
+                    series_attrs.patient_id,
+                    series_attrs.hash_study_id,
                     "structures",
-                    f"{series_uid_hash}_{linked_uid_hash}.nrrd",
+                    f"{series_attrs.hash_series_id}_{series_attrs.hash_linked_series_id}.nrrd",
                 )
                 write_nrrd_from_mask_directory(output_dir, nrrd_file)
+            
+            # Save the series attibutes to file
+
