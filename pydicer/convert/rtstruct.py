@@ -34,8 +34,6 @@ def convert_rtstruct(
     # logger.debug("Output file prefix: {0}".format(prefix))
     # logger.debug("Output directory: {0}".format(output_dir))
 
-    prefix = prefix + "{0}"
-
     dicom_image = sitk.ReadImage(dcm_img_list)
     dicom_struct = pydicom.read_file(dcm_rt_file, force=True)
 
@@ -69,7 +67,7 @@ def convert_rtstruct(
     )
     # logger.debug("Converted all structures. Writing output.")
     for struct_index, struct_image in enumerate(struct_list):
-        out_name = f"{prefix.format(struct_name_sequence[struct_index])}.nii.gz"
+        out_name = f"{prefix}{struct_name_sequence[struct_index]}.nii.gz"
         out_name = output_dir.joinpath(out_name)
         # logger.debug(f"Writing file to: {output_dir}")
         sitk.WriteImage(struct_image, str(out_name))
