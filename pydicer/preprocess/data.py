@@ -1,3 +1,5 @@
+import logging
+
 import pydicom
 import numpy as np
 
@@ -5,6 +7,8 @@ from pydicer.constants import (
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class PreprocessData:
@@ -106,7 +110,7 @@ class PreprocessData:
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
-                print(e)
+                logger.error("Error parsing file %s: %s", file, e)
 
             # Include any linked DICOM series
             # This is a dictionary holding potential matching series

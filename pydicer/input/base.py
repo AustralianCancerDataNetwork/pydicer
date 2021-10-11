@@ -1,7 +1,11 @@
 import tempfile
+import logging
 
 import abc
 from pathlib import Path
+
+
+logger = logging.getLogger(__name__)
 
 
 class InputBase(abc.ABC):
@@ -18,3 +22,5 @@ class InputBase(abc.ABC):
             working_directory = tempfile.mkdtemp()
 
         self.working_directory = Path(working_directory)
+
+        logger.debug("Working directory set to: %s", self.working_directory)

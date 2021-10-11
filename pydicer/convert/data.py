@@ -1,3 +1,4 @@
+import logging
 import hashlib
 from pathlib import Path
 import SimpleITK as sitk
@@ -8,6 +9,8 @@ from pydicer.constants import (
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class ConvertData:
@@ -46,6 +49,7 @@ class ConvertData:
                 )
                 output_file.parent.mkdir(exist_ok=True, parents=True)
                 sitk.WriteImage(series, str(output_file))
+                logger.debug("Writing CT Image Series to: %s", output_file)
 
             elif file_dic["sop_class_uid"] == RT_STRUCTURE_STORAGE_UID:
 
@@ -83,4 +87,5 @@ class ConvertData:
                     "structures",
                     f"{series_uid_hash}_{linked_uid_hash}.nrrd",
                 )
+
                 write_nrrd_from_mask_directory(output_dir, nrrd_file)
