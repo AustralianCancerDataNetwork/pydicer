@@ -245,7 +245,7 @@ def get_physical_values_pt(slices, patient_weight):
     elif units == "CNTS":
         suv_results = get_suv_philips(slices)
     else:
-        raise ValueError("The {} units is not handled".format(units))
+        raise ValueError(f"The {units} units is not handled")
 
     return suv_results
 
