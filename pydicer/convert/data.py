@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 import SimpleITK as sitk
+import numpy as np
 
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.utils import hash_uid
@@ -49,6 +50,14 @@ class ConvertData:
             try:
 
                 if sop_class_uid == CT_IMAGE_STORAGE_UID:
+
+                    # Check that the slice location spacing is consistent, if not raise and error
+                    # for now
+                    slice_location_diffs = np.gradient(df_files.slice_location.to_numpy())
+                    if not np.allclose(slice_location_diffs, slice_location_diffs[0]):
+                        # TODO Handle inconsistent slice spacing
+                        raise ValueError("Slice Locations are not evenly spaced")
+
                     series_files = df_files.file_path.tolist()
                     series_files = [str(f) for f in series_files]
                     series = sitk.ReadImage(series_files)
@@ -122,6 +131,6 @@ class ConvertData:
 
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
-                logger.error("Unable to convert series with UID")
+                logger.error("Unable to convert series with UID: {series_uid}")
 
                 # TODO send to quarantine
