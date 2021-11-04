@@ -88,10 +88,7 @@ class PreprocessData:
 
                     res_dict[ds.SeriesInstanceUID]["files"].append(file)
 
-                elif (
-                    dicom_type_uid == CT_IMAGE_STORAGE_UID
-                    or dicom_type_uid == PET_IMAGE_STORAGE_UID
-                ):
+                elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID):
 
                     image_position = np.array(ds.ImagePositionPatient, dtype=float)
                     image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
