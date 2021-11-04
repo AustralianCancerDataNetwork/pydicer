@@ -113,7 +113,9 @@ class PreprocessData:
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
-                logger.error("Error parsing file %s: %s. Placing file into Quarantine folder...", file, e)
+                logger.error(
+                    "Error parsing file %s: %s. Placing file into Quarantine folder...", file, e
+                )
                 move_file_to_quarantine(file, self.working_directory, "Broad error")
 
             # Include any linked DICOM series
