@@ -6,10 +6,10 @@ import pydicom as pdcm
 
 
 def convert_dicom_to_nifty_pt(
-        input_filepaths,
-        output_filepath,
-        patient_weight_from_ct=None,
-    ):
+    input_filepaths,
+    output_filepath,
+    patient_weight_from_ct=None,
+):
     """Function to convert the dicom files contained in input_filepaths to one
        NIFTI image.
     Args:
@@ -30,7 +30,7 @@ def convert_dicom_to_nifty_pt(
     Returns:
         numpy.array: The numpy image, used to compute the bounding boxes
     """
-    slices = [pdcm.read_file(str(dcm["path"])) for dcm in input_filepaths]
+    slices = [pdcm.read_file(str(dcm)) for dcm in input_filepaths]
     slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
 
     if hasattr(slices[0], "PatientWeight") and (slices[0].PatientWeight is None):
@@ -43,8 +43,7 @@ def convert_dicom_to_nifty_pt(
             #     'Cannot compute SUV the weight is missing')
             patient_weight = 75.0  # default
             warnings.warn(
-                "Cannot find the weight of the patient, hence it "
-                "is approximated to be 75.0 kg"
+                "Cannot find the weight of the patient, hence it " "is approximated to be 75.0 kg"
             )
     elif not hasattr(slices[0], "PatientWeight"):
         if hasattr(slices[0], "PatientsWeight"):
@@ -56,8 +55,7 @@ def convert_dicom_to_nifty_pt(
             #     'Cannot compute SUV the weight is missing')
             patient_weight = 75.0  # default
             warnings.warn(
-                "Cannot find the weight of the patient, hence it "
-                "is approximated to be 75.0 kg"
+                "Cannot find the weight of the patient, hence it " "is approximated to be 75.0 kg"
             )
     else:
         patient_weight = float(slices[0].PatientWeight)
@@ -83,9 +81,7 @@ def convert_dicom_to_nifty_pt(
         slices = [k for i, k in enumerate(slices) if i not in ind2rm]
         axial_positions = np.asarray([k.ImagePositionPatient[2] for k in slices])
 
-    slice_spacing = (
-        slices[1].ImagePositionPatient[2] - slices[0].ImagePositionPatient[2]
-    )
+    slice_spacing = slices[1].ImagePositionPatient[2] - slices[0].ImagePositionPatient[2]
 
     pixel_spacing = np.asarray(
         [
@@ -97,15 +93,11 @@ def convert_dicom_to_nifty_pt(
 
     np_image = get_physical_values_pt(slices, patient_weight)
 
-    position_final_slice = (len(slices) - 1) * slice_spacing + slices[
-        0
-    ].ImagePositionPatient[2]
+    position_final_slice = (len(slices) - 1) * slice_spacing + slices[0].ImagePositionPatient[2]
     # Test whether some slices are missing
     # due to an error at line 144: TypeError: only size-1 arrays can be converted
     # to Python scalars
-    if not is_approx_equal(
-            position_final_slice, float(slices[-1].ImagePositionPatient[2])
-        ):
+    if not is_approx_equal(position_final_slice, float(slices[-1].ImagePositionPatient[2])):
         if (position_final_slice - axial_positions[-1]) / slice_spacing < 1.5:
             # If only one slice is missing
             diff = np.asarray(
@@ -120,25 +112,19 @@ def convert_dicom_to_nifty_pt(
                 ]
             )
             ind2interp = int(np.where(diff)[0])
-            new_slice = (
-                np_image[:, :, ind2interp] + np_image[:, :, ind2interp + 1]
-            ) * 0.5
+            new_slice = (np_image[:, :, ind2interp] + np_image[:, :, ind2interp + 1]) * 0.5
             new_slice = new_slice[..., np.newaxis]
             np_image = np.concatenate(
                 (np_image[..., :ind2interp], new_slice, np_image[..., ind2interp:]),
                 axis=2,
             )
-            warnings.warn(
-                "One slice is missing, we replaced it by linear interpolation"
-            )
+            warnings.warn("One slice is missing, we replaced it by linear interpolation")
         else:
             # if more than one slice are missing
             raise RuntimeError("Multiple slices are missing")
 
     image_position_patient = [float(k) for k in slices[0].ImagePositionPatient]
-    sitk_image = get_sitk_volume_from_np(
-        np_image, pixel_spacing, image_position_patient
-    )
+    sitk_image = get_sitk_volume_from_np(np_image, pixel_spacing, image_position_patient)
 
     sitk.WriteImage(sitk_image, str(output_filepath))
 
@@ -210,9 +196,7 @@ def get_physical_values_pt(slices, patient_weight):
             else:
                 scan_datetime_value = s.ScanDateTime
                 if isinstance(scan_datetime_value, bytes):
-                    scan_datetime_str = scan_datetime_value.decode("utf-8").split(".")[
-                        0
-                    ]
+                    scan_datetime_str = scan_datetime_value.decode("utf-8").split(".")[0]
                 elif isinstance(scan_datetime_value, str):
                     scan_datetime_str = scan_datetime_value.split(".")[0]
                 else:
@@ -231,14 +215,11 @@ def get_physical_values_pt(slices, patient_weight):
             decay_time = (scan_datetime - start_datetime).total_seconds()
         except KeyError:
             warnings.warn(
-                "Estimation of time decay for SUV"
-                " computation from average parameters"
+                "Estimation of time decay for SUV" " computation from average parameters"
             )
             decay_time = 1.75 * 3600
         except AttributeError:
-            warnings.warn(
-                "'Dataset' object has no attribute 'RadiopharmaceuticalStartTime'"
-            )
+            warnings.warn("'Dataset' object has no attribute 'RadiopharmaceuticalStartTime'")
             decay_time = 1.75 * 3600
         suv_results = get_suv_from_bqml(slices, decay_time, patient_weight)
 
@@ -258,16 +239,12 @@ def get_suv_philips(slices):
         suv philips results
     """
     image = []
-    suv_scale_factor_tag = "SUVScaleFactor"#Tag(0x70531000)
+    suv_scale_factor_tag = "SUVScaleFactor"  # Tag(0x70531000)
     for s in slices:
-        if (
-                suv_scale_factor_tag in s
-                and "RescaleSlope" in s
-                and "RescaleIntercept" in s
-            ):
-            im = (
-                float(s.RescaleSlope) * s.pixel_array + float(s.RescaleIntercept)
-            ) * float(s.SUVScaleFactor)
+        if suv_scale_factor_tag in s and "RescaleSlope" in s and "RescaleIntercept" in s:
+            im = (float(s.RescaleSlope) * s.pixel_array + float(s.RescaleIntercept)) * float(
+                s.SUVScaleFactor
+            )
         else:
             im = (1.0 * s.pixel_array + 0.0) * 0.000587
 
@@ -289,16 +266,12 @@ def get_suv_from_bqml(slices, decay_time, patient_weight):
     for s in slices:
         pet = float(s.RescaleSlope) * s.pixel_array + float(s.RescaleIntercept)
         if "RadionuclideHalfLife" in s.RadiopharmaceuticalInformationSequence[0]:
-            half_life = float(
-                s.RadiopharmaceuticalInformationSequence[0].RadionuclideHalfLife
-            )
+            half_life = float(s.RadiopharmaceuticalInformationSequence[0].RadionuclideHalfLife)
         else:
             half_life = 6500.0  # default
             print("there is no RadionuclideHalfLife")
         if "RadionuclideTotalDose" in s.RadiopharmaceuticalInformationSequence[0]:
-            total_dose = float(
-                s.RadiopharmaceuticalInformationSequence[0].RadionuclideTotalDose
-            )
+            total_dose = float(s.RadiopharmaceuticalInformationSequence[0].RadionuclideTotalDose)
         else:
             total_dose = 487254240.0  # default
             print("there is no RadionuclideTotalDose")

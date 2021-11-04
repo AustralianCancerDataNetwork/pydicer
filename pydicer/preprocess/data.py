@@ -2,6 +2,7 @@ import pydicom
 import numpy as np
 
 from pydicer.constants import (
+    PET_IMAGE_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
 )
@@ -87,7 +88,10 @@ class PreprocessData:
 
                     res_dict[ds.SeriesInstanceUID]["files"].append(file)
 
-                elif dicom_type_uid == CT_IMAGE_STORAGE_UID:
+                elif (
+                    dicom_type_uid == CT_IMAGE_STORAGE_UID
+                    or dicom_type_uid == PET_IMAGE_STORAGE_UID
+                ):
 
                     image_position = np.array(ds.ImagePositionPatient, dtype=float)
                     image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
@@ -101,7 +105,9 @@ class PreprocessData:
                     res_dict[ds.SeriesInstanceUID]["files"].append(temp_dict)
 
                 else:
-                    raise ValueError("Could not determine DICOM type.")
+                    raise ValueError(
+                        f"Could not determine DICOM type {ds.Modality} {dicom_type_uid}."
+                    )
 
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a

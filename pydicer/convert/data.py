@@ -87,13 +87,8 @@ class ConvertData:
                 write_nrrd_from_mask_directory(output_dir, nrrd_file)
 
             elif file_dic["modality"] == "PT":
-                all_files = file_dic["files"]
-
-                hash_sha.update(file_dic["study_id"].encode("UTF-8"))
-                study_id_hash = hash_sha.hexdigest()[:6]
-
-                hash_sha.update(series_uid.encode("UTF-8"))
-                series_uid_hash = hash_sha.hexdigest()[:6]
+                # all_files = file_dic["files"]
+                series_files = [str(x["path"]) for x in file_dic["files"]]
 
                 output_dir = self.output_directory.joinpath(
                     file_dic["patient_id"],
@@ -103,7 +98,8 @@ class ConvertData:
                 )
                 output_dir.parent.mkdir(exist_ok=True, parents=True)
 
+                print(series_files)
                 convert_dicom_to_nifty_pt(
-                    all_files,
+                    series_files,
                     output_dir,
                 )
