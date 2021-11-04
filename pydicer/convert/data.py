@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 import SimpleITK as sitk
+from pydicer.convert.pt import convert_dicom_to_nifty_pt
 
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.utils import hash_uid
@@ -8,6 +9,7 @@ from pydicer.utils import hash_uid
 from pydicer.constants import (
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
+    PET_IMAGE_STORAGE_UID
 )
 
 logger = logging.getLogger(__name__)
@@ -113,6 +115,21 @@ class ConvertData:
                     )
 
                     write_nrrd_from_mask_directory(output_dir, nrrd_file)
+                elif sop_class_uid == PET_IMAGE_STORAGE_UID:
+
+                    # all_files = file_dic["files"]
+                    series_files = df_files.file_path.tolist()
+                    series_files = [str(f) for f in series_files]
+
+                    output_file = self.output_directory.joinpath(
+                        patient_id, study_id_hash, "images", f"PT_{series_uid_hash}.nii.gz"
+                    )
+                    output_file.parent.mkdir(exist_ok=True, parents=True)
+
+                    convert_dicom_to_nifty_pt(
+                        series_files,
+                        output_file,
+                    )
 
                 else:
                     raise NotImplementedError(

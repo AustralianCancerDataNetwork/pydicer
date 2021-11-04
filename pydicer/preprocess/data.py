@@ -6,6 +6,7 @@ import pydicom
 import numpy as np
 
 from pydicer.constants import (
+    PET_IMAGE_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
 )
@@ -105,7 +106,7 @@ class PreprocessData:
                     except AttributeError:
                         logger.warning("Unable to determine Referenced Frame of Reference UID")
 
-                elif dicom_type_uid == CT_IMAGE_STORAGE_UID:
+                elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID):
 
                     image_position = np.array(ds.ImagePositionPatient, dtype=float)
                     image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
@@ -117,7 +118,9 @@ class PreprocessData:
                     res_dict["slice_location"] = slice_location
 
                 else:
-                    raise ValueError("Could not determine DICOM type.")
+                    raise ValueError(
+                        f"Could not determine DICOM type {ds.Modality} {dicom_type_uid}."
+                    )
 
                 # Add as a row to the DataFrame
                 df = df.append(res_dict, ignore_index=True)
