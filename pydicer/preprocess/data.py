@@ -1,4 +1,6 @@
 import logging
+from pathlib import Path
+import shutil
 
 import pydicom
 import numpy as np
@@ -7,6 +9,7 @@ from pydicer.constants import (
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
 )
+from pydicer.quarantine.treat import move_file_to_quarantine
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +113,8 @@ class PreprocessData:
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
-                logger.error("Error parsing file %s: %s", file, e)
+                logger.error("Error parsing file %s: %s. Placing file into Quarantine folder...", file, e)
+                move_file_to_quarantine(file, self.working_directory, "Broad error")
 
             # Include any linked DICOM series
             # This is a dictionary holding potential matching series
