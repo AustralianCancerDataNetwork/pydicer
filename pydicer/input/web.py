@@ -1,10 +1,13 @@
 import zipfile
 import urllib.request
 import tempfile
+import logging
 
 from pathlib import Path
 
 from pydicer.input.base import InputBase
+
+logger = logging.getLogger(__name__)
 
 
 def download_and_extract_zip_file(zip_url, output_directory):
@@ -48,7 +51,8 @@ class WebInput(InputBase):
 
         files_in_directory = list(self.working_directory.glob("*"))
         if len(files_in_directory) > 0:
-            print("Warning: Directory not empty, won't download files")
+            logger.warning("Directory not empty, won't download files")
             return
 
+        logger.info("Downloading files from %s", self.data_url)
         download_and_extract_zip_file(self.data_url, self.working_directory)
