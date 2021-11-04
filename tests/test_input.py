@@ -91,7 +91,7 @@ def test_dicom_pacs_invalid_host():
     with pytest.raises(ConnectionError):
         DICOMPACSInput("INCORRECT_HOST", 1234)
 
-
+@pytest.mark.skip
 def test_dicom_pacs_fetch():
 
     # Using this public DICOM PACS for testing, not sure how reliable this one is to provide this
