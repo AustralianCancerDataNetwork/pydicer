@@ -21,7 +21,7 @@ def run(input_object, output_directory="."):
     input_object.fetch_data()
 
     # Preprocess the data fetch to prepare it for conversion
-    preprocessed_data = PreprocessData(input_object.working_directory)
+    preprocessed_data = PreprocessData(input_object.working_directory, output_directory)
     preprocessed_result = preprocessed_data.preprocess()
 
     # Convert the data into the output directory

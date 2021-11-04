@@ -1,6 +1,4 @@
 import logging
-from pathlib import Path
-import shutil
 
 import pydicom
 import numpy as np
@@ -9,7 +7,7 @@ from pydicer.constants import (
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
 )
-from pydicer.quarantine.treat import move_file_to_quarantine
+from pydicer.quarantine.treat import copy_file_to_quarantine
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +22,10 @@ class PreprocessData:
         Input module)
     """
 
-    def __init__(self, working_directory):
+    def __init__(self, working_directory, output_directory):
         self.working_directory = working_directory
+        self.output_directory = output_directory
+
 
     # TODO: need to find the linked series UID
     def preprocess(self):
@@ -116,7 +116,7 @@ class PreprocessData:
                 logger.error(
                     "Error parsing file %s: %s. Placing file into Quarantine folder...", file, e
                 )
-                move_file_to_quarantine(file, self.working_directory, "Broad error")
+                copy_file_to_quarantine(file, self.output_directory, e)
 
             # Include any linked DICOM series
             # This is a dictionary holding potential matching series

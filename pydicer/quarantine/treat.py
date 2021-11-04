@@ -4,7 +4,7 @@ import shutil
 import pandas as pd
 
 
-def move_file_to_quarantine(file, working_directory, error_msg):
+def copy_file_to_quarantine(file, output_directory, error_msg):
     """Move a DICOM file that couldn't be processed into the quarantine directory
 
     Args:
@@ -13,7 +13,7 @@ def move_file_to_quarantine(file, working_directory, error_msg):
         Input module)
         error_msg (str): error message associated with the quarantined file
     """
-    quaran_dir = Path(working_directory.parent).joinpath("quarantine")
+    quaran_dir = Path(output_directory).joinpath("quarantine")
     file_dir = quaran_dir.joinpath(str(file.parents[0]))
     # Create "quarantine/PATH_TO_DCM" directory
     file_dir.mkdir(exist_ok=True, parents=True)
