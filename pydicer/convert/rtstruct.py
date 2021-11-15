@@ -34,13 +34,13 @@ def convert_rtstruct(
 
     prefix = prefix + "{0}"
 
-    dicom_image = sitk.ReadImage(dcm_img_list)
+    dicom_image = sitk.ReadImage([str(i) for i in dcm_img_list])
     dicom_struct = pydicom.read_file(dcm_rt_file, force=True)
 
     if not isinstance(output_dir, Path):
         output_dir = Path(output_dir)
 
-    if output_dir.exists():
+    if not output_dir.exists():
         output_dir.mkdir(exist_ok=True, parents=True)
 
     image_output_path = None

@@ -60,7 +60,7 @@ class ConvertData:
                 )
 
                 convert_rtstruct(
-                    linked_dicom_dict["files"],
+                    [i["path"] for i in linked_dicom_dict["files"]],
                     file_dic["files"][0],
                     prefix=f"STRUCT_{series_uid_hash}_{linked_uid_hash}",
                     output_dir=output_dir,
