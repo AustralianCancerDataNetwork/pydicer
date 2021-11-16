@@ -150,9 +150,4 @@ class ConvertData:
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
                 logger.error("Unable to convert series with UID")
-
-                # TODO send to quarantine
-
-                temp_dcm = pydicom.dcmwrite()
-                series
                 
