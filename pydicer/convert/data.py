@@ -1,4 +1,5 @@
 import logging
+import tempfile
 from pathlib import Path
 import numpy as np
 import SimpleITK as sitk
@@ -8,13 +9,12 @@ from pydicer.convert.pt import convert_dicom_to_nifty_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.utils import hash_uid
 
-from pydicer.constants import (
-    RT_STRUCTURE_STORAGE_UID,
-    CT_IMAGE_STORAGE_UID,
-    PET_IMAGE_STORAGE_UID
-)
+from pydicer.constants import RT_STRUCTURE_STORAGE_UID, CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID
 
 logger = logging.getLogger(__name__)
+
+# TODO make this user-selected
+INTERPOLATE_MISSING_DATA = True
 
 
 class ConvertData:
@@ -55,11 +55,92 @@ class ConvertData:
                 if sop_class_uid == CT_IMAGE_STORAGE_UID:
                     # Check that the slice location spacing is consistent, if not raise and error
                     # for now
-                    slice_location_diffs = np.gradient(df_files.slice_location.to_numpy())
-                    if not np.allclose(slice_location_diffs, slice_location_diffs[0]):
+                    slice_location_diffs = np.diff(df_files.slice_location.to_numpy())
+                    unique_slice_diffs, num_unique_slice_diffs = np.unique(
+                        slice_location_diffs, return_counts=True
+                    )
+                    expected_slice_diff = unique_slice_diffs[0]
+                    if len(unique_slice_diffs) > 1:
+
+                        logger.warning(
+                            "Missing DICOM slices found: %s", df_files.iloc[0]["series_uid"]
+                        )
+
+                        temp_dir = Path(tempfile.mkdtemp())
+
                         # TODO Handle inconsistent slice spacing
-                        raise ValueError("Slice Locations are not evenly spaced")
-                        
+                        if INTERPOLATE_MISSING_DATA:
+                            # find where the missing slices are
+                            missing_indices = np.where(
+                                slice_location_diffs != expected_slice_diff
+                            )[0]
+
+                            for missing_index in missing_indices:
+                                logger.debug("Interpolating missing slice %s", missing_index)
+                                # locate nearest DICOM files to the missing slices
+                                prior_dcm_file = df_files.iloc[missing_index]["file_path"]
+                                next_dcm_file = df_files.iloc[missing_index + 1]["file_path"]
+
+                                prior_dcm = pydicom.read_file(prior_dcm_file)
+                                next_dcm = pydicom.read_file(next_dcm_file)
+
+                                logger.debug("Read in adjacent DICOM files")
+
+                                # TODO add other interp options (cubic)
+                                interp_array = np.array(
+                                    (prior_dcm.pixel_array + next_dcm.pixel_array) / 2,
+                                    prior_dcm.pixel_array.dtype,
+                                )
+
+                                logger.debug("Computed missing image data")
+
+                                # write a copy to a temporary DICOM file
+                                prior_dcm.PixelData = interp_array.tobytes()
+
+                                # compute spatial information
+                                image_orientation = np.array(
+                                    prior_dcm.ImageOrientationPatient, dtype=float
+                                )
+
+                                image_plane_normal = np.cross(
+                                    image_orientation[:3], image_orientation[3:]
+                                )
+
+                                image_position_patient = np.array(
+                                    (
+                                        np.array(prior_dcm.ImagePositionPatient)
+                                        + np.array(next_dcm.ImagePositionPatient)
+                                    )
+                                    / 2,
+                                )
+
+                                slice_location = (image_position_patient * image_plane_normal)[2]
+
+                                logger.debug("Computed spatial information for missing slice")
+
+                                # insert new spatial information into interpolated slice
+                                prior_dcm.SliceLocation = slice_location
+                                prior_dcm.ImagePositionPatient = image_position_patient.tolist()
+
+                                logger.debug("Set DICOM tags")
+
+                                # write interpolated slice to DICOM
+                                interp_dcm_file = temp_dir / f"{slice_location}.dcm"
+                                pydicom.write_file(interp_dcm_file, prior_dcm)
+
+                                logger.debug("Wrote DICOM to temp file")
+
+                                # insert into dataframe
+                                interp_df_row = df_files.iloc[missing_index]
+                                interp_df_row["slice_location"] = slice_location
+                                interp_df_row["file_path"] = str(interp_dcm_file)
+                                df_files = df_files.append(interp_df_row, ignore_index=True)
+                                df_files.sort_values(by="slice_location", inplace=True)
+
+                                logger.debug("Insert data to dataframe")
+
+                        else:
+                            raise ValueError("Slice Locations are not evenly spaced")
 
                     series_files = df_files.file_path.tolist()
                     series_files = [str(f) for f in series_files]
@@ -73,6 +154,8 @@ class ConvertData:
                     logger.debug("Writing CT Image Series to: %s", output_file)
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
+
+                    continue
 
                     # Should only be one file per RTSTRUCT series
                     if not len(df_files) == 1:
@@ -150,4 +233,3 @@ class ConvertData:
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
                 logger.error("Unable to convert series with UID")
-                
