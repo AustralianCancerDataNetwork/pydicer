@@ -5,6 +5,7 @@ from pathlib import Path
 from pydicer.input.test import TestInput
 from pydicer.preprocess.data import PreprocessData
 from pydicer.convert.data import ConvertData
+from pydicer.visualise.data import VisualiseData
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,8 @@ def run(input_object, output_directory="."):
     convert_data.convert()
 
     # TODO Visualise the converted data
+    visualise_data = VisualiseData(output_directory)
+    visualise_data.visualise()
 
     # TODO Dataset selection and preparation
 

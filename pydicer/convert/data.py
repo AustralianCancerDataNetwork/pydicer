@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import SimpleITK as sitk
 import pydicom
-from pydicer.convert.pt import convert_dicom_to_nifty_pt
+from pydicer.convert.pt import convert_dicom_to_nifti_pt
 
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.utils import hash_uid
@@ -51,7 +51,7 @@ class ConvertData:
             series_uid_hash = hash_uid(series_uid)
 
             try:
-
+                # TODO abstract this interpolation, apply to other image modalities
                 if sop_class_uid == CT_IMAGE_STORAGE_UID:
                     # Check that the slice location spacing is consistent, if not raise and error
                     # for now
@@ -225,7 +225,7 @@ class ConvertData:
                     )
                     output_file.parent.mkdir(exist_ok=True, parents=True)
 
-                    convert_dicom_to_nifty_pt(
+                    convert_dicom_to_nifti_pt(
                         series_files,
                         output_file,
                     )
