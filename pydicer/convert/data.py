@@ -56,11 +56,19 @@ class ConvertData:
                     # Check that the slice location spacing is consistent, if not raise and error
                     # for now
                     slice_location_diffs = np.diff(df_files.slice_location.to_numpy())
+
                     unique_slice_diffs, num_unique_slice_diffs = np.unique(
                         slice_location_diffs, return_counts=True
                     )
                     expected_slice_diff = unique_slice_diffs[0]
-                    if len(unique_slice_diffs) > 1:
+
+                    # check to see if any slice thickness exceed 2% tolerance
+                    # this is extremely conservative as missing slices would produce 100% differences
+                    slice_thickness_variations = ~np.isclose(
+                        slice_location_diffs, expected_slice_diff, rtol=0.02
+                    )
+
+                    if np.any(slice_thickness_variations):
 
                         logger.warning(
                             "Missing DICOM slices found: %s", df_files.iloc[0]["series_uid"]
@@ -71,9 +79,7 @@ class ConvertData:
                         # TODO Handle inconsistent slice spacing
                         if INTERPOLATE_MISSING_DATA:
                             # find where the missing slices are
-                            missing_indices = np.where(
-                                slice_location_diffs != expected_slice_diff
-                            )[0]
+                            missing_indices = np.where(slice_thickness_variations)[0]
 
                             for missing_index in missing_indices:
                                 logger.debug("Interpolating missing slice %s", missing_index)
