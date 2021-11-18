@@ -1,18 +1,20 @@
 import logging
+import tempfile
 from pathlib import Path
+import numpy as np
 import SimpleITK as sitk
-from pydicer.convert.pt import convert_dicom_to_nifty_pt
+import pydicom
+from pydicer.convert.pt import convert_dicom_to_nifti_pt
 
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.utils import hash_uid
 
-from pydicer.constants import (
-    RT_STRUCTURE_STORAGE_UID,
-    CT_IMAGE_STORAGE_UID,
-    PET_IMAGE_STORAGE_UID
-)
+from pydicer.constants import RT_STRUCTURE_STORAGE_UID, CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID
 
 logger = logging.getLogger(__name__)
+
+# TODO make this user-selected
+INTERPOLATE_MISSING_DATA = True
 
 
 class ConvertData:
@@ -49,8 +51,89 @@ class ConvertData:
             series_uid_hash = hash_uid(series_uid)
 
             try:
-
+                # TODO abstract this interpolation, apply to other image modalities
                 if sop_class_uid == CT_IMAGE_STORAGE_UID:
+                    # Check that the slice location spacing is consistent, if not raise and error
+                    # for now
+                    slice_location_diffs = np.diff(df_files.slice_location.to_numpy())
+
+                    unique_slice_diffs, _ = np.unique(slice_location_diffs, return_counts=True)
+                    expected_slice_diff = unique_slice_diffs[0]
+
+                    # check to see if any slice thickness exceed 2% tolerance
+                    # this is conservative as missing slices would produce 100% differences
+                    slice_thickness_variations = ~np.isclose(
+                        slice_location_diffs, expected_slice_diff, rtol=0.02
+                    )
+
+                    if np.any(slice_thickness_variations):
+
+                        logger.warning(
+                            "Missing DICOM slices found: %s", df_files.iloc[0]["series_uid"]
+                        )
+
+                        temp_dir = Path(tempfile.mkdtemp())
+
+                        # TODO Handle inconsistent slice spacing
+                        if INTERPOLATE_MISSING_DATA:
+                            # find where the missing slices are
+                            missing_indices = np.where(slice_thickness_variations)[0]
+
+                            for missing_index in missing_indices:
+
+                                # locate nearest DICOM files to the missing slices
+                                prior_dcm_file = df_files.iloc[missing_index]["file_path"]
+                                next_dcm_file = df_files.iloc[missing_index + 1]["file_path"]
+
+                                prior_dcm = pydicom.read_file(prior_dcm_file)
+                                next_dcm = pydicom.read_file(next_dcm_file)
+
+                                # TODO add other interp options (cubic)
+                                interp_array = np.array(
+                                    (prior_dcm.pixel_array + next_dcm.pixel_array) / 2,
+                                    prior_dcm.pixel_array.dtype,
+                                )
+
+                                # write a copy to a temporary DICOM file
+                                prior_dcm.PixelData = interp_array.tobytes()
+
+                                # compute spatial information
+                                image_orientation = np.array(
+                                    prior_dcm.ImageOrientationPatient, dtype=float
+                                )
+
+                                image_plane_normal = np.cross(
+                                    image_orientation[:3], image_orientation[3:]
+                                )
+
+                                image_position_patient = np.array(
+                                    (
+                                        np.array(prior_dcm.ImagePositionPatient)
+                                        + np.array(next_dcm.ImagePositionPatient)
+                                    )
+                                    / 2,
+                                )
+
+                                slice_location = (image_position_patient * image_plane_normal)[2]
+
+                                # insert new spatial information into interpolated slice
+                                prior_dcm.SliceLocation = slice_location
+                                prior_dcm.ImagePositionPatient = image_position_patient.tolist()
+
+                                # write interpolated slice to DICOM
+                                interp_dcm_file = temp_dir / f"{slice_location}.dcm"
+                                pydicom.write_file(interp_dcm_file, prior_dcm)
+
+                                # insert into dataframe
+                                interp_df_row = df_files.iloc[missing_index]
+                                interp_df_row["slice_location"] = slice_location
+                                interp_df_row["file_path"] = str(interp_dcm_file)
+                                df_files = df_files.append(interp_df_row, ignore_index=True)
+                                df_files.sort_values(by="slice_location", inplace=True)
+
+                        else:
+                            raise ValueError("Slice Locations are not evenly spaced")
+
                     series_files = df_files.file_path.tolist()
                     series_files = [str(f) for f in series_files]
                     series = sitk.ReadImage(series_files)
@@ -126,7 +209,7 @@ class ConvertData:
                     )
                     output_file.parent.mkdir(exist_ok=True, parents=True)
 
-                    convert_dicom_to_nifty_pt(
+                    convert_dicom_to_nifti_pt(
                         series_files,
                         output_file,
                     )
@@ -140,5 +223,3 @@ class ConvertData:
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
                 logger.error("Unable to convert series with UID")
-
-                # TODO send to quarantine

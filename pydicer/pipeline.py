@@ -5,6 +5,7 @@ from pathlib import Path
 from pydicer.input.test import TestInput
 from pydicer.preprocess.data import PreprocessData
 from pydicer.convert.data import ConvertData
+from pydicer.visualise.data import VisualiseData
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ def run(input_object, output_directory="."):
     input_object.fetch_data()
 
     # Preprocess the data fetch to prepare it for conversion
-    preprocessed_data = PreprocessData(input_object.working_directory)
+    preprocessed_data = PreprocessData(input_object.working_directory, output_directory)
     preprocessed_result = preprocessed_data.preprocess()
 
     # Convert the data into the output directory
@@ -29,6 +30,8 @@ def run(input_object, output_directory="."):
     convert_data.convert()
 
     # TODO Visualise the converted data
+    visualise_data = VisualiseData(output_directory)
+    visualise_data.visualise()
 
     # TODO Dataset selection and preparation
 
@@ -46,7 +49,7 @@ def run_test(directory="./testdata"):
     directory = Path(directory)
     directory.mkdir(exist_ok=True, parents=True)
 
-    working_directory = directory.joinpath("working")
+    working_directory = directory.joinpath("working2")
     working_directory.mkdir(exist_ok=True, parents=True)
     output_directory = directory.joinpath("output")
     output_directory.mkdir(exist_ok=True, parents=True)

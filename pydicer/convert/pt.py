@@ -5,7 +5,7 @@ import SimpleITK as sitk
 import pydicom as pdcm
 
 
-def convert_dicom_to_nifty_pt(
+def convert_dicom_to_nifti_pt(
     input_filepaths,
     output_filepath,
     patient_weight_from_ct=None,

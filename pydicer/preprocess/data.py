@@ -10,6 +10,7 @@ from pydicer.constants import (
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
 )
+from pydicer.quarantine.treat import copy_file_to_quarantine
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +25,10 @@ class PreprocessData:
         Input module)
     """
 
-    def __init__(self, working_directory):
+    def __init__(self, working_directory, output_directory):
         self.working_directory = working_directory
+        self.output_directory = output_directory
+
 
     # TODO: need to find the linked series UID
     def preprocess(self):
@@ -128,7 +131,10 @@ class PreprocessData:
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
-                logger.error("Error parsing file %s: %s", file, e)
+                logger.error(
+                    "Error parsing file %s: %s. Placing file into Quarantine folder...", file, e
+                )
+                copy_file_to_quarantine(file, self.output_directory, e)
 
                 # TODO Send to quarantine
 
