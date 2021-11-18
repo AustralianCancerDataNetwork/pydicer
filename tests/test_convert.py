@@ -12,7 +12,7 @@ from pydicer.input.test import TestInput
 from pydicer.input.web import WebInput
 
 from pydicer.convert.rtstruct import convert_rtstruct
-from pydicer.convert.pt import convert_dicom_to_nifty_pt
+from pydicer.convert.pt import convert_dicom_to_nifti_pt
 
 
 @pytest.fixture
@@ -104,7 +104,7 @@ def test_convert_pet(test_data_all):
 
         output_path = Path(output_dir)
         output_file = output_path.joinpath("pet.nii.gz")
-        convert_dicom_to_nifty_pt(pet_files, str(output_file))
+        convert_dicom_to_nifti_pt(pet_files, str(output_file))
 
         assert output_file.exists()
 
