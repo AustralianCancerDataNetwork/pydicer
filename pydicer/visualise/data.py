@@ -11,8 +11,6 @@ class VisualiseData:
     Class that facilitates the visualisation of the data once converted
 
     Args:
-        - :
-        df_preprocess (pd.DataFrame): the DataFrame which was produced by PreprocessData
         output_directory (str|pathlib.Path, optional): Directory in which converted data is stored.
             Defaults to ".".
     """

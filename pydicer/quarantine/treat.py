@@ -1,8 +1,6 @@
 from pathlib import Path
 import shutil
 
-import pandas as pd
-
 
 def copy_file_to_quarantine(file, output_directory, error_msg):
     """Move a DICOM file that couldn't be processed into the quarantine directory
@@ -37,7 +35,3 @@ class TreatImages:
 
     def __init__(self, quaran_directory):
         self.quaran_directory = quaran_directory
-
-    def treat_images(self):
-        summary_df = pd.read_csv(self.quaran_directory.joinpath("summary.csv"))
-        print(summary_df)

@@ -57,13 +57,11 @@ class ConvertData:
                     # for now
                     slice_location_diffs = np.diff(df_files.slice_location.to_numpy())
 
-                    unique_slice_diffs, num_unique_slice_diffs = np.unique(
-                        slice_location_diffs, return_counts=True
-                    )
+                    unique_slice_diffs, _ = np.unique(slice_location_diffs, return_counts=True)
                     expected_slice_diff = unique_slice_diffs[0]
 
                     # check to see if any slice thickness exceed 2% tolerance
-                    # this is extremely conservative as missing slices would produce 100% differences
+                    # this is conservative as missing slices would produce 100% differences
                     slice_thickness_variations = ~np.isclose(
                         slice_location_diffs, expected_slice_diff, rtol=0.02
                     )
@@ -82,7 +80,7 @@ class ConvertData:
                             missing_indices = np.where(slice_thickness_variations)[0]
 
                             for missing_index in missing_indices:
-                                logger.debug("Interpolating missing slice %s", missing_index)
+
                                 # locate nearest DICOM files to the missing slices
                                 prior_dcm_file = df_files.iloc[missing_index]["file_path"]
                                 next_dcm_file = df_files.iloc[missing_index + 1]["file_path"]
@@ -90,15 +88,11 @@ class ConvertData:
                                 prior_dcm = pydicom.read_file(prior_dcm_file)
                                 next_dcm = pydicom.read_file(next_dcm_file)
 
-                                logger.debug("Read in adjacent DICOM files")
-
                                 # TODO add other interp options (cubic)
                                 interp_array = np.array(
                                     (prior_dcm.pixel_array + next_dcm.pixel_array) / 2,
                                     prior_dcm.pixel_array.dtype,
                                 )
-
-                                logger.debug("Computed missing image data")
 
                                 # write a copy to a temporary DICOM file
                                 prior_dcm.PixelData = interp_array.tobytes()
@@ -122,19 +116,13 @@ class ConvertData:
 
                                 slice_location = (image_position_patient * image_plane_normal)[2]
 
-                                logger.debug("Computed spatial information for missing slice")
-
                                 # insert new spatial information into interpolated slice
                                 prior_dcm.SliceLocation = slice_location
                                 prior_dcm.ImagePositionPatient = image_position_patient.tolist()
 
-                                logger.debug("Set DICOM tags")
-
                                 # write interpolated slice to DICOM
                                 interp_dcm_file = temp_dir / f"{slice_location}.dcm"
                                 pydicom.write_file(interp_dcm_file, prior_dcm)
-
-                                logger.debug("Wrote DICOM to temp file")
 
                                 # insert into dataframe
                                 interp_df_row = df_files.iloc[missing_index]
@@ -142,8 +130,6 @@ class ConvertData:
                                 interp_df_row["file_path"] = str(interp_dcm_file)
                                 df_files = df_files.append(interp_df_row, ignore_index=True)
                                 df_files.sort_values(by="slice_location", inplace=True)
-
-                                logger.debug("Insert data to dataframe")
 
                         else:
                             raise ValueError("Slice Locations are not evenly spaced")
@@ -160,8 +146,6 @@ class ConvertData:
                     logger.debug("Writing CT Image Series to: %s", output_file)
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
-
-                    continue
 
                     # Should only be one file per RTSTRUCT series
                     if not len(df_files) == 1:
