@@ -51,12 +51,11 @@ class VisualiseData:
 
             img_id = struct_dir.name.split("_")[1]
 
-            img_links = [f for f in struct_dir.parent.parent.glob(f"images/*{img_id}.nii.gz")]
+            img_links = list(struct_dir.parent.parent.glob(f"images/*{img_id}.nii.gz"))
 
             # If we have multiple linked images (not sure if this can happen but it might?) then
             # take the first one. If we find no linked images log and error and don't visualise for
             # now
-
             if len(img_links) == 0:
                 logger.error("Linked image %s not found", img_id)
                 continue
