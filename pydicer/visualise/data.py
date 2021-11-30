@@ -69,6 +69,11 @@ class VisualiseData:
                 f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
                 for f in struct_dir.glob("*.nii.gz")
             }
+
+            if len(masks) == 0:
+                logger.warning("No contours found in structure directory: %s", {struct_dir})
+                continue
+
             vis.add_contour(masks)
             fig = vis.show()
 
