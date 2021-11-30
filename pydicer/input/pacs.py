@@ -67,6 +67,7 @@ class DICOMPACSInput(InputBase):
 
                 for modality in modalities:
                     dataset = pydicom.Dataset()
+                    dataset.PatientID = patient
                     dataset.StudyInstanceUID = study.StudyInstanceUID
                     dataset.Modality = modality
                     dataset.SeriesInstanceUID = ""
