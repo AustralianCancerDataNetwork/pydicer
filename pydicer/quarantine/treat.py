@@ -11,12 +11,15 @@ def copy_file_to_quarantine(file, output_directory, error_msg):
         Input module)
         error_msg (str): error message associated with the quarantined file
     """
+
     quaran_dir = Path(output_directory).joinpath("quarantine")
-    file_dir = quaran_dir.joinpath(str(file.parents[0]))
+    file_dir = quaran_dir.joinpath(file.parent.name)
+
     # Create "quarantine/PATH_TO_DCM" directory
     file_dir.mkdir(exist_ok=True, parents=True)
+
     # Copy original DCM file to quarantine area
-    shutil.copy(str(file), file_dir)
+    shutil.copyfile(file, file_dir.joinpath(file.name))
 
     # Create (if doesn't exist) summary file to hold info about file error
     quaran_dir.touch("summary.csv")
