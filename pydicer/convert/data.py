@@ -22,10 +22,10 @@ class ConvertData:
     Class that facilitates the conversion of the data into its intended final type
 
     Args:
-        - :
-        df_preprocess (pd.DataFrame): the DataFrame which was produced by PreprocessData
-        output_directory (str|pathlib.Path, optional): Directory in which to store converted data.
+        - df_preprocess (pd.DataFrame): the DataFrame which was produced by PreprocessData
+        - output_directory (str|pathlib.Path, optional): Directory in which to store converted data.
             Defaults to ".".
+
     """
 
     def __init__(self, df_preprocess, output_directory="."):
