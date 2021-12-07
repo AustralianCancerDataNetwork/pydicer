@@ -1,5 +1,6 @@
 import logging
 import tempfile
+import json
 from pathlib import Path
 import numpy as np
 import SimpleITK as sitk
@@ -9,7 +10,12 @@ from pydicer.convert.pt import convert_dicom_to_nifti_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.utils import hash_uid
 
-from pydicer.constants import RT_STRUCTURE_STORAGE_UID, CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID
+from pydicer.constants import (
+    RT_PLAN_STORAGE_UID,
+    RT_STRUCTURE_STORAGE_UID,
+    CT_IMAGE_STORAGE_UID,
+    PET_IMAGE_STORAGE_UID,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +37,26 @@ class ConvertData:
     def __init__(self, df_preprocess, output_directory="."):
         self.df_preprocess = df_preprocess
         self.output_directory = Path(output_directory)
+
+    def save_dicom_headers(self, dcm_file, binary_path, json_file):
+        """Save the DICOM Headers as a JSON file
+
+        Args:
+            dcm_file (str|pathlib.Path): The files from which to save the headers.
+            binary_path (str): Relative path to binary data which will be placed into JSON.
+            json_file (str|pathlib.Path): Path to JSON file to save output.
+        """
+
+        # Write the DICOM headers (of the first slice) to JSON
+        dcm_ds = pydicom.read_file(dcm_file)
+        dcm_dict = dcm_ds.to_json_dict(
+            bulk_data_threshold=4096, bulk_data_element_handler=lambda _: binary_path
+        )
+
+        with open(json_file, "w", encoding="utf8") as jsonfile:
+            json.dump(dcm_dict, jsonfile, indent=2)
+
+        logger.debug("DICOM Headers written to: %s", json_file)
 
     def convert(self):
         """
@@ -138,12 +164,20 @@ class ConvertData:
                     series_files = [str(f) for f in series_files]
                     series = sitk.ReadImage(series_files)
 
-                    output_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "images", f"CT_{series_uid_hash}.nii.gz"
+                    output_file_base = f"CT_{series_uid_hash}"
+                    nifti_file_name = f"{output_file_base}.nii.gz"
+                    nifti_file = self.output_directory.joinpath(
+                        patient_id, study_id_hash, "images", nifti_file_name
                     )
-                    output_file.parent.mkdir(exist_ok=True, parents=True)
-                    sitk.WriteImage(series, str(output_file))
-                    logger.debug("Writing CT Image Series to: %s", output_file)
+                    nifti_file.parent.mkdir(exist_ok=True, parents=True)
+                    sitk.WriteImage(series, str(nifti_file))
+                    logger.debug("Writing CT Image Series to: %s", nifti_file)
+
+                    json_file_name = f"{output_file_base}.json"
+                    json_file = self.output_directory.joinpath(
+                        patient_id, study_id_hash, "images", json_file_name
+                    )
+                    self.save_dicom_headers(series_files[0], nifti_file_name, json_file)
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
 
@@ -154,10 +188,10 @@ class ConvertData:
                     rt_struct_file = df_files.iloc[0]
 
                     # Get the linked image
-                    # TODO Link via alternative method if referenced_series_uid is not available
-                    linked_uid = rt_struct_file.referenced_series_uid
+                    # TODO Link via alternative method if referenced_uid is not available
+                    linked_uid = rt_struct_file.referenced_uid
                     df_linked_series = self.df_preprocess[
-                        self.df_preprocess.series_uid == rt_struct_file.referenced_series_uid
+                        self.df_preprocess.series_uid == rt_struct_file.referenced_uid
                     ]
 
                     # Check that the linked series is available
@@ -188,8 +222,7 @@ class ConvertData:
                         spacing=None,
                     )
 
-                    # TODO Make generation of NRRD file optional (especially because these files
-                    # are quite large), as well as the colormap configurable
+                    # TODO Make generation of NRRD file optional
                     nrrd_file = self.output_directory.joinpath(
                         patient_id,
                         study_id_hash,
@@ -198,21 +231,75 @@ class ConvertData:
                     )
 
                     write_nrrd_from_mask_directory(output_dir, nrrd_file)
+
+                    # Save JSON
+                    json_file_name = f"{series_uid_hash}_{linked_uid_hash}.nrrd"
+                    json_file = self.output_directory.joinpath(
+                        patient_id,
+                        study_id_hash,
+                        "structures",
+                        f"{series_uid_hash}_{linked_uid_hash}.json",
+                    )
+                    self.save_dicom_headers(
+                        rt_struct_file.file_path, f"{series_uid_hash}_{linked_uid_hash}", json_file
+                    )
+
                 elif sop_class_uid == PET_IMAGE_STORAGE_UID:
 
-                    # all_files = file_dic["files"]
                     series_files = df_files.file_path.tolist()
                     series_files = [str(f) for f in series_files]
 
-                    output_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "images", f"PT_{series_uid_hash}.nii.gz"
+                    output_file_base = f"PT_{series_uid_hash}"
+                    nifti_file_name = f"{output_file_base}.nii.gz"
+                    nifti_file = self.output_directory.joinpath(
+                        patient_id, study_id_hash, "images", nifti_file_name
                     )
-                    output_file.parent.mkdir(exist_ok=True, parents=True)
+                    nifti_file.parent.mkdir(exist_ok=True, parents=True)
 
                     convert_dicom_to_nifti_pt(
                         series_files,
-                        output_file,
+                        nifti_file,
                     )
+
+                    json_file_name = f"{output_file_base}.json"
+                    json_file = self.output_directory.joinpath(
+                        patient_id, study_id_hash, "images", json_file_name
+                    )
+                    self.save_dicom_headers(series_files[0], nifti_file_name, json_file)
+
+                elif sop_class_uid == RT_PLAN_STORAGE_UID:
+
+                    # No Nifti to create here, just save the JSON
+
+                    # Should only be one file per RTPLAN series
+                    if not len(df_files) == 1:
+                        ValueError("More than one RTPLAN with the same SeriesInstanceUID")
+
+                    rt_plan_file = df_files.iloc[0]
+
+                    # Get the linked structure set
+                    # TODO Link via alternative method if referenced_uid is not available
+                    linked_uid = rt_plan_file.referenced_uid
+                    df_linked_series = self.df_preprocess[
+                        self.df_preprocess.sop_instance_uid == rt_plan_file.referenced_uid
+                    ]
+
+                    # Check that the linked series is available
+                    # TODO handle rconverting RTPLAN even if we don't have a structure set it's
+                    # linked to
+                    if len(df_linked_series) == 0:
+                        raise ValueError("Series Referenced by RTPLAN not found")
+
+                    linked_uid_hash = hash_uid(df_linked_series.iloc[0].series_uid)
+
+                    output_file_base = f"RP_{series_uid_hash}_{linked_uid_hash}"
+                    json_file_name = f"{output_file_base}.json"
+                    json_file = self.output_directory.joinpath(
+                        patient_id, study_id_hash, "plans", json_file_name
+                    )
+                    json_file.parent.mkdir(exist_ok=True, parents=True)
+
+                    self.save_dicom_headers(rt_plan_file, nifti_file_name, json_file)
 
                 else:
                     raise NotImplementedError(

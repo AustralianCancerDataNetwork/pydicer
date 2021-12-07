@@ -49,7 +49,7 @@ def run_test(directory="./testdata"):
     directory = Path(directory)
     directory.mkdir(exist_ok=True, parents=True)
 
-    working_directory = directory.joinpath("working2")
+    working_directory = directory.joinpath("working")
     working_directory.mkdir(exist_ok=True, parents=True)
     output_directory = directory.joinpath("output")
     output_directory.mkdir(exist_ok=True, parents=True)
