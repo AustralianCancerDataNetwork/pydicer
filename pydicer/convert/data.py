@@ -1,6 +1,5 @@
 import logging
 import tempfile
-import json
 from pathlib import Path
 import numpy as np
 import SimpleITK as sitk
@@ -8,6 +7,7 @@ import pydicom
 from pydicer.convert.pt import convert_dicom_to_nifti_pt
 
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
+from pydicer.convert.headers import convert_dicom_headers
 from pydicer.utils import hash_uid
 
 from pydicer.constants import (
@@ -37,26 +37,6 @@ class ConvertData:
     def __init__(self, df_preprocess, output_directory="."):
         self.df_preprocess = df_preprocess
         self.output_directory = Path(output_directory)
-
-    def save_dicom_headers(self, dcm_file, binary_path, json_file):
-        """Save the DICOM Headers as a JSON file
-
-        Args:
-            dcm_file (str|pathlib.Path): The files from which to save the headers.
-            binary_path (str): Relative path to binary data which will be placed into JSON.
-            json_file (str|pathlib.Path): Path to JSON file to save output.
-        """
-
-        # Write the DICOM headers (of the first slice) to JSON
-        dcm_ds = pydicom.read_file(dcm_file)
-        dcm_dict = dcm_ds.to_json_dict(
-            bulk_data_threshold=4096, bulk_data_element_handler=lambda _: binary_path
-        )
-
-        with open(json_file, "w", encoding="utf8") as jsonfile:
-            json.dump(dcm_dict, jsonfile, indent=2)
-
-        logger.debug("DICOM Headers written to: %s", json_file)
 
     def convert(self):
         """
@@ -177,7 +157,7 @@ class ConvertData:
                     json_file = self.output_directory.joinpath(
                         patient_id, study_id_hash, "images", json_file_name
                     )
-                    self.save_dicom_headers(series_files[0], nifti_file_name, json_file)
+                    convert_dicom_headers(series_files[0], nifti_file_name, json_file)
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
 
@@ -240,7 +220,7 @@ class ConvertData:
                         "structures",
                         f"{series_uid_hash}_{linked_uid_hash}.json",
                     )
-                    self.save_dicom_headers(
+                    convert_dicom_headers(
                         rt_struct_file.file_path, f"{series_uid_hash}_{linked_uid_hash}", json_file
                     )
 
@@ -265,7 +245,7 @@ class ConvertData:
                     json_file = self.output_directory.joinpath(
                         patient_id, study_id_hash, "images", json_file_name
                     )
-                    self.save_dicom_headers(series_files[0], nifti_file_name, json_file)
+                    convert_dicom_headers(series_files[0], nifti_file_name, json_file)
 
                 elif sop_class_uid == RT_PLAN_STORAGE_UID:
 
@@ -299,7 +279,7 @@ class ConvertData:
                     )
                     json_file.parent.mkdir(exist_ok=True, parents=True)
 
-                    self.save_dicom_headers(rt_plan_file.file_path, "", json_file)
+                    convert_dicom_headers(rt_plan_file.file_path, "", json_file)
 
                 else:
                     raise NotImplementedError(
