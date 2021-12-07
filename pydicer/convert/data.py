@@ -299,7 +299,7 @@ class ConvertData:
                     )
                     json_file.parent.mkdir(exist_ok=True, parents=True)
 
-                    self.save_dicom_headers(rt_plan_file, nifti_file_name, json_file)
+                    self.save_dicom_headers(rt_plan_file.file_path, "", json_file)
 
                 else:
                     raise NotImplementedError(
@@ -309,4 +309,6 @@ class ConvertData:
 
             except Exception as e:  # pylint: disable=broad-except
                 logger.error(e)
-                logger.error("Unable to convert series with UID")
+                logger.error("Unable to convert series with UID: %s", series_uid)
+
+                # TODO Copy DICOM to Quarantine

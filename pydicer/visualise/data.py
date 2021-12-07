@@ -40,7 +40,7 @@ class VisualiseData:
                 dpi=fig.dpi,
             )
 
-            logger.debug("created visualisation%s", vis_filename)
+            logger.debug("created visualisation: %s", vis_filename)
 
         # Next visualise the structures on top of their linked image
         for struct_dir in self.output_directory.glob("**/structures/*"):
@@ -84,4 +84,4 @@ class VisualiseData:
                 dpi=fig.dpi,
             )
 
-            logger.debug("created visualisation%s", vis_filename)
+            logger.debug("created visualisation: %s", vis_filename)
