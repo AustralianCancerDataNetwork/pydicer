@@ -94,11 +94,12 @@ Input module)</p>
 <li><p>series_uid: SeriesInstanceUID field from the DICOM header</p></li>
 <li><p>modality: Modailty field from the DICOM header</p></li>
 <li><p>sop_class_uid: SOPClassUID field from the DICOM header</p></li>
+<li><p>sop_instance_uid: SOPInstanceUID field from the DICOM header</p></li>
 <li><p>for_uid: FrameOfReferenceUID field from the DICOM header</p></li>
 <li><p>file_path: The path to the file (as a pathlib.Path object)</p></li>
 <li><p>slice_location: The real-world location of the slice (used for imaging modalities)</p></li>
-<li><p>referenced_series_uid: The SeriesUID referenced by this DICOM file (used for RTSTRUCT
-and RTDOSE)</p></li>
+<li><p>referenced_uid: The SeriesUID referenced by this DICOM file for RTSTRUCT
+and RTDOSE, the SOPInstanceUID of the structure set referenced by an RTPLAN.</p></li>
 <li><p>referenced_for_uid: The ReferencedFrameOfReferenceUID referenced by this DICOM file</p></li>
 </ul>
 </dd>
