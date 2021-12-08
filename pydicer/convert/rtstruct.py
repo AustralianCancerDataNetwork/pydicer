@@ -26,7 +26,7 @@ def convert_rtstruct(
         dcm_img_list (list): List of DICOM paths (as str) to use as the reference image series.
         dcm_rt_file (str|pathlib.Path): Path to the DICOM RTSTRUCT file
         prefix (str, optional): The prefix to give the output files.
-        Defaults to "Struct" + backslash.
+        Defaults to "Struct" + underscore.
         output_dir (str|pathlib.Path, optional): Path to the output directory. Defaults to ".".
         output_img (str|pathlib.Path, optional): If set, write the reference image to this file as
         in NIFTI format. Defaults to None.
