@@ -25,10 +25,11 @@ def convert_rtstruct(
     Args:
         dcm_img_list (list): List of DICOM paths (as str) to use as the reference image series.
         dcm_rt_file (str|pathlib.Path): Path to the DICOM RTSTRUCT file
-        prefix (str, optional): The prefix to give the output files. Defaults to "Struct_".
+        prefix (str, optional): The prefix to give the output files.
+        Defaults to "Struct" + underscore.
         output_dir (str|pathlib.Path, optional): Path to the output directory. Defaults to ".".
         output_img (str|pathlib.Path, optional): If set, write the reference image to this file as
-                                                 in NIFTI format. Defaults to None.
+        in NIFTI format. Defaults to None.
         spacing (list, optional): Values of image spacing to override. Defaults to None.
     """
 
@@ -82,7 +83,7 @@ def write_nrrd_from_mask_directory(mask_directory, output_file, colormap=cm.get_
         mask_directory (pathlib.Path|str): Path object of directory containing masks
         output_file (pathlib.Path|str): The output NRRD file to write to.
         color_map (matplotlib.colors.Colormap | dict, optional): Colormap to use for output.
-            Defaults to cm.get_cmap("rainbow").
+        Defaults to cm.get_cmap("rainbow").
     """
 
     if isinstance(mask_directory, str):
