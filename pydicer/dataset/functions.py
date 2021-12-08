@@ -2,6 +2,7 @@ import os
 import json
 import logging
 from datetime import datetime
+from pathlib import Path
 
 import pydicom
 
@@ -12,31 +13,41 @@ def determine_dcm_datetime(ds):
 
     if "SeriesDate" in ds and len(ds.SeriesDate) > 0:
 
-        if "SeriesTime" in ds and len(ds.StudyTime) > 0:
-            return datetime.strptime(f"{ds.SeriesDate}{ds.StudyTime}", "%Y%m%d%H%M%S")
+        if "SeriesTime" in ds and len(ds.SeriesTime) > 0:
+            date_time_str = f"{ds.SeriesDate}{ds.SeriesTime}"
+            if "." in date_time_str:
+                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
+            else:
+                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
 
         return datetime.strptime(ds.SeriesDate, "%Y%m%d")
 
     if "StudyDate" in ds and len(ds.StudyDate) > 0:
 
         if "StudyTime" in ds and len(ds.StudyTime) > 0:
-            return datetime.strptime(f"{ds.StudyDate}{ds.StudyTime}", "%Y%m%d%H%M%S")
+            date_time_str = f"{ds.StudyDate}{ds.StudyTime}"
+            if "." in date_time_str:
+                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
+            else:
+                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
 
         return datetime.strptime(ds.StudyDate, "%Y%m%d")
 
     if "InstanceCreationDate" in ds and len(ds.InstanceCreationDate) > 0:
 
         if "InstanceCreationTime" in ds and len(ds.InstanceCreationTime) > 0:
-            return datetime.strptime(
-                f"{ds.InstanceCreationDate}{ds.InstanceCreationTime}", "%Y%m%d%H%M%S"
-            )
+            date_time_str = f"{ds.InstanceCreationDate}{ds.InstanceCreationTime}"
+            if "." in date_time_str:
+                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
+            else:
+                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
 
         return datetime.strptime(ds.InstanceCreationDate, "%Y%m%d")
 
     return None
 
 
-def rt_latest_struct(data_directory, target_directory, **kwargs):
+def rt_latest_struct(working_directory, dataset_name, patients=None, **kwargs):
     """Select the latest Structure set and the image which it is linked to. You can specify keyword
     arguments to for a match on any top level DICOM attributes. You may also supply lists of values
     to these, one of which should match to select that series.
@@ -45,14 +56,20 @@ def rt_latest_struct(data_directory, target_directory, **kwargs):
     "APPROVED"
     .. code-block:: python
 
-    prepare_dataset = PrepareDataset(output_directory)
-    prepare_dataset.prepare("./clean", "rt_latest_struct", SeriesDescription=["FINAL", "APPROVED"])
+        prepare_dataset = PrepareDataset(output_directory)
+        prepare_dataset.prepare(
+            "./clean",
+            "rt_latest_struct",
+            SeriesDescription=["FINAL", "APPROVED"]
+        )
 
     Args:
-        data_directory (pathlib.Path): The directory holding the converted data
-        target_directory (pathlib.Path): The directory in which to place the linked clean dataset
+        working_directory (pathlib.Path): The directory holding the converted data
+        dataset_name (str): The name of the dataset being prepared
     """
 
+    data_directory = working_directory.joinpath("data")
+    target_directory = working_directory.joinpath(dataset_name)
     pat_dirs = [p for p in data_directory.glob("*") if p.is_dir() and not "quarantine" in p.name]
 
     if len(pat_dirs) == 0:
@@ -61,6 +78,10 @@ def rt_latest_struct(data_directory, target_directory, **kwargs):
     for pat_dir in pat_dirs:
 
         pat_id = pat_dir.name
+
+        if patients:
+            if not pat_id in patients:
+                continue
 
         logger.debug("Selecting data for patient: %s", pat_id)
 
@@ -128,17 +149,20 @@ def rt_latest_struct(data_directory, target_directory, **kwargs):
         referenced_img_id = struct_parts[1]
 
         pat_prep_dir = target_directory.joinpath(pat_id)
-        pat_prep_img_dir = pat_prep_dir.joinpath("images")
-        pat_prep_struct_dir = pat_prep_dir.joinpath("structure")
-        pat_prep_img_dir.mkdir(parents=True, exist_ok=True)
-        pat_prep_struct_dir.mkdir(parents=True, exist_ok=True)
 
         files_to_link = list(pat_dir.glob(f"**/images/*{referenced_img_id}*")) + list(
             pat_dir.glob(f"**/structures/*{struct_dir_name}*")
         )
 
-        for img_file in files_to_link:
-            symlink_path = pat_prep_img_dir.joinpath(img_file.name)
+        for file_path in files_to_link:
+            symlink_path = pat_prep_dir.joinpath(file_path.parent.name, file_path.name)
             if symlink_path.exists():
                 os.remove(symlink_path)
-            symlink_path.symlink_to(img_file.resolve())
+
+            rel_part = os.sep.join(
+                [".." for _ in symlink_path.parent.relative_to(working_directory).parts]
+            )
+            src_path = Path(f"{rel_part}{os.sep}{file_path.relative_to(working_directory)}")
+
+            symlink_path.parent.mkdir(parents=True, exist_ok=True)
+            symlink_path.symlink_to(src_path)

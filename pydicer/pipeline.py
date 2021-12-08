@@ -35,7 +35,7 @@ def run(input_object, output_directory="."):
     visualise_data.visualise()
 
     # Dataset selection and preparation
-    prepare_dataset = PrepareDataset(output_directory)
+    prepare_dataset = PrepareDataset(output_directory.parent)
     clean_directory = Path(output_directory.parent.joinpath("clean_and_ready"))
     prepare_dataset.prepare(clean_directory, "rt_latest_struct")
 
