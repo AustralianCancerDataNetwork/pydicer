@@ -16,11 +16,11 @@ def convert_dicom_to_nifti_pt(
         input_filepaths (list): list of the dicom paths
         output_filepath (str): path to the output file path where to store the NIFTI file.
         patient_weight_from_ct (float, optional): If the patient's weight is missing from the PT
-        DICOM it can be provided through this argument. Defaults to None.
+            DICOM it can be provided through this argument. Defaults to None.
 
     Raises:
         MissingWeightError: Error to alert when the weight is missing from the PT, to compute
-        the SUV.
+            the SUV.
         RuntimeError: Error to alert when one or more slices are missing
         ValueError: Raised when a modality or a unit (for the PT) is not handled.
 

@@ -85,13 +85,14 @@
 <dt class="sig sig-object py" id="pydicer.input.pacs.DICOMPACSInput.fetch_data">
 <span class="sig-name descname"><span class="pre">fetch_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patients</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modalities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.input.pacs.DICOMPACSInput.fetch_data" title="Permalink to this definition"></a></dt>
 <dd><p>Download the DICOM data from the PACS.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>patients (list|str): A list of patient IDs, or a single patient ID. Wildcard matching</dt><dd><p>based on the DICOM standard is supported.</p>
-</dd>
-<dt>modalities (list|str, optional): List of modalities or a single modality to fetch.</dt><dd><p>Defaults to None where all modalities would be fetched.</p>
-</dd>
-</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>patients</strong> (<em>list</em><em>|</em><em>str</em>) – A list of patient IDs, or a single patient ID. Wildcard matching
+based on the DICOM standard is supported.</p></li>
+<li><p><strong>modalities</strong> (<em>list</em><em>|</em><em>str</em><em>, </em><em>optional</em>) – List of modalities or a single modality to fetch.
+Defaults to None where all modalities would be fetched.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -133,9 +134,12 @@
 <span class="sig-prename descclassname"><span class="pre">pydicer.input.web.</span></span><span class="sig-name descname"><span class="pre">download_and_extract_zip_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zip_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.input.web.download_and_extract_zip_file" title="Permalink to this definition"></a></dt>
 <dd><p>Downloads a zip file from the URL specified and extracts the contents to the output
 directory.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>zip_url (str): The URL of the zip file.
-output_directory (str|pathlib.Path): The path in which to extract the contents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>zip_url</strong> (<em>str</em>) – The URL of the zip file.</p></li>
+<li><p><strong>output_directory</strong> (<em>str</em><em>|</em><em>pathlib.Path</em>) – The path in which to extract the contents.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

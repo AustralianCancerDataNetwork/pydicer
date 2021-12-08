@@ -76,14 +76,12 @@
 <dt class="sig sig-object py" id="pydicer.convert.data.ConvertData">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">ConvertData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_preprocess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.ConvertData" title="Permalink to this definition"></a></dt>
 <dd><p>Class that facilitates the conversion of the data into its intended final type</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><p>df_preprocess (pd.DataFrame): the DataFrame which was produced by PreprocessData</p></li>
-<li><dl class="simple">
-<dt>output_directory (str|pathlib.Path, optional): Directory in which to store converted data.</dt><dd><p>Defaults to “.”.</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_preprocess</strong> (<em>-</em>) – the DataFrame which was produced by PreprocessData</p></li>
+<li><p><strong>output_directory</strong> (<em>-</em>) – Directory in which to store converted data.
+Defaults to “.”.</p></li>
 </ul>
 </dd>
 </dl>
@@ -99,10 +97,13 @@
 <dt class="sig sig-object py" id="pydicer.convert.headers.convert_dicom_headers">
 <span class="sig-prename descclassname"><span class="pre">pydicer.convert.headers.</span></span><span class="sig-name descname"><span class="pre">convert_dicom_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcm_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.headers.convert_dicom_headers" title="Permalink to this definition"></a></dt>
 <dd><p>Save the DICOM Headers as a JSON file</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>dcm_file (str|pathlib.Path): The files from which to save the headers.
-binary_path (str): Relative path to binary data which will be placed into JSON.
-json_file (str|pathlib.Path): Path to JSON file to save output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dcm_file</strong> (<em>str</em><em>|</em><em>pathlib.Path</em>) – The files from which to save the headers.</p></li>
+<li><p><strong>binary_path</strong> (<em>str</em>) – Relative path to binary data which will be placed into JSON.</p></li>
+<li><p><strong>json_file</strong> (<em>str</em><em>|</em><em>pathlib.Path</em>) – Path to JSON file to save output.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -112,15 +113,18 @@ json_file (str|pathlib.Path): Path to JSON file to save output.</p>
 <span class="sig-prename descclassname"><span class="pre">pydicer.convert.rtstruct.</span></span><span class="sig-name descname"><span class="pre">convert_rtstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcm_img_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dcm_rt_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Struct_'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_img</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.rtstruct.convert_rtstruct" title="Permalink to this definition"></a></dt>
 <dd><p>Convert a DICOM RTSTRUCT to NIFTI masks.</p>
 <p>The masks are stored as NIFTI files in the output directory</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>dcm_img_list (list): List of DICOM paths (as str) to use as the reference image series.
-dcm_rt_file (str|pathlib.Path): Path to the DICOM RTSTRUCT file
-prefix (str, optional): The prefix to give the output files.
-Defaults to “Struct” + underscore.
-output_dir (str|pathlib.Path, optional): Path to the output directory. Defaults to “.”.
-output_img (str|pathlib.Path, optional): If set, write the reference image to this file as
-in NIFTI format. Defaults to None.
-spacing (list, optional): Values of image spacing to override. Defaults to None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dcm_img_list</strong> (<em>list</em>) – List of DICOM paths (as str) to use as the reference image series.</p></li>
+<li><p><strong>dcm_rt_file</strong> (<em>str</em><em>|</em><em>pathlib.Path</em>) – Path to the DICOM RTSTRUCT file</p></li>
+<li><p><strong>prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – The prefix to give the output files. Defaults to “Struct” +
+underscore.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em><em>|</em><em>pathlib.Path</em><em>, </em><em>optional</em>) – Path to the output directory. Defaults to “.”.</p></li>
+<li><p><strong>output_img</strong> (<em>str</em><em>|</em><em>pathlib.Path</em><em>, </em><em>optional</em>) – If set, write the reference image to this file as
+in NIFTI format. Defaults to None.</p></li>
+<li><p><strong>spacing</strong> (<em>list</em><em>, </em><em>optional</em>) – Values of image spacing to override. Defaults to None.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -129,11 +133,14 @@ spacing (list, optional): Values of image spacing to override. Defaults to None.
 <dt class="sig sig-object py" id="pydicer.convert.rtstruct.write_nrrd_from_mask_directory">
 <span class="sig-prename descclassname"><span class="pre">pydicer.convert.rtstruct.</span></span><span class="sig-name descname"><span class="pre">write_nrrd_from_mask_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">mask_directory</span></em>, <em class="sig-param"><span class="pre">output_file</span></em>, <em class="sig-param"><span class="pre">colormap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.rtstruct.write_nrrd_from_mask_directory" title="Permalink to this definition"></a></dt>
 <dd><p>Produce a NRRD file from a directory of masks in Nifti format</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>mask_directory (pathlib.Path|str): Path object of directory containing masks
-output_file (pathlib.Path|str): The output NRRD file to write to.
-color_map (matplotlib.colors.Colormap | dict, optional): Colormap to use for output.
-Defaults to cm.get_cmap(“rainbow”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask_directory</strong> (<em>pathlib.Path</em><em>|</em><em>str</em>) – Path object of directory containing masks</p></li>
+<li><p><strong>output_file</strong> (<em>pathlib.Path</em><em>|</em><em>str</em>) – The output NRRD file to write to.</p></li>
+<li><p><strong>color_map</strong> (<em>matplotlib.colors.Colormap</em><em> | </em><em>dict</em><em>, </em><em>optional</em>) – Colormap to use for output.
+Defaults to cm.get_cmap(“rainbow”).</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -142,18 +149,28 @@ Defaults to cm.get_cmap(“rainbow”).</p>
 <dt class="sig sig-object py" id="pydicer.convert.pt.convert_dicom_to_nifti_pt">
 <span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">convert_dicom_to_nifti_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_filepaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_weight_from_ct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.convert_dicom_to_nifti_pt" title="Permalink to this definition"></a></dt>
 <dd><p>Function to convert the dicom files contained in input_filepaths to one NIFTI image.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>input_filepaths (list): list of the dicom paths
-output_filepath (str): path to the output file path where to store the NIFTI file.
-patient_weight_from_ct (float, optional): If the patient’s weight is missing from the PT
-DICOM it can be provided through this argument. Defaults to None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_filepaths</strong> (<em>list</em>) – list of the dicom paths</p></li>
+<li><p><strong>output_filepath</strong> (<em>str</em>) – path to the output file path where to store the NIFTI file.</p></li>
+<li><p><strong>patient_weight_from_ct</strong> (<em>float</em><em>, </em><em>optional</em>) – If the patient’s weight is missing from the PT
+DICOM it can be provided through this argument. Defaults to None.</p></li>
+</ul>
 </dd>
-<dt>Raises:</dt><dd><p>MissingWeightError: Error to alert when the weight is missing from the PT, to compute
-the SUV.
-RuntimeError: Error to alert when one or more slices are missing
-ValueError: Raised when a modality or a unit (for the PT) is not handled.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>MissingWeightError</strong> – Error to alert when the weight is missing from the PT, to compute
+    the SUV.</p></li>
+<li><p><strong>RuntimeError</strong> – Error to alert when one or more slices are missing</p></li>
+<li><p><strong>ValueError</strong> – Raised when a modality or a unit (for the PT) is not handled.</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>numpy.array: The numpy image, used to compute the bounding boxes</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The numpy image, used to compute the bounding boxes</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.array</p>
 </dd>
 </dl>
 </dd></dl>
@@ -162,11 +179,15 @@ ValueError: Raised when a modality or a unit (for the PT) is not handled.</p>
 <dt class="sig sig-object py" id="pydicer.convert.pt.get_physical_values_pt">
 <span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">get_physical_values_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_weight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.get_physical_values_pt" title="Permalink to this definition"></a></dt>
 <dd><p>Function to Get physical values from raw PET</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>slices: all pet slices of this patient
-patient_weight: a value about this patient</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slices</strong> – all pet slices of this patient</p></li>
+<li><p><strong>patient_weight</strong> – a value about this patient</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>extract physical values for pet</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>extract physical values for pet</p>
 </dd>
 </dl>
 </dd></dl>
@@ -175,12 +196,16 @@ patient_weight: a value about this patient</p>
 <dt class="sig sig-object py" id="pydicer.convert.pt.get_sitk_volume_from_np">
 <span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">get_sitk_volume_from_np</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_spacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_position_patient</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.get_sitk_volume_from_np" title="Permalink to this definition"></a></dt>
 <dd><p>Function to get sitk volume from np image</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>np_image: extracted pet data with numpy format
-pixel_spacing: extracted pixel spacing information
-image_position_patient: extracted image position about this patient</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>np_image</strong> – extracted pet data with numpy format</p></li>
+<li><p><strong>pixel_spacing</strong> – extracted pixel spacing information</p></li>
+<li><p><strong>image_position_patient</strong> – extracted image position about this patient</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>a pet sitk data</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a pet sitk data</p>
 </dd>
 </dl>
 </dd></dl>
@@ -189,12 +214,16 @@ image_position_patient: extracted image position about this patient</p>
 <dt class="sig sig-object py" id="pydicer.convert.pt.get_suv_from_bqml">
 <span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">get_suv_from_bqml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decay_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_weight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.get_suv_from_bqml" title="Permalink to this definition"></a></dt>
 <dd><p>Function to Get SUV from raw PET if units = “BQML”</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>slices: all pet slices from this patient
-decay_time: decay time
-patient_weight: patient weight information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slices</strong> – all pet slices from this patient</p></li>
+<li><p><strong>decay_time</strong> – decay time</p></li>
+<li><p><strong>patient_weight</strong> – patient weight information</p></li>
+</ul>
 </dd>
-<dt>Returns:</dt><dd><p>suv results</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>suv results</p>
 </dd>
 </dl>
 </dd></dl>
@@ -203,10 +232,12 @@ patient_weight: patient weight information</p>
 <dt class="sig sig-object py" id="pydicer.convert.pt.get_suv_philips">
 <span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">get_suv_philips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.get_suv_philips" title="Permalink to this definition"></a></dt>
 <dd><p>Function to Get SUV from raw PET if units = “CNTS”</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>slices: all pet slices from this patient</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>slices</strong> – all pet slices from this patient</p>
 </dd>
-<dt>Returns:</dt><dd><p>suv philips results</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>suv philips results</p>
 </dd>
 </dl>
 </dd></dl>
@@ -215,10 +246,12 @@ patient_weight: patient weight information</p>
 <dt class="sig sig-object py" id="pydicer.convert.pt.is_approx_equal">
 <span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">is_approx_equal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.is_approx_equal" title="Permalink to this definition"></a></dt>
 <dd><p>Function to know is_approx_equal</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>x and y: two values to be compared</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>x and</em>) – two values to be compared</p>
 </dd>
-<dt>Returns:</dt><dd><p>True or False</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True or False</p>
 </dd>
 </dl>
 </dd></dl>
