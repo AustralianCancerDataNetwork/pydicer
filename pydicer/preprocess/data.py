@@ -7,6 +7,7 @@ import numpy as np
 
 from pydicer.constants import (
     PET_IMAGE_STORAGE_UID,
+    RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
 )
@@ -29,7 +30,6 @@ class PreprocessData:
         self.working_directory = working_directory
         self.output_directory = output_directory
 
-
     # TODO: need to find the linked series UID
     def preprocess(self):
         """
@@ -42,11 +42,12 @@ class PreprocessData:
             - series_uid: SeriesInstanceUID field from the DICOM header
             - modality: Modailty field from the DICOM header
             - sop_class_uid: SOPClassUID field from the DICOM header
+            - sop_instance_uid: SOPInstanceUID field from the DICOM header
             - for_uid: FrameOfReferenceUID field from the DICOM header
             - file_path: The path to the file (as a pathlib.Path object)
             - slice_location: The real-world location of the slice (used for imaging modalities)
-            - referenced_series_uid: The SeriesUID referenced by this DICOM file (used for RTSTRUCT
-              and RTDOSE)
+            - referenced_uid: The SeriesUID referenced by this DICOM file for RTSTRUCT
+              and RTDOSE, the SOPInstanceUID of the structure set referenced by an RTPLAN.
             - referenced_for_uid: The ReferencedFrameOfReferenceUID referenced by this DICOM file
 
         """
@@ -57,10 +58,11 @@ class PreprocessData:
                 "series_uid",
                 "modality",
                 "sop_class_uid",
+                "sop_instance_uid",
                 "for_uid",
                 "file_path",
                 "slice_location",
-                "referenced_series_uid",
+                "referenced_uid",
                 "referenced_for_uid",
             ]
         )
@@ -79,6 +81,7 @@ class PreprocessData:
                     "series_uid": ds.SeriesInstanceUID,
                     "modality": ds.Modality,
                     "sop_class_uid": dicom_type_uid,
+                    "sop_instance_uid": ds.SOPInstanceUID,
                     "file_path": str(file),
                 }
 
@@ -94,7 +97,7 @@ class PreprocessData:
                             .RTReferencedSeriesSequence[0]
                             .SeriesInstanceUID
                         )
-                        res_dict["referenced_series_uid"] = referenced_series_uid
+                        res_dict["referenced_uid"] = referenced_series_uid
                     except AttributeError:
                         logger.warning("Unable to determine Reference Series UID")
 
@@ -108,6 +111,13 @@ class PreprocessData:
                         res_dict["referenced_for_uid"] = referenced_frame_of_reference_uid
                     except AttributeError:
                         logger.warning("Unable to determine Referenced Frame of Reference UID")
+
+                elif dicom_type_uid == RT_PLAN_STORAGE_UID:
+
+                    referenced_sop_instance_uid = ds.ReferencedStructureSetSequence[
+                        0
+                    ].ReferencedSOPInstanceUID
+                    res_dict["referenced_uid"] = referenced_sop_instance_uid
 
                 elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID):
 

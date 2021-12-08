@@ -1,16 +1,19 @@
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,missing-function-docstring
 
 import tempfile
+import json
 from pathlib import Path
 import numpy as np
 
 import pytest
 
 import SimpleITK as sitk
+import pydicom
 
 from pydicer.input.test import TestInput
 from pydicer.input.web import WebInput
 
+from pydicer.convert.headers import convert_dicom_headers
 from pydicer.convert.rtstruct import convert_rtstruct
 from pydicer.convert.pt import convert_dicom_to_nifti_pt
 
@@ -113,3 +116,34 @@ def test_convert_pet(test_data_all):
 
         pet_arr = sitk.GetArrayFromImage(pet_img)
         assert np.allclose(pet_arr.max(), 11.9479, atol=0.001)
+
+
+def test_save_dicom_headers(test_data_all):
+
+    dicom_dir = test_data_all.joinpath(
+        "1.3.6.1.4.1.14519.5.2.1.1706.8040.995469920533091641707578194770"
+    )
+
+    dicom_file = [str(f) for f in dicom_dir.glob("*.dcm")][0]
+
+    with tempfile.TemporaryDirectory() as output_dir:
+
+        # Save off the headers for this file
+        output_path = Path(output_dir)
+        output_file = output_path.joinpath("test.json")
+        convert_dicom_headers(dicom_file, "", output_file)
+
+        # Check that we can read them again from the JSON
+        with open(output_file, "r", encoding="utf8") as json_file:
+            ds_dict = json.load(json_file)
+
+        loaded_ds = pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
+        original_ds = pydicom.read_file(dicom_file)
+
+        # Check that some key header values are the same in the original DICOM and the one loaded
+        # from JSON
+        assert loaded_ds.SeriesInstanceUID == original_ds.SeriesInstanceUID
+        assert loaded_ds.PatientID == original_ds.PatientID
+        assert loaded_ds.Modality == original_ds.Modality
+        assert loaded_ds.SeriesDate == original_ds.SeriesDate
+        assert loaded_ds.FrameOfReferenceUID == original_ds.FrameOfReferenceUID
