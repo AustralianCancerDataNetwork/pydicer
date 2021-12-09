@@ -11,16 +11,16 @@ logger = logging.getLogger(__name__)
 
 
 def adapt_dataset_from_bytes(blob):
+    """Convert bytes coming from Orthanc to DICOM dataset
+
+    Args:
+        blob (bytes): The bytes to convert
+
+    Returns:
+        pydicom.Dataset: The DICOM dataset
+    """
     dataset = pydicom.dcmread(BytesIO(blob))
     return dataset
-
-
-def write_dataset_to_bytes(dataset):
-    with BytesIO() as buffer:
-        memory_dataset = pydicom.filebase.DicomFileLike(buffer)
-        pydicom.dcmwrite(memory_dataset, dataset)
-        memory_dataset.seek(0)
-        return memory_dataset.read()
 
 
 class OrthancInput(InputBase):
