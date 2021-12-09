@@ -47,7 +47,7 @@ class OrthancInput(InputBase):
 
         self.orthanc = Orthanc(f"{host}:{port}")
 
-        if username and password:
+        if username is not None and password is not None:
             self.orthanc.setup_credentials(username, password)
 
         # Do a dummy lookup to check that we can reach the Orthanc host, this will throw a
