@@ -10,23 +10,20 @@ def convert_dicom_to_nifti_pt(
     output_filepath,
     patient_weight_from_ct=None,
 ):
-    """Function to convert the dicom files contained in input_filepaths to one
-       NIFTI image.
+    """Function to convert the dicom files contained in input_filepaths to one NIFTI image.
+
     Args:
         input_filepaths (list): list of the dicom paths
-        output_filepath (str): path to the output file path where to store the
-                             NIFTI file.
-        patient_weight_from_ct (float, optional): If the patient's weight is
-                                                  missing from the PT DICOM
-                                                  it can be provided through
-                                                  this argument. Defaults to
-                                                  None.
+        output_filepath (str): path to the output file path where to store the NIFTI file.
+        patient_weight_from_ct (float, optional): If the patient's weight is missing from the PT
+            DICOM it can be provided through this argument. Defaults to None.
+
     Raises:
-        MissingWeightError: Error to alert when the weight is missing from
-                                the PT, to compute the SUV.
+        MissingWeightError: Error to alert when the weight is missing from the PT, to compute
+            the SUV.
         RuntimeError: Error to alert when one or more slices are missing
-        ValueError: Raised when a modality or a unit (for the PT) is not
-                    handled.
+        ValueError: Raised when a modality or a unit (for the PT) is not handled.
+
     Returns:
         numpy.array: The numpy image, used to compute the bounding boxes
     """
@@ -131,10 +128,12 @@ def convert_dicom_to_nifti_pt(
 
 def get_sitk_volume_from_np(np_image, pixel_spacing, image_position_patient):
     """Function to get sitk volume from np image
+
     Args:
         np_image: extracted pet data with numpy format
         pixel_spacing: extracted pixel spacing information
         image_position_patient: extracted image position about this patient
+
     Returns:
         a pet sitk data
     """
@@ -147,8 +146,10 @@ def get_sitk_volume_from_np(np_image, pixel_spacing, image_position_patient):
 
 def is_approx_equal(x, y, tolerance=0.05):
     """Function to know is_approx_equal
+
     Args:
         x and y: two values to be compared
+
     Returns:
         True or False
     """
@@ -167,9 +168,11 @@ def is_approx_equal(x, y, tolerance=0.05):
 
 def get_physical_values_pt(slices, patient_weight):
     """Function to Get physical values from raw PET
+
     Args:
         slices: all pet slices of this patient
         patient_weight: a value about this patient
+
     Returns:
         extract physical values for pet
     """
@@ -233,8 +236,10 @@ def get_physical_values_pt(slices, patient_weight):
 
 def get_suv_philips(slices):
     """Function to Get SUV from raw PET if units = "CNTS"
+
     Args:
         slices: all pet slices from this patient
+
     Returns:
         suv philips results
     """
@@ -255,10 +260,12 @@ def get_suv_philips(slices):
 
 def get_suv_from_bqml(slices, decay_time, patient_weight):
     """Function to Get SUV from raw PET if units = "BQML"
+
     Args:
         slices: all pet slices from this patient
         decay_time: decay time
         patient_weight: patient weight information
+
     Returns:
         suv results
     """
