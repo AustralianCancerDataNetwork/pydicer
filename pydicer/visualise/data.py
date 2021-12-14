@@ -102,7 +102,9 @@ class VisualiseData:
 
             # Find the linked struct
             struct_id = plan_links[0].name.replace(".json", "").split("_")[-1]
-            struct_links = list(dose_file.parent.parent.glob(f"structures/{struct_id}_*/"))
+            struct_links = [
+                p for p in dose_file.parent.parent.glob(f"structures/{struct_id}_*/") if p.is_dir()
+            ]
 
             if len(struct_links) == 0:
                 logger.error("Linked structure %s not found", struct_id)
