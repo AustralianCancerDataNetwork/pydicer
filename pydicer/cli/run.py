@@ -53,6 +53,7 @@ def pydicer_cli():
         usage=f"python -m pydicer.cli.run {commands}",
     )
 
+    # Default to "pipeline" option without input
     parser.add_argument(
         "command",
         help=f"One of the following commands: {commands}",
