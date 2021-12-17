@@ -29,7 +29,7 @@ def handle_missing_slice(files):
 
     Args:
         df_files (pd.DataFrame|list): the DataFrame which was produced by PreprocessData
-        or list of filepaths to dicom slices 
+        or list of filepaths to dicom slices
 
     Returns:
         file_paths(list): a list of the interpolated file paths
@@ -43,7 +43,6 @@ def handle_missing_slice(files):
         df_files = pd.DataFrame(files)
     else:
         raise ValueError("This function requires a Dataframe or list")
-
 
     temp_dir = Path(tempfile.mkdtemp())
 
