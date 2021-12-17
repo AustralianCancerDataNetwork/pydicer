@@ -1,6 +1,7 @@
 import logging
 import tempfile
 from pathlib import Path
+import pandas as pd
 import numpy as np
 import SimpleITK as sitk
 import pydicom
@@ -21,6 +22,105 @@ logger = logging.getLogger(__name__)
 
 # TODO make this user-selected
 INTERPOLATE_MISSING_DATA = True
+
+
+def handle_missing_slice(files):
+    """function to interpolate missing slices in an image
+
+    Args:
+        df_files (pd.DataFrame|list): the DataFrame which was produced by PreprocessData
+        or list of filepaths to dicom slices 
+
+    Returns:
+        file_paths(list): a list of the interpolated file paths
+    """
+
+    if isinstance(files, pd.DataFrame):
+        df_files = files
+    # TODO: unpack lists and make dataframe
+    elif isinstance(files, list):
+
+        df_files = pd.DataFrame(files)
+    else:
+        raise ValueError("This function requires a Dataframe or list")
+
+
+    temp_dir = Path(tempfile.mkdtemp())
+
+    # Check that the slice location spacing is consistent, if not raise and error
+    # for now
+    slice_location_diffs = np.diff(df_files.slice_location.to_numpy())
+
+    unique_slice_diffs, _ = np.unique(slice_location_diffs, return_counts=True)
+    expected_slice_diff = unique_slice_diffs[0]
+
+    # check to see if any slice thickness exceed 2% tolerance
+    # this is conservative as missing slices would produce 100% differences
+    slice_thickness_variations = ~np.isclose(slice_location_diffs, expected_slice_diff, rtol=0.02)
+
+    if np.any(slice_thickness_variations):
+
+        logger.warning("Missing DICOM slices found: %s", df_files.iloc[0]["series_uid"])
+
+        # find where the missing slices are
+        missing_indices = np.where(slice_thickness_variations)[0]
+
+        for missing_index in missing_indices:
+
+            num_missing_slices = int(slice_location_diffs[missing_index] / expected_slice_diff) - 1
+
+            # locate nearest DICOM files to the missing slices
+            prior_dcm_file = df_files.iloc[missing_index]["file_path"]
+            next_dcm_file = df_files.iloc[missing_index + 1]["file_path"]
+
+            prior_dcm = pydicom.read_file(prior_dcm_file)
+            next_dcm = pydicom.read_file(next_dcm_file)
+
+            for missing_slice in range(num_missing_slices):
+
+                # TODO add other interp options (cubic)
+                interp_array = np.array(
+                    prior_dcm.pixel_array
+                    + ((missing_slice + 1) / (num_missing_slices + 1))
+                    * (next_dcm.pixel_array - prior_dcm.pixel_array),
+                    prior_dcm.pixel_array.dtype,
+                )
+
+                # write a copy to a temporary DICOM file
+                prior_dcm.PixelData = interp_array.tobytes()
+
+                # compute spatial information
+                image_orientation = np.array(prior_dcm.ImageOrientationPatient, dtype=float)
+
+                image_plane_normal = np.cross(image_orientation[:3], image_orientation[3:])
+
+                image_position_patient = np.array(
+                    np.array(prior_dcm.ImagePositionPatient)
+                    + ((missing_slice + 1) / (num_missing_slices + 1))
+                    * (
+                        np.array(next_dcm.ImagePositionPatient)
+                        - np.array(prior_dcm.ImagePositionPatient)
+                    )
+                )
+
+                slice_location = (image_position_patient * image_plane_normal)[2]
+
+                # insert new spatial information into interpolated slice
+                prior_dcm.SliceLocation = slice_location
+                prior_dcm.ImagePositionPatient = image_position_patient.tolist()
+
+                # write interpolated slice to DICOM
+                interp_dcm_file = temp_dir / f"{slice_location}.dcm"
+                pydicom.write_file(interp_dcm_file, prior_dcm)
+
+                # insert into dataframe
+                interp_df_row = dict(df_files.iloc[missing_index])
+                interp_df_row["slice_location"] = slice_location
+                interp_df_row["file_path"] = str(interp_dcm_file)
+
+                df_files = df_files.append(interp_df_row, ignore_index=True)
+                df_files.sort_values(by="slice_location", inplace=True)
+    return df_files.file_path.tolist()
 
 
 class ConvertData:
@@ -59,88 +159,13 @@ class ConvertData:
             try:
                 # TODO abstract this interpolation, apply to other image modalities
                 if sop_class_uid == CT_IMAGE_STORAGE_UID:
-                    # Check that the slice location spacing is consistent, if not raise and error
-                    # for now
-                    slice_location_diffs = np.diff(df_files.slice_location.to_numpy())
+                    # TODO Handle inconsistent slice spacing
+                    if INTERPOLATE_MISSING_DATA:
+                        series_files = handle_missing_slice(df_files)
+                    else:
+                        raise ValueError("Slice Locations are not evenly spaced")
 
-                    unique_slice_diffs, _ = np.unique(slice_location_diffs, return_counts=True)
-                    expected_slice_diff = unique_slice_diffs[0]
-
-                    # check to see if any slice thickness exceed 2% tolerance
-                    # this is conservative as missing slices would produce 100% differences
-                    slice_thickness_variations = ~np.isclose(
-                        slice_location_diffs, expected_slice_diff, rtol=0.02
-                    )
-
-                    if np.any(slice_thickness_variations):
-
-                        logger.warning(
-                            "Missing DICOM slices found: %s", df_files.iloc[0]["series_uid"]
-                        )
-
-                        temp_dir = Path(tempfile.mkdtemp())
-
-                        # TODO Handle inconsistent slice spacing
-                        if INTERPOLATE_MISSING_DATA:
-                            # find where the missing slices are
-                            missing_indices = np.where(slice_thickness_variations)[0]
-
-                            for missing_index in missing_indices:
-
-                                # locate nearest DICOM files to the missing slices
-                                prior_dcm_file = df_files.iloc[missing_index]["file_path"]
-                                next_dcm_file = df_files.iloc[missing_index + 1]["file_path"]
-
-                                prior_dcm = pydicom.read_file(prior_dcm_file)
-                                next_dcm = pydicom.read_file(next_dcm_file)
-
-                                # TODO add other interp options (cubic)
-                                interp_array = np.array(
-                                    (prior_dcm.pixel_array + next_dcm.pixel_array) / 2,
-                                    prior_dcm.pixel_array.dtype,
-                                )
-
-                                # write a copy to a temporary DICOM file
-                                prior_dcm.PixelData = interp_array.tobytes()
-
-                                # compute spatial information
-                                image_orientation = np.array(
-                                    prior_dcm.ImageOrientationPatient, dtype=float
-                                )
-
-                                image_plane_normal = np.cross(
-                                    image_orientation[:3], image_orientation[3:]
-                                )
-
-                                image_position_patient = np.array(
-                                    (
-                                        np.array(prior_dcm.ImagePositionPatient)
-                                        + np.array(next_dcm.ImagePositionPatient)
-                                    )
-                                    / 2,
-                                )
-
-                                slice_location = (image_position_patient * image_plane_normal)[2]
-
-                                # insert new spatial information into interpolated slice
-                                prior_dcm.SliceLocation = slice_location
-                                prior_dcm.ImagePositionPatient = image_position_patient.tolist()
-
-                                # write interpolated slice to DICOM
-                                interp_dcm_file = temp_dir / f"{slice_location}.dcm"
-                                pydicom.write_file(interp_dcm_file, prior_dcm)
-
-                                # insert into dataframe
-                                interp_df_row = df_files.iloc[missing_index]
-                                interp_df_row["slice_location"] = slice_location
-                                interp_df_row["file_path"] = str(interp_dcm_file)
-                                df_files = df_files.append(interp_df_row, ignore_index=True)
-                                df_files.sort_values(by="slice_location", inplace=True)
-
-                        else:
-                            raise ValueError("Slice Locations are not evenly spaced")
-
-                    series_files = df_files.file_path.tolist()
+                    # series_files = df_files.file_path.tolist()
                     series_files = [str(f) for f in series_files]
                     series = sitk.ReadImage(series_files)
 
