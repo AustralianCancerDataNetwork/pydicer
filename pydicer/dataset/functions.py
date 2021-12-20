@@ -283,7 +283,7 @@ def rt_latest_dose(working_directory, dataset_name, patients=None, **kwargs):
         pat_doses = sorted(pat_doses, key=lambda d: d["datetime"], reverse=True)
 
         if len(pat_doses) == 0:
-            logger.warning("No data selected for patient: %s", pat_id)
+            logger.warning("No dose selected for patient: %s", pat_id)
             continue
 
         # Select the latest structure
@@ -295,12 +295,22 @@ def rt_latest_dose(working_directory, dataset_name, patients=None, **kwargs):
         )
 
         dose_md = pat_dose["metadata"]
-        dose_files = list(pat_dir.glob(f"**/doses/{dose_md.name}*"))
+        dose_files = list(pat_dir.glob(f"**/doses/{dose_md.name.split('.')[0]}*"))
+
         plan_files = get_linked_series(dose_md)
+        if len(plan_files) == 0:
+            logger.warning("No plan linked to dose for patient %s", pat_id)
+            continue
 
         structure_files = get_linked_series(plan_files[0])
+        if len(structure_files) == 0:
+            logger.warning("No structures linked to plan for patient %s", pat_id)
+            continue
 
         image_files = get_linked_series(structure_files[0])
+        if len(image_files) == 0:
+            logger.warning("No image linked to structures for patient %s", pat_id)
+            continue
 
         pat_prep_dir = target_directory.joinpath(pat_id)
 
