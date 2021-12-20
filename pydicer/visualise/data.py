@@ -137,7 +137,8 @@ class VisualiseData:
                 for f in struct_dir.glob("*.nii.gz")
             }
 
-            vis.add_contour(masks, linewidth=1)
+            if len(masks) > 0:
+                vis.add_contour(masks, linewidth=1)
 
             fig = vis.show()
 
