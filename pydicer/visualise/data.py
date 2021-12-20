@@ -84,6 +84,7 @@ class VisualiseData:
                 vis_filename,
                 dpi=fig.dpi,
             )
+            plt.close(fig)
 
             logger.debug("created visualisation: %s", vis_filename)
 
