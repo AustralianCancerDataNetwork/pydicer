@@ -3,8 +3,8 @@ from argparse import RawTextHelpFormatter
 import sys
 
 from pydicer.cli.contants import get_sub_help_mesg
+from pydicer.cli.input import testinput_cli, pacs_cli, tcia_cli, web_cli, run_pipeline
 from pydicer.pipeline import run_test
-from pydicer.cli.input import testinput_cli, pacs_cli, tcia_cli, web_cli
 
 # Sub command types for the Input command
 INPUT_TOOLS = {
@@ -14,22 +14,43 @@ INPUT_TOOLS = {
     "web": web_cli,
 }
 
+PIPELINE_TOOLS = {
+    "e2e": run_test,
+    "filesystem": run_pipeline,
+    "test": run_pipeline,
+    "pacs": run_pipeline,
+    "tcia": run_pipeline,
+    "web": run_pipeline,
+}
 
-def parse_sub_input():
+
+def parse_sub_input(command):
     """function to parse the input command args"""
     parse_sub_command(
+        command,
         "Run the Input module only",
         INPUT_TOOLS,
         "test",
+        INPUT_COMMANDS
     )
 
+def parse_sub_pipeline(command):
+    """function to parse the pipeline command args"""
+    parse_sub_command(
+        command,
+        "Run the pipeline with a specific input method",
+        PIPELINE_TOOLS,
+        "e2e",
+        PIPELINE_COMMANDS
+    )
 
 INPUT_COMMANDS = str(list(INPUT_TOOLS.keys())).replace(", ", "|")
-MODULES = {"pipeline": run_test, "input": parse_sub_input}
+PIPELINE_COMMANDS = str(list(PIPELINE_TOOLS.keys())).replace(", ", "|")
+MODULES = {"pipeline": parse_sub_pipeline, "input": parse_sub_input}
 COMMANDS = str(list(MODULES.keys())).replace(", ", "|")
 
 
-def parse_sub_command(desc, tools, default_choice):
+def parse_sub_command(command, desc, tools, default_choice, help_commands):
     """Generic function to take in dynamic input and trigger the respective sub commands
 
     Args:
@@ -41,13 +62,16 @@ def parse_sub_command(desc, tools, default_choice):
     parser = argparse.ArgumentParser(description=desc, formatter_class=RawTextHelpFormatter)
     parser.add_argument(
         "--type",
-        help=get_sub_help_mesg(INPUT_COMMANDS),
+        help=get_sub_help_mesg(help_commands, command),
         default=default_choice,
         choices=tools,
     )
 
     args = parser.parse_args(sys.argv[2:4])
-    tools[args.type](*sys.argv[4:])
+    if command == "pipeline":
+        tools[args.type](args.type, *sys.argv[4:])
+    else:
+        tools[args.type](*sys.argv[4:])
 
 
 def pydicer_cli():
@@ -67,7 +91,7 @@ def pydicer_cli():
     )
 
     args = parser.parse_args(sys.argv[1:2])
-    MODULES[args.command]()
+    MODULES[args.command](sys.argv[1])
 
 
 if __name__ == "__main__":
