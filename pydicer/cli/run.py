@@ -26,13 +26,8 @@ PIPELINE_TOOLS = {
 
 def parse_sub_input(command):
     """function to parse the input command args"""
-    parse_sub_command(
-        command,
-        "Run the Input module only",
-        INPUT_TOOLS,
-        "test",
-        INPUT_COMMANDS
-    )
+    parse_sub_command(command, "Run the Input module only", INPUT_TOOLS, "test", INPUT_COMMANDS)
+
 
 def parse_sub_pipeline(command):
     """function to parse the pipeline command args"""
@@ -41,8 +36,9 @@ def parse_sub_pipeline(command):
         "Run the pipeline with a specific input method",
         PIPELINE_TOOLS,
         "e2e",
-        PIPELINE_COMMANDS
+        PIPELINE_COMMANDS,
     )
+
 
 INPUT_COMMANDS = str(list(INPUT_TOOLS.keys())).replace(", ", "|")
 PIPELINE_COMMANDS = str(list(PIPELINE_TOOLS.keys())).replace(", ", "|")

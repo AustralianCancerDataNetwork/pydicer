@@ -6,13 +6,13 @@ from pydicer.input.pacs import DICOMPACSInput
 from pydicer.input.test import TestInput
 from pydicer.input.web import WebInput
 from pydicer.input.filesystem import FileSystemInput
-from pydicer.pipeline import run
 from pydicer.preprocess.data import PreprocessData
 from pydicer.convert.data import ConvertData
 from pydicer.visualise.data import VisualiseData
 
 
 logger = logging.getLogger(__name__)
+
 
 def run_pipeline(input_method, *args):
     """Run the pipeline using a specific input methodthe test data provided
@@ -57,6 +57,7 @@ def run_pipeline(input_method, *args):
     logger.info("Running Pipeline visualisation")
     visualise_data = VisualiseData(output_dir)
     visualise_data.visualise()
+
 
 def testinput_cli(working_dir):
     """Trigger the test input as a mini pipeline for the CLI tool
