@@ -1,8 +1,32 @@
 import argparse
 import sys
 
-from pydicer.cli.input import testinput_cli
+from pydicer.cli.input import testinput_cli, filesystem_cli, pacs_cli, tcia_cli, web_cli
 from pydicer.pipeline import run_test
+
+
+def parse_sub_input():
+    """function to parse the input command args"""
+    parse_sub_command(
+        "Run the Input module only",
+        INPUT_TOOLS,
+        "test",
+    )
+
+
+# Commands that can be run
+MODULES = {"pipeline": run_test, "input": parse_sub_input}
+
+# Sub command types for the Input command
+INPUT_TOOLS = {
+    "test": testinput_cli,
+    "filesystem": filesystem_cli,
+    "pacs": pacs_cli,
+    "tcia": tcia_cli,
+    "web": web_cli,
+}
+
+COMMANDS = str(list(MODULES.keys())).replace(", ", "|")
 
 
 def parse_sub_command(desc, tools, default_choice):
@@ -17,28 +41,13 @@ def parse_sub_command(desc, tools, default_choice):
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument(
         "--type",
-        help=f"Subcommand of the following: {str(list(tools.keys())).replace(', ', '|')}",
-        default=tools[default_choice],
+        help=f"Subcommand of the following: {COMMANDS}",
+        default=default_choice,
         choices=tools,
-        nargs=2,
-    )
-    args = parser.parse_args(sys.argv[2:])
-    args.type()
-
-
-def parse_sub_input():
-    """function to parse the input command args"""
-    parse_sub_command(
-        "Run the Input module only",
-        INPUT_TOOLS,
-        "test",
     )
 
-
-# Commands that can be run
-MODULES = {"pipeline": run_test, "input": parse_sub_input}
-# Sub command types for the Input command
-INPUT_TOOLS = {"test": testinput_cli}
+    args = parser.parse_args(sys.argv[2:4])
+    tools[args.type](*sys.argv[4:])
 
 
 def pydicer_cli():
@@ -46,17 +55,15 @@ def pydicer_cli():
     Trigger pydicer CLI
     """
 
-    commands = str(list(MODULES.keys())).replace(", ", "|")
-
     parser = argparse.ArgumentParser(
         description="pydicer CLI (Command Line Interface)",
-        usage=f"python -m pydicer.cli.run {commands}",
+        usage=f"python -m pydicer.cli.run {COMMANDS}",
     )
 
     # Default to "pipeline" option without input
     parser.add_argument(
         "command",
-        help=f"One of the following commands: {commands}",
+        help=f"One of the following COMMANDS: {COMMANDS}",
     )
 
     args = parser.parse_args(sys.argv[1:2])
