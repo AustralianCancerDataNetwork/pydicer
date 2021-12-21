@@ -1,8 +1,18 @@
 import argparse
+from argparse import RawTextHelpFormatter
 import sys
 
-from pydicer.cli.input import testinput_cli, filesystem_cli, pacs_cli, tcia_cli, web_cli
+from pydicer.cli.contants import get_sub_help_mesg
 from pydicer.pipeline import run_test
+from pydicer.cli.input import testinput_cli, pacs_cli, tcia_cli, web_cli
+
+# Sub command types for the Input command
+INPUT_TOOLS = {
+    "test": testinput_cli,
+    "pacs": pacs_cli,
+    "tcia": tcia_cli,
+    "web": web_cli,
+}
 
 
 def parse_sub_input():
@@ -14,18 +24,8 @@ def parse_sub_input():
     )
 
 
-# Commands that can be run
+INPUT_COMMANDS = str(list(INPUT_TOOLS.keys())).replace(", ", "|")
 MODULES = {"pipeline": run_test, "input": parse_sub_input}
-
-# Sub command types for the Input command
-INPUT_TOOLS = {
-    "test": testinput_cli,
-    "filesystem": filesystem_cli,
-    "pacs": pacs_cli,
-    "tcia": tcia_cli,
-    "web": web_cli,
-}
-
 COMMANDS = str(list(MODULES.keys())).replace(", ", "|")
 
 
@@ -38,10 +38,10 @@ def parse_sub_command(desc, tools, default_choice):
         default_choice (str): default sub command type that will be run in the case no input is
         received from the user
     """
-    parser = argparse.ArgumentParser(description=desc)
+    parser = argparse.ArgumentParser(description=desc, formatter_class=RawTextHelpFormatter)
     parser.add_argument(
         "--type",
-        help=f"Subcommand of the following: {COMMANDS}",
+        help=get_sub_help_mesg(INPUT_COMMANDS),
         default=default_choice,
         choices=tools,
     )
