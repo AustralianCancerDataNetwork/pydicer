@@ -9,6 +9,7 @@ from pydicer.convert.pt import convert_dicom_to_nifti_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.convert.headers import convert_dicom_headers
 from pydicer.utils import hash_uid
+from pydicer.quarantine.treat import copy_file_to_quarantine
 
 from pydicer.constants import (
     RT_PLAN_STORAGE_UID,
@@ -288,7 +289,13 @@ class ConvertData:
                     )
 
             except Exception as e:  # pylint: disable=broad-except
+                # Broad except ok here, since we will put these file into a
+                # quarantine location for further inspection.
                 logger.error(e)
                 logger.error("Unable to convert series with UID: %s", series_uid)
 
-                # TODO Copy DICOM to Quarantine
+                for f in df_files.file_path.tolist():
+                    logger.error(
+                        "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
+                    )
+                    copy_file_to_quarantine(f, self.output_directory, e)
