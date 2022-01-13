@@ -7,6 +7,7 @@ import numpy as np
 
 from pydicer.constants import (
     PET_IMAGE_STORAGE_UID,
+    RT_DOSE_STORAGE_UID,
     RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
@@ -115,6 +116,13 @@ class PreprocessData:
                 elif dicom_type_uid == RT_PLAN_STORAGE_UID:
 
                     referenced_sop_instance_uid = ds.ReferencedStructureSetSequence[
+                        0
+                    ].ReferencedSOPInstanceUID
+                    res_dict["referenced_uid"] = referenced_sop_instance_uid
+
+                elif dicom_type_uid == RT_DOSE_STORAGE_UID:
+
+                    referenced_sop_instance_uid = ds.ReferencedRTPlanSequence[
                         0
                     ].ReferencedSOPInstanceUID
                     res_dict["referenced_uid"] = referenced_sop_instance_uid
