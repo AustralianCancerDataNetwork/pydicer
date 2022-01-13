@@ -1,8 +1,10 @@
-import warnings
+import logging
 from datetime import time, datetime
 import numpy as np
 import SimpleITK as sitk
 import pydicom as pdcm
+
+logger = logging.getLogger(__name__)
 
 
 def convert_dicom_to_nifti_pt(
@@ -98,7 +100,7 @@ def convert_dicom_to_nifti_pt(
                 (np_image[..., :ind2interp], new_slice, np_image[..., ind2interp:]),
                 axis=2,
             )
-            warnings.warn("One slice is missing, we replaced it by linear interpolation")
+            logger.warn("One slice is missing, we replaced it by linear interpolation")
         else:
             # if more than one slice are missing
             raise RuntimeError("Multiple slices are missing")
