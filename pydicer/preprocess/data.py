@@ -154,8 +154,6 @@ class PreprocessData:
                 )
                 copy_file_to_quarantine(file, self.output_directory, e)
 
-                # TODO Send to quarantine
-
         # Sort the the DataFrame by the patient then series uid and the slice location, ensuring
         # that the slices are ordered correctly
         df = df.sort_values(["patient_id", "series_uid", "slice_location"])
