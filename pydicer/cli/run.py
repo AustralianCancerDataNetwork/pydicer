@@ -1,3 +1,16 @@
+"""
+Command Line Interface tool to run pydicer pipeline or specific modules on their own
+
+usage: python -m pydicer.cli.run ['pipeline'|'input']
+
+pydicer CLI (Command Line Interface)
+
+positional arguments:
+  command     One of the following COMMANDS: ['pipeline'|'input']
+
+optional arguments:
+  -h, --help  show help message 
+"""
 import argparse
 from argparse import RawTextHelpFormatter
 import sys
