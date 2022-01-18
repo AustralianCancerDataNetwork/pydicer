@@ -9,7 +9,7 @@ positional arguments:
   command     One of the following COMMANDS: ['pipeline'|'input']
 
 optional arguments:
-  -h, --help  show help message 
+  -h, --help  show help message
 """
 import argparse
 from argparse import RawTextHelpFormatter
