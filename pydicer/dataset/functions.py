@@ -46,8 +46,8 @@ def determine_dcm_datetime(ds):
             date_time_str = f"{ds.SeriesDate}{ds.SeriesTime}"
             if "." in date_time_str:
                 return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
-            else:
-                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
+
+            return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
 
         return datetime.strptime(ds.SeriesDate, "%Y%m%d")
 
@@ -57,8 +57,8 @@ def determine_dcm_datetime(ds):
             date_time_str = f"{ds.StudyDate}{ds.StudyTime}"
             if "." in date_time_str:
                 return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
-            else:
-                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
+
+            return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
 
         return datetime.strptime(ds.StudyDate, "%Y%m%d")
 
@@ -68,8 +68,8 @@ def determine_dcm_datetime(ds):
             date_time_str = f"{ds.InstanceCreationDate}{ds.InstanceCreationTime}"
             if "." in date_time_str:
                 return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
-            else:
-                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
+
+            return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
 
         return datetime.strptime(ds.InstanceCreationDate, "%Y%m%d")
 
@@ -127,18 +127,18 @@ def rt_latest_struct(working_directory, dataset_name, patients=None, **kwargs):
             ds_date = determine_dcm_datetime(struct_ds)
 
             skip_series = False
-            for k in kwargs:
+            for k, item in kwargs.items():
 
                 if not k in struct_ds:
                     logger.debug("Attribute %s not in %s", k, struct_md)
                     skip_series = True
                     continue
 
-                if isinstance(kwargs[k], str):
-                    kwargs[k] = [kwargs[k]]
+                if isinstance(item, str):
+                    item = [item]
 
                 attribute_match = False
-                for sd in kwargs[k]:
+                for sd in item:
                     if sd == struct_ds[k].value:
                         attribute_match = True
 
@@ -147,7 +147,7 @@ def rt_latest_struct(working_directory, dataset_name, patients=None, **kwargs):
                     logger.debug(
                         "Attribute %s's value(s) %s does not match %s",
                         k,
-                        kwargs[k],
+                        item,
                         str(struct_ds[k].value),
                     )
 
@@ -248,18 +248,18 @@ def rt_latest_dose(working_directory, dataset_name, patients=None, **kwargs):
             ds_date = determine_dcm_datetime(dose_ds)
 
             skip_series = False
-            for k in kwargs:
+            for k, item in kwargs.items():
 
                 if not k in dose_ds:
                     logger.debug("Attribute %s not in %s", k, dose_md)
                     skip_series = True
                     continue
 
-                if isinstance(kwargs[k], str):
-                    kwargs[k] = [kwargs[k]]
+                if isinstance(item, str):
+                    item = [item]
 
                 attribute_match = False
-                for sd in kwargs[k]:
+                for sd in item:
                     if sd == dose_ds[k].value:
                         attribute_match = True
 
@@ -268,7 +268,7 @@ def rt_latest_dose(working_directory, dataset_name, patients=None, **kwargs):
                     logger.debug(
                         "Attribute %s's value(s) %s does not match %s",
                         k,
-                        kwargs[k],
+                        item,
                         str(dose_ds[k].value),
                     )
 

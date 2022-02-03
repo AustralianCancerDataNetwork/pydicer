@@ -12,7 +12,7 @@ class PrepareDataset:
 
     def prepare(self, dataset_name, preparation_function, **kwargs):
         """Calls upon an appropriate preparation function to generate a clean dataset ready for
-        use.
+        use. Additional keyword arguments are passed through to the preparation_function.
 
         Args:
             dataset_name (str): The name of the dataset to generate
