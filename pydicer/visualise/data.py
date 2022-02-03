@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from types import NoneType
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
 from platipy.imaging import ImageVisualiser
@@ -34,7 +33,7 @@ class VisualiseData:
                 raise ValueError("All patient IDs must be of type 'str'")
         else:
 
-            if not isinstance(patient, (str, NoneType)):
+            if not isinstance(patient, str) and patient is not None:
                 raise ValueError(
                     "Patient ID must be list or str. None is a valid to process all patients"
                 )
