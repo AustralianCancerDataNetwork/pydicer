@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 # TODO make this user-selected
 INTERPOLATE_MISSING_DATA = True
 
+
 class ConvertData:
     """
     Class that facilitates the conversion of the data into its intended final type
@@ -34,19 +35,23 @@ class ConvertData:
         - df_preprocess (pd.DataFrame): the DataFrame which was produced by PreprocessData
         - output_directory (str|pathlib.Path, optional): Directory in which to store converted data.
             Defaults to ".".
-
     """
 
     def __init__(self, df_preprocess, output_directory="."):
         self.df_preprocess = df_preprocess
         self.output_directory = Path(output_directory)
 
-
     def link_via_frame_of_reference(self, for_uid):
+        """Find the image series linked to this FOR
 
-        df_linked_series = self.df_preprocess[
-            self.df_preprocess.for_uid==for_uid
-        ]
+        Args:
+            for_uid (str): The Frame of Reference UID
+
+        Returns:
+            pd.DataFrame: DataFrame of the linked series entries
+        """
+
+        df_linked_series = self.df_preprocess[self.df_preprocess.for_uid == for_uid]
 
         # Find the image series to link to in this order of perference
         modality_prefs = ["CT", "MR", "PT"]
@@ -183,7 +188,7 @@ class ConvertData:
 
                     json_file_name = f"{output_file_base}.json"
                     json_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "images", json_file_name
+                        patient_id, "images", json_file_name
                     )
                     convert_dicom_headers(series_files[0], nifti_file_name, json_file)
 
@@ -264,7 +269,7 @@ class ConvertData:
                     output_file_base = f"PT_{series_uid_hash}"
                     nifti_file_name = f"{output_file_base}.nii.gz"
                     nifti_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "images", nifti_file_name
+                        patient_id, "images", nifti_file_name
                     )
                     nifti_file.parent.mkdir(exist_ok=True, parents=True)
 
@@ -275,7 +280,7 @@ class ConvertData:
 
                     json_file_name = f"{output_file_base}.json"
                     json_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "images", json_file_name
+                        patient_id, "images", json_file_name
                     )
                     convert_dicom_headers(series_files[0], nifti_file_name, json_file)
 
@@ -308,9 +313,7 @@ class ConvertData:
 
                     output_file_base = f"RP_{series_uid_hash}_{linked_uid_hash}"
                     json_file_name = f"{output_file_base}.json"
-                    json_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "plans", json_file_name
-                    )
+                    json_file = self.output_directory.joinpath(patient_id, "plans", json_file_name)
                     json_file.parent.mkdir(exist_ok=True, parents=True)
 
                     convert_dicom_headers(rt_plan_file.file_path, "", json_file)
@@ -343,16 +346,14 @@ class ConvertData:
                     output_file_base = f"RD_{series_uid_hash}_{linked_uid_hash}"
                     nifti_file_name = f"{output_file_base}.nii.gz"
                     nifti_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "doses", nifti_file_name
+                        patient_id, "doses", nifti_file_name
                     )
                     nifti_file.parent.mkdir(exist_ok=True, parents=True)
                     logger.debug("Writing RTDOSE to: %s", nifti_file)
                     convert_rtdose(rt_dose_file.file_path, nifti_file)
 
                     json_file_name = f"{output_file_base}.json"
-                    json_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "doses", json_file_name
-                    )
+                    json_file = self.output_directory.joinpath(patient_id, "doses", json_file_name)
                     convert_dicom_headers(rt_dose_file.file_path, nifti_file_name, json_file)
                 else:
                     raise NotImplementedError(
