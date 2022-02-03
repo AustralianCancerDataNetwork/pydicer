@@ -40,6 +40,7 @@ class VisualiseData:
                 vis_filename,
                 dpi=fig.dpi,
             )
+            plt.close(fig)
 
             logger.debug("created visualisation: %s", vis_filename)
 
@@ -84,6 +85,7 @@ class VisualiseData:
                 vis_filename,
                 dpi=fig.dpi,
             )
+            plt.close(fig)
 
             logger.debug("created visualisation: %s", vis_filename)
 
@@ -136,7 +138,8 @@ class VisualiseData:
                 for f in struct_dir.glob("*.nii.gz")
             }
 
-            vis.add_contour(masks, linewidth=1)
+            if len(masks) > 0:
+                vis.add_contour(masks, linewidth=1)
 
             fig = vis.show()
 
@@ -147,5 +150,6 @@ class VisualiseData:
                 vis_filename,
                 dpi=fig.dpi,
             )
+            plt.close(fig)
 
             logger.debug("created visualisation: %s", vis_filename)

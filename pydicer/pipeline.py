@@ -6,6 +6,7 @@ from pydicer.input.test import TestInput
 from pydicer.preprocess.data import PreprocessData
 from pydicer.convert.data import ConvertData
 from pydicer.visualise.data import VisualiseData
+from pydicer.dataset.preparation import PrepareDataset
 
 logger = logging.getLogger(__name__)
 
@@ -29,11 +30,14 @@ def run(input_object, output_directory="."):
     convert_data = ConvertData(preprocessed_result, output_directory=output_directory)
     convert_data.convert()
 
-    # TODO Visualise the converted data
+    # Visualise the converted data
     visualise_data = VisualiseData(output_directory)
     visualise_data.visualise()
 
-    # TODO Dataset selection and preparation
+    # Dataset selection and preparation
+    prepare_dataset = PrepareDataset(output_directory.parent)
+    clean_directory = Path(output_directory.parent.joinpath("clean_and_ready"))
+    prepare_dataset.prepare(clean_directory, "rt_latest_struct")
 
 
 def run_test(directory="./testdata"):
