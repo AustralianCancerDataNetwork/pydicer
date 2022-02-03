@@ -81,7 +81,7 @@ class ConvertData:
             # Grab the patied_id, study_uid, sop_class_uid and modality (should be the same for all
             # files in series)
             patient_id = df_files.patient_id.unique()[0]
-            study_uid = df_files.study_uid.unique()[0]
+            # study_uid = df_files.study_uid.unique()[0]
             sop_class_uid = df_files.sop_class_uid.unique()[0]
             modality = df_files.sop_class_uid.unique()[0]
 
@@ -208,7 +208,7 @@ class ConvertData:
 
                     # If not linked via referenced UID, then try to link via FOR
                     if len(df_linked_series) == 0:
-                        for_uid = rt_dose_file.for_uid
+                        for_uid = rt_struct_file.for_uid
                         df_linked_series = self.link_via_frame_of_reference(for_uid)
 
                     # Check that the linked series is available
@@ -299,7 +299,7 @@ class ConvertData:
 
                     # If not linked via referenced UID, then try to link via FOR
                     if len(df_linked_series) == 0:
-                        for_uid = rt_dose_file.for_uid
+                        for_uid = rt_plan_file.for_uid
                         df_linked_series = self.link_via_frame_of_reference(for_uid)
 
                     # Check that the linked series is available
