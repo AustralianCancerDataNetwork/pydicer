@@ -7,6 +7,7 @@ import numpy as np
 
 from pydicer.constants import (
     PET_IMAGE_STORAGE_UID,
+    RT_DOSE_STORAGE_UID,
     RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
@@ -119,6 +120,13 @@ class PreprocessData:
                     ].ReferencedSOPInstanceUID
                     res_dict["referenced_uid"] = referenced_sop_instance_uid
 
+                elif dicom_type_uid == RT_DOSE_STORAGE_UID:
+
+                    referenced_sop_instance_uid = ds.ReferencedRTPlanSequence[
+                        0
+                    ].ReferencedSOPInstanceUID
+                    res_dict["referenced_uid"] = referenced_sop_instance_uid
+
                 elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID):
 
                     image_position = np.array(ds.ImagePositionPatient, dtype=float)
@@ -145,8 +153,6 @@ class PreprocessData:
                     "Error parsing file %s: %s. Placing file into Quarantine folder...", file, e
                 )
                 copy_file_to_quarantine(file, self.output_directory, e)
-
-                # TODO Send to quarantine
 
         # Sort the the DataFrame by the patient then series uid and the slice location, ensuring
         # that the slices are ordered correctly

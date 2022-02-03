@@ -4,13 +4,17 @@ from pathlib import Path
 import numpy as np
 import SimpleITK as sitk
 import pydicom
-from pydicer.convert.pt import convert_dicom_to_nifti_pt
 
+from platipy.dicom.io.rtdose_to_nifti import convert_rtdose
+
+from pydicer.convert.pt import convert_dicom_to_nifti_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.convert.headers import convert_dicom_headers
 from pydicer.utils import hash_uid
+from pydicer.quarantine.treat import copy_file_to_quarantine
 
 from pydicer.constants import (
+    RT_DOSE_STORAGE_UID,
     RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
@@ -281,6 +285,42 @@ class ConvertData:
 
                     convert_dicom_headers(rt_plan_file.file_path, "", json_file)
 
+                elif sop_class_uid == RT_DOSE_STORAGE_UID:
+
+                    # Should only be one file per RTDOSE series
+                    if not len(df_files) == 1:
+                        ValueError("More than one RTDOSE with the same SeriesInstanceUID")
+
+                    rt_dose_file = df_files.iloc[0]
+
+                    # Get the linked structure set
+                    # TODO Link via alternative method if referenced_uid is not available
+                    linked_uid = rt_dose_file.referenced_uid
+                    df_linked_series = self.df_preprocess[
+                        self.df_preprocess.sop_instance_uid == rt_dose_file.referenced_uid
+                    ]
+
+                    # Check that the linked series is available
+                    # TODO handle rconverting RTDOSE even if we don't have a plan it's linked to
+                    if len(df_linked_series) == 0:
+                        raise ValueError("Series Referenced by RTDOSE not found")
+
+                    linked_uid_hash = hash_uid(df_linked_series.iloc[0].series_uid)
+
+                    output_file_base = f"RD_{series_uid_hash}_{linked_uid_hash}"
+                    nifti_file_name = f"{output_file_base}.nii.gz"
+                    nifti_file = self.output_directory.joinpath(
+                        patient_id, study_id_hash, "doses", nifti_file_name
+                    )
+                    nifti_file.parent.mkdir(exist_ok=True, parents=True)
+                    logger.debug("Writing RTDOSE to: %s", nifti_file)
+                    convert_rtdose(rt_dose_file.file_path, nifti_file)
+
+                    json_file_name = f"{output_file_base}.json"
+                    json_file = self.output_directory.joinpath(
+                        patient_id, study_id_hash, "doses", json_file_name
+                    )
+                    convert_dicom_headers(rt_dose_file.file_path, nifti_file_name, json_file)
                 else:
                     raise NotImplementedError(
                         "Unable to convert Series with SOP Class UID: {sop_class_uid} / "
@@ -288,7 +328,13 @@ class ConvertData:
                     )
 
             except Exception as e:  # pylint: disable=broad-except
+                # Broad except ok here, since we will put these file into a
+                # quarantine location for further inspection.
                 logger.error(e)
                 logger.error("Unable to convert series with UID: %s", series_uid)
 
-                # TODO Copy DICOM to Quarantine
+                for f in df_files.file_path.tolist():
+                    logger.error(
+                        "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
+                    )
+                    copy_file_to_quarantine(f, self.output_directory, e)
