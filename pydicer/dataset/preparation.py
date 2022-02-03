@@ -11,6 +11,17 @@ class PrepareDataset:
         self.working_directory = Path(working_directory)
 
     def prepare(self, dataset_name, preparation_function, **kwargs):
+        """Calls upon an appropriate preparation function to generate a clean dataset ready for
+        use.
+
+        Args:
+            dataset_name (str): The name of the dataset to generate
+            preparation_function (function|str): the function use for preparation
+
+        Raises:
+            AttributeError: Raised if preparation_function is not a function or a string defining
+              a known preparation function.
+        """
 
         if isinstance(preparation_function, str):
 
