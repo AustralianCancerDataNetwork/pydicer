@@ -26,7 +26,6 @@ logger = logging.getLogger(__name__)
 # TODO make this user-selected
 INTERPOLATE_MISSING_DATA = True
 
-
 class ConvertData:
     """
     Class that facilitates the conversion of the data into its intended final type
@@ -42,12 +41,37 @@ class ConvertData:
         self.df_preprocess = df_preprocess
         self.output_directory = Path(output_directory)
 
-    def convert(self):
+
+    def link_via_frame_of_reference(self, for_uid):
+
+        df_linked_series = self.df_preprocess[
+            self.df_preprocess.for_uid==for_uid
+        ]
+
+        # Find the image series to link to in this order of perference
+        modality_prefs = ["CT", "MR", "PT"]
+
+        df_linked_series = df_linked_series[df_linked_series.modality.isin(modality_prefs)]
+        df_linked_series.loc[:, "modality"] = df_linked_series.modality.astype("category")
+        df_linked_series.modality.cat.set_categories(modality_prefs, inplace=True)
+        df_linked_series.sort_values(["modality"])
+
+        return df_linked_series
+
+    def convert(self, patient=None):
         """
         Function to convert the data into its intended form (eg. images into Nifti)
         """
 
-        for series_uid, df_files in self.df_preprocess.groupby("series_uid"):
+        if patient is not None and not hasattr(patient, "__iter__"):
+            patient = [patient]
+
+        for key, df_files in self.df_preprocess.groupby(["patient_id", "series_uid"]):
+
+            patient_id, series_uid = key
+
+            if patient is not None and patient_id not in patient:
+                continue
 
             # Grab the patied_id, study_uid, sop_class_uid and modality (should be the same for all
             # files in series)
@@ -65,7 +89,7 @@ class ConvertData:
                 if sop_class_uid == CT_IMAGE_STORAGE_UID:
                     # Check that the slice location spacing is consistent, if not raise and error
                     # for now
-                    slice_location_diffs = np.diff(df_files.slice_location.to_numpy())
+                    slice_location_diffs = np.diff(df_files.slice_location.to_numpy(dtype=float))
 
                     unique_slice_diffs, _ = np.unique(slice_location_diffs, return_counts=True)
                     expected_slice_diff = unique_slice_diffs[0]
@@ -172,11 +196,15 @@ class ConvertData:
                     rt_struct_file = df_files.iloc[0]
 
                     # Get the linked image
-                    # TODO Link via alternative method if referenced_uid is not available
                     linked_uid = rt_struct_file.referenced_uid
                     df_linked_series = self.df_preprocess[
                         self.df_preprocess.series_uid == rt_struct_file.referenced_uid
                     ]
+
+                    # If not linked via referenced UID, then try to link via FOR
+                    if len(df_linked_series) == 0:
+                        for_uid = rt_dose_file.for_uid
+                        df_linked_series = self.link_via_frame_of_reference(for_uid)
 
                     # Check that the linked series is available
                     # TODO handle rendering the masks even if we don't have an image series it's
@@ -262,15 +290,17 @@ class ConvertData:
                     rt_plan_file = df_files.iloc[0]
 
                     # Get the linked structure set
-                    # TODO Link via alternative method if referenced_uid is not available
                     linked_uid = rt_plan_file.referenced_uid
                     df_linked_series = self.df_preprocess[
                         self.df_preprocess.sop_instance_uid == rt_plan_file.referenced_uid
                     ]
 
+                    # If not linked via referenced UID, then try to link via FOR
+                    if len(df_linked_series) == 0:
+                        for_uid = rt_dose_file.for_uid
+                        df_linked_series = self.link_via_frame_of_reference(for_uid)
+
                     # Check that the linked series is available
-                    # TODO handle rconverting RTPLAN even if we don't have a structure set it's
-                    # linked to
                     if len(df_linked_series) == 0:
                         raise ValueError("Series Referenced by RTPLAN not found")
 
@@ -293,15 +323,18 @@ class ConvertData:
 
                     rt_dose_file = df_files.iloc[0]
 
-                    # Get the linked structure set
-                    # TODO Link via alternative method if referenced_uid is not available
+                    # Get the linked plan
                     linked_uid = rt_dose_file.referenced_uid
                     df_linked_series = self.df_preprocess[
                         self.df_preprocess.sop_instance_uid == rt_dose_file.referenced_uid
                     ]
 
+                    # If not linked via referenced UID, then try to link via FOR
+                    if len(df_linked_series) == 0:
+                        for_uid = rt_dose_file.for_uid
+                        df_linked_series = self.link_via_frame_of_reference(for_uid)
+
                     # Check that the linked series is available
-                    # TODO handle rconverting RTDOSE even if we don't have a plan it's linked to
                     if len(df_linked_series) == 0:
                         raise ValueError("Series Referenced by RTDOSE not found")
 
@@ -330,11 +363,11 @@ class ConvertData:
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
-                logger.error(e)
+                logger.exception(e)
                 logger.error("Unable to convert series with UID: %s", series_uid)
 
                 for f in df_files.file_path.tolist():
                     logger.error(
                         "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
                     )
-                    copy_file_to_quarantine(f, self.output_directory, e)
+                    copy_file_to_quarantine(Path(f), self.output_directory, e)

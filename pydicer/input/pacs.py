@@ -1,3 +1,4 @@
+import os
 import pydicom
 
 from platipy.dicom.communication.connector import DicomConnector
@@ -78,5 +79,20 @@ class DICOMPACSInput(InputBase):
                         if not s:
                             continue  # Again, safe to skip this if None
 
+                        if not s.PatientID == patient:
+                            continue
+
                         # Download the series
                         self.dicom_connector.download_series(s.SeriesInstanceUID)
+
+        # Finally, just make sure all files end with the .dcm extension
+        for f in self.working_directory.glob("**/*"):
+            if f.is_dir():
+                continue
+
+            if f.name.endswith(".dcm"):
+                continue
+
+            target = f.parent.joinpath(f"{f.name}.dcm")
+            os.rename(f, target)
+
