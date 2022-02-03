@@ -27,6 +27,27 @@ INTERPOLATE_MISSING_DATA = True
 def handle_missing_slice(files):
     """function to interpolate missing slices in an image
 
+    Example usage:
+        ```
+            input_dic = [
+                {
+                    "file_path" : "Dicom_Path_1",
+                    "slice_location: -100
+                },
+                {
+                    "file_path" : "Dicom_Path_2",
+                    "slice_location: -98
+                },
+                .
+                .
+                {
+                    "file_path" : "Dicom_Path_100",
+                    "slice_location: 100
+                },
+            ]
+            file_paths_list = handle_missing_slices(input_dict)
+        ```
+
     Args:
         df_files (pd.DataFrame|list): the DataFrame which was produced by PreprocessData
         or list of filepaths to dicom slices
@@ -37,18 +58,14 @@ def handle_missing_slice(files):
 
     if isinstance(files, pd.DataFrame):
         df_files = files
-    # TODO: unpack lists and make dataframe
     elif isinstance(files, list):
-
         df_files = pd.DataFrame(files)
     else:
         raise ValueError("This function requires a Dataframe or list")
 
     temp_dir = Path(tempfile.mkdtemp())
 
-    # Check that the slice location spacing is consistent, if not raise and error
-    # for now
-    slice_location_diffs = np.diff(df_files.slice_location.to_numpy())
+    slice_location_diffs = np.diff(df_files.slice_location.to_numpy(dtype=float))
 
     unique_slice_diffs, _ = np.unique(slice_location_diffs, return_counts=True)
     expected_slice_diff = unique_slice_diffs[0]
