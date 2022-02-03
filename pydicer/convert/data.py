@@ -86,7 +86,7 @@ class ConvertData:
             modality = df_files.sop_class_uid.unique()[0]
 
             # Prepare some hashes of these UIDs to use for directory/file output paths
-            study_id_hash = hash_uid(study_uid)
+            # study_id_hash = hash_uid(study_uid)
             series_uid_hash = hash_uid(series_uid)
 
             try:
@@ -180,7 +180,7 @@ class ConvertData:
                     output_file_base = f"CT_{series_uid_hash}"
                     nifti_file_name = f"{output_file_base}.nii.gz"
                     nifti_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "images", nifti_file_name
+                        patient_id, "images", nifti_file_name
                     )
                     nifti_file.parent.mkdir(exist_ok=True, parents=True)
                     sitk.WriteImage(series, str(nifti_file))
@@ -221,7 +221,6 @@ class ConvertData:
 
                     output_dir = self.output_directory.joinpath(
                         patient_id,
-                        study_id_hash,
                         "structures",
                         f"{series_uid_hash}_{linked_uid_hash}",
                     )
@@ -242,7 +241,6 @@ class ConvertData:
                     # TODO Make generation of NRRD file optional
                     nrrd_file = self.output_directory.joinpath(
                         patient_id,
-                        study_id_hash,
                         "structures",
                         f"{series_uid_hash}_{linked_uid_hash}.nrrd",
                     )
@@ -253,7 +251,6 @@ class ConvertData:
                     json_file_name = f"{series_uid_hash}_{linked_uid_hash}.nrrd"
                     json_file = self.output_directory.joinpath(
                         patient_id,
-                        study_id_hash,
                         "structures",
                         f"{series_uid_hash}_{linked_uid_hash}.json",
                     )
