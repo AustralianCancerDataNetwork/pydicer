@@ -1,5 +1,6 @@
 import logging
 import tempfile
+import copy
 from pathlib import Path
 import pandas as pd
 import numpy as np
@@ -60,6 +61,8 @@ def handle_missing_slice(files):
         df_files = files
     elif isinstance(files, list):
         df_files = pd.DataFrame(files)
+
+        df_files = df_files.sort_values(["slice_location"])
     else:
         raise ValueError("This function requires a Dataframe or list")
 
@@ -76,7 +79,7 @@ def handle_missing_slice(files):
 
     if np.any(slice_thickness_variations):
 
-        logger.warning("Missing DICOM slices found: %s", df_files.iloc[0]["series_uid"])
+        logger.warning("Missing DICOM slices found")
 
         # find where the missing slices are
         missing_indices = np.where(slice_thickness_variations)[0]
@@ -92,18 +95,23 @@ def handle_missing_slice(files):
             prior_dcm = pydicom.read_file(prior_dcm_file)
             next_dcm = pydicom.read_file(next_dcm_file)
 
+            working_dcm = copy.deepcopy(prior_dcm)
+
+            prior_array = prior_dcm.pixel_array.astype(float)
+            next_array = next_dcm.pixel_array.astype(float)
+
             for missing_slice in range(num_missing_slices):
 
                 # TODO add other interp options (cubic)
                 interp_array = np.array(
-                    prior_dcm.pixel_array
+                    prior_array
                     + ((missing_slice + 1) / (num_missing_slices + 1))
-                    * (next_dcm.pixel_array - prior_dcm.pixel_array),
-                    prior_dcm.pixel_array.dtype,
+                    * (next_array - prior_array),
+                    next_array.dtype,
                 )
 
                 # write a copy to a temporary DICOM file
-                prior_dcm.PixelData = interp_array.tobytes()
+                working_dcm.PixelData = interp_array.astype(prior_dcm.pixel_array.dtype).tobytes()
 
                 # compute spatial information
                 image_orientation = np.array(prior_dcm.ImageOrientationPatient, dtype=float)
@@ -112,22 +120,24 @@ def handle_missing_slice(files):
 
                 image_position_patient = np.array(
                     np.array(prior_dcm.ImagePositionPatient)
-                    + ((missing_slice + 1) / (num_missing_slices + 1))
-                    * (
-                        np.array(next_dcm.ImagePositionPatient)
-                        - np.array(prior_dcm.ImagePositionPatient)
+                    + (
+                        ((missing_slice + 1) / (num_missing_slices + 1))
+                        * (
+                            np.array(next_dcm.ImagePositionPatient)
+                            - np.array(prior_dcm.ImagePositionPatient)
+                        )
                     )
                 )
 
                 slice_location = (image_position_patient * image_plane_normal)[2]
 
                 # insert new spatial information into interpolated slice
-                prior_dcm.SliceLocation = slice_location
-                prior_dcm.ImagePositionPatient = image_position_patient.tolist()
+                working_dcm.SliceLocation = slice_location
+                working_dcm.ImagePositionPatient = image_position_patient.tolist()
 
                 # write interpolated slice to DICOM
                 interp_dcm_file = temp_dir / f"{slice_location}.dcm"
-                pydicom.write_file(interp_dcm_file, prior_dcm)
+                pydicom.write_file(interp_dcm_file, working_dcm)
 
                 # insert into dataframe
                 interp_df_row = dict(df_files.iloc[missing_index])
