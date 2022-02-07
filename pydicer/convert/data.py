@@ -70,6 +70,9 @@ def handle_missing_slice(files):
     else:
         raise ValueError("This function requires a Dataframe or list")
 
+    # If duplicated slices locations are present in series, drop the duplicates
+    df_files = df_files.drop_duplicates(subset=["slice_location"])
+
     temp_dir = Path(tempfile.mkdtemp())
 
     slice_location_diffs = np.diff(df_files.slice_location.to_numpy(dtype=float))
