@@ -200,9 +200,9 @@ class ConvertData:
         if patient is not None and not hasattr(patient, "__iter__"):
             patient = [patient]
 
-        for key, df_files in self.df_preprocess.groupby(["patient_id", "series_uid"]):
+        for key, df_files in self.df_preprocess.groupby(["patient_id", "modality", "series_uid"]):
 
-            patient_id, series_uid = key
+            patient_id, _, series_uid = key
 
             if patient is not None and patient_id not in patient:
                 continue
