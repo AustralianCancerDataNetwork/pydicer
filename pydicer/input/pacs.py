@@ -95,4 +95,3 @@ class DICOMPACSInput(InputBase):
 
             target = f.parent.joinpath(f"{f.name}.dcm")
             os.rename(f, target)
-

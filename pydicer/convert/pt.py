@@ -1,8 +1,10 @@
-import warnings
+import logging
 from datetime import time, datetime
 import numpy as np
 import SimpleITK as sitk
 import pydicom as pdcm
+
+logger = logging.getLogger(__name__)
 
 
 def convert_dicom_to_nifti_pt(
@@ -30,30 +32,13 @@ def convert_dicom_to_nifti_pt(
     slices = [pdcm.read_file(str(dcm)) for dcm in input_filepaths]
     slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
 
-    if hasattr(slices[0], "PatientWeight") and (slices[0].PatientWeight is None):
+    if not hasattr(slices[0], "PatientWeight") or slices[0].PatientWeight is None:
         if hasattr(slices[0], "PatientsWeight"):
             patient_weight = float(slices[0].PatientsWeight)
         elif patient_weight_from_ct is not None:
             patient_weight = patient_weight_from_ct
         else:
-            # raise MissingWeightError(
-            #     'Cannot compute SUV the weight is missing')
-            patient_weight = 75.0  # default
-            warnings.warn(
-                "Cannot find the weight of the patient, hence it " "is approximated to be 75.0 kg"
-            )
-    elif not hasattr(slices[0], "PatientWeight"):
-        if hasattr(slices[0], "PatientsWeight"):
-            patient_weight = float(slices[0].PatientsWeight)
-        elif patient_weight_from_ct is not None:
-            patient_weight = patient_weight_from_ct
-        else:
-            # raise MissingWeightError(
-            #     'Cannot compute SUV the weight is missing')
-            patient_weight = 75.0  # default
-            warnings.warn(
-                "Cannot find the weight of the patient, hence it " "is approximated to be 75.0 kg"
-            )
+            raise ValueError("Cannot compute SUV the weight is missing")
     else:
         patient_weight = float(slices[0].PatientWeight)
 
@@ -115,7 +100,7 @@ def convert_dicom_to_nifti_pt(
                 (np_image[..., :ind2interp], new_slice, np_image[..., ind2interp:]),
                 axis=2,
             )
-            warnings.warn("One slice is missing, we replaced it by linear interpolation")
+            logger.warning("One slice is missing, we replaced it by linear interpolation")
         else:
             # if more than one slice are missing
             raise RuntimeError("Multiple slices are missing")
@@ -156,16 +141,6 @@ def is_approx_equal(x, y, tolerance=0.05):
     return abs(x - y) <= tolerance
 
 
-# class MissingWeightError(RuntimeError):
-#     """
-#     Args:
-#         there is an error about weight
-#     Returns:
-#         pass
-#     """
-#     pass
-
-
 def get_physical_values_pt(slices, patient_weight):
     """Function to Get physical values from raw PET
 
@@ -177,17 +152,18 @@ def get_physical_values_pt(slices, patient_weight):
         extract physical values for pet
     """
     s = slices[0]
-    if "Units" in s:
-        units = s.Units
-    else:
-        units = "CNTS"
+    if "Units" not in s:
+        raise ValueError("DICOM Units tag is not found")
+    units = s.Units
 
     if units == "BQML":
 
+        # TODO: use the function in the dataset module to convert datetime
         acquisition_datetime = datetime.strptime(
             s.AcquisitionDate + s.AcquisitionTime.split(".")[0],
             "%Y%m%d%H%M%S",
         )
+        # TODO: use the function in the dataset module to convert datetime
         series_datetime = datetime.strptime(
             s.SeriesDate + s.SeriesTime.split(".")[0],
             "%Y%m%d%H%M%S",
@@ -216,14 +192,8 @@ def get_physical_values_pt(slices, patient_weight):
             )
             start_datetime = datetime.combine(scan_datetime.date(), start_time)
             decay_time = (scan_datetime - start_datetime).total_seconds()
-        except KeyError:
-            warnings.warn(
-                "Estimation of time decay for SUV" " computation from average parameters"
-            )
-            decay_time = 1.75 * 3600
-        except AttributeError:
-            warnings.warn("'Dataset' object has no attribute 'RadiopharmaceuticalStartTime'")
-            decay_time = 1.75 * 3600
+        except (KeyError, AttributeError) as e:
+            raise ValueError("Error calculating Decay Time") from e
         suv_results = get_suv_from_bqml(slices, decay_time, patient_weight)
 
     elif units == "CNTS":
@@ -244,14 +214,13 @@ def get_suv_philips(slices):
         suv philips results
     """
     image = []
-    suv_scale_factor_tag = "SUVScaleFactor"  # Tag(0x70531000)
     for s in slices:
-        if suv_scale_factor_tag in s and "RescaleSlope" in s and "RescaleIntercept" in s:
+        try:
             im = (float(s.RescaleSlope) * s.pixel_array + float(s.RescaleIntercept)) * float(
                 s.SUVScaleFactor
             )
-        else:
-            im = (1.0 * s.pixel_array + 0.0) * 0.000587
+        except AttributeError as e:
+            raise ValueError("Cannot compute SUV from raw PET for CNTS") from e
 
         image.append(im)
 
@@ -272,16 +241,11 @@ def get_suv_from_bqml(slices, decay_time, patient_weight):
     image = []
     for s in slices:
         pet = float(s.RescaleSlope) * s.pixel_array + float(s.RescaleIntercept)
-        if "RadionuclideHalfLife" in s.RadiopharmaceuticalInformationSequence[0]:
+        try:
             half_life = float(s.RadiopharmaceuticalInformationSequence[0].RadionuclideHalfLife)
-        else:
-            half_life = 6500.0  # default
-            print("there is no RadionuclideHalfLife")
-        if "RadionuclideTotalDose" in s.RadiopharmaceuticalInformationSequence[0]:
             total_dose = float(s.RadiopharmaceuticalInformationSequence[0].RadionuclideTotalDose)
-        else:
-            total_dose = 487254240.0  # default
-            print("there is no RadionuclideTotalDose")
+        except AttributeError as e:
+            raise ValueError("Cannot compute SUV from raw PET for BQML") from e
 
         decay = 2 ** (-decay_time / half_life)
         actual_activity = total_dose * decay
