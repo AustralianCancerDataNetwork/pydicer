@@ -115,17 +115,23 @@ class PreprocessData:
 
                 elif dicom_type_uid == RT_PLAN_STORAGE_UID:
 
-                    referenced_sop_instance_uid = ds.ReferencedStructureSetSequence[
-                        0
-                    ].ReferencedSOPInstanceUID
-                    res_dict["referenced_uid"] = referenced_sop_instance_uid
+                    try:
+                        referenced_sop_instance_uid = ds.ReferencedStructureSetSequence[
+                            0
+                        ].ReferencedSOPInstanceUID
+                        res_dict["referenced_uid"] = referenced_sop_instance_uid
+                    except AttributeError:
+                        logger.warning("Unable to determine Reference Series UID")
 
                 elif dicom_type_uid == RT_DOSE_STORAGE_UID:
 
-                    referenced_sop_instance_uid = ds.ReferencedRTPlanSequence[
-                        0
-                    ].ReferencedSOPInstanceUID
-                    res_dict["referenced_uid"] = referenced_sop_instance_uid
+                    try:
+                        referenced_sop_instance_uid = ds.ReferencedRTPlanSequence[
+                            0
+                        ].ReferencedSOPInstanceUID
+                        res_dict["referenced_uid"] = referenced_sop_instance_uid
+                    except AttributeError:
+                        logger.warning("Unable to determine Reference Series UID")
 
                 elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID):
 

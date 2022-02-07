@@ -161,29 +161,58 @@ class ConvertData:
         - df_preprocess (pd.DataFrame): the DataFrame which was produced by PreprocessData
         - output_directory (str|pathlib.Path, optional): Directory in which to store converted data.
             Defaults to ".".
-
     """
 
     def __init__(self, df_preprocess, output_directory="."):
         self.df_preprocess = df_preprocess
         self.output_directory = Path(output_directory)
 
-    def convert(self):
+    def link_via_frame_of_reference(self, for_uid):
+        """Find the image series linked to this FOR
+
+        Args:
+            for_uid (str): The Frame of Reference UID
+
+        Returns:
+            pd.DataFrame: DataFrame of the linked series entries
+        """
+
+        df_linked_series = self.df_preprocess[self.df_preprocess.for_uid == for_uid]
+
+        # Find the image series to link to in this order of perference
+        modality_prefs = ["CT", "MR", "PT"]
+
+        df_linked_series = df_linked_series[df_linked_series.modality.isin(modality_prefs)]
+        df_linked_series.loc[:, "modality"] = df_linked_series.modality.astype("category")
+        df_linked_series.modality.cat.set_categories(modality_prefs, inplace=True)
+        df_linked_series.sort_values(["modality"])
+
+        return df_linked_series
+
+    def convert(self, patient=None):
         """
         Function to convert the data into its intended form (eg. images into Nifti)
         """
 
-        for series_uid, df_files in self.df_preprocess.groupby("series_uid"):
+        if patient is not None and not hasattr(patient, "__iter__"):
+            patient = [patient]
+
+        for key, df_files in self.df_preprocess.groupby(["patient_id", "series_uid"]):
+
+            patient_id, series_uid = key
+
+            if patient is not None and patient_id not in patient:
+                continue
 
             # Grab the patied_id, study_uid, sop_class_uid and modality (should be the same for all
             # files in series)
             patient_id = df_files.patient_id.unique()[0]
-            study_uid = df_files.study_uid.unique()[0]
+            # study_uid = df_files.study_uid.unique()[0]
             sop_class_uid = df_files.sop_class_uid.unique()[0]
             modality = df_files.sop_class_uid.unique()[0]
 
             # Prepare some hashes of these UIDs to use for directory/file output paths
-            study_id_hash = hash_uid(study_uid)
+            # study_id_hash = hash_uid(study_uid)
             series_uid_hash = hash_uid(series_uid)
 
             try:
@@ -202,7 +231,7 @@ class ConvertData:
                     output_file_base = f"CT_{series_uid_hash}"
                     nifti_file_name = f"{output_file_base}.nii.gz"
                     nifti_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "images", nifti_file_name
+                        patient_id, "images", nifti_file_name
                     )
                     nifti_file.parent.mkdir(exist_ok=True, parents=True)
                     sitk.WriteImage(series, str(nifti_file))
@@ -210,7 +239,7 @@ class ConvertData:
 
                     json_file_name = f"{output_file_base}.json"
                     json_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "images", json_file_name
+                        patient_id, "images", json_file_name
                     )
                     convert_dicom_headers(series_files[0], nifti_file_name, json_file)
 
@@ -223,11 +252,15 @@ class ConvertData:
                     rt_struct_file = df_files.iloc[0]
 
                     # Get the linked image
-                    # TODO Link via alternative method if referenced_uid is not available
                     linked_uid = rt_struct_file.referenced_uid
                     df_linked_series = self.df_preprocess[
                         self.df_preprocess.series_uid == rt_struct_file.referenced_uid
                     ]
+
+                    # If not linked via referenced UID, then try to link via FOR
+                    if len(df_linked_series) == 0:
+                        for_uid = rt_struct_file.for_uid
+                        df_linked_series = self.link_via_frame_of_reference(for_uid)
 
                     # Check that the linked series is available
                     # TODO handle rendering the masks even if we don't have an image series it's
@@ -239,7 +272,6 @@ class ConvertData:
 
                     output_dir = self.output_directory.joinpath(
                         patient_id,
-                        study_id_hash,
                         "structures",
                         f"{series_uid_hash}_{linked_uid_hash}",
                     )
@@ -260,7 +292,6 @@ class ConvertData:
                     # TODO Make generation of NRRD file optional
                     nrrd_file = self.output_directory.joinpath(
                         patient_id,
-                        study_id_hash,
                         "structures",
                         f"{series_uid_hash}_{linked_uid_hash}.nrrd",
                     )
@@ -271,7 +302,6 @@ class ConvertData:
                     json_file_name = f"{series_uid_hash}_{linked_uid_hash}.nrrd"
                     json_file = self.output_directory.joinpath(
                         patient_id,
-                        study_id_hash,
                         "structures",
                         f"{series_uid_hash}_{linked_uid_hash}.json",
                     )
@@ -287,7 +317,7 @@ class ConvertData:
                     output_file_base = f"PT_{series_uid_hash}"
                     nifti_file_name = f"{output_file_base}.nii.gz"
                     nifti_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "images", nifti_file_name
+                        patient_id, "images", nifti_file_name
                     )
                     nifti_file.parent.mkdir(exist_ok=True, parents=True)
 
@@ -298,7 +328,7 @@ class ConvertData:
 
                     json_file_name = f"{output_file_base}.json"
                     json_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "images", json_file_name
+                        patient_id, "images", json_file_name
                     )
                     convert_dicom_headers(series_files[0], nifti_file_name, json_file)
 
@@ -313,15 +343,17 @@ class ConvertData:
                     rt_plan_file = df_files.iloc[0]
 
                     # Get the linked structure set
-                    # TODO Link via alternative method if referenced_uid is not available
                     linked_uid = rt_plan_file.referenced_uid
                     df_linked_series = self.df_preprocess[
                         self.df_preprocess.sop_instance_uid == rt_plan_file.referenced_uid
                     ]
 
+                    # If not linked via referenced UID, then try to link via FOR
+                    if len(df_linked_series) == 0:
+                        for_uid = rt_plan_file.for_uid
+                        df_linked_series = self.link_via_frame_of_reference(for_uid)
+
                     # Check that the linked series is available
-                    # TODO handle rconverting RTPLAN even if we don't have a structure set it's
-                    # linked to
                     if len(df_linked_series) == 0:
                         raise ValueError("Series Referenced by RTPLAN not found")
 
@@ -329,9 +361,7 @@ class ConvertData:
 
                     output_file_base = f"RP_{series_uid_hash}_{linked_uid_hash}"
                     json_file_name = f"{output_file_base}.json"
-                    json_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "plans", json_file_name
-                    )
+                    json_file = self.output_directory.joinpath(patient_id, "plans", json_file_name)
                     json_file.parent.mkdir(exist_ok=True, parents=True)
 
                     convert_dicom_headers(rt_plan_file.file_path, "", json_file)
@@ -344,15 +374,18 @@ class ConvertData:
 
                     rt_dose_file = df_files.iloc[0]
 
-                    # Get the linked structure set
-                    # TODO Link via alternative method if referenced_uid is not available
+                    # Get the linked plan
                     linked_uid = rt_dose_file.referenced_uid
                     df_linked_series = self.df_preprocess[
                         self.df_preprocess.sop_instance_uid == rt_dose_file.referenced_uid
                     ]
 
+                    # If not linked via referenced UID, then try to link via FOR
+                    if len(df_linked_series) == 0:
+                        for_uid = rt_dose_file.for_uid
+                        df_linked_series = self.link_via_frame_of_reference(for_uid)
+
                     # Check that the linked series is available
-                    # TODO handle rconverting RTDOSE even if we don't have a plan it's linked to
                     if len(df_linked_series) == 0:
                         raise ValueError("Series Referenced by RTDOSE not found")
 
@@ -361,16 +394,14 @@ class ConvertData:
                     output_file_base = f"RD_{series_uid_hash}_{linked_uid_hash}"
                     nifti_file_name = f"{output_file_base}.nii.gz"
                     nifti_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "doses", nifti_file_name
+                        patient_id, "doses", nifti_file_name
                     )
                     nifti_file.parent.mkdir(exist_ok=True, parents=True)
                     logger.debug("Writing RTDOSE to: %s", nifti_file)
                     convert_rtdose(rt_dose_file.file_path, nifti_file)
 
                     json_file_name = f"{output_file_base}.json"
-                    json_file = self.output_directory.joinpath(
-                        patient_id, study_id_hash, "doses", json_file_name
-                    )
+                    json_file = self.output_directory.joinpath(patient_id, "doses", json_file_name)
                     convert_dicom_headers(rt_dose_file.file_path, nifti_file_name, json_file)
                 else:
                     raise NotImplementedError(
@@ -381,11 +412,11 @@ class ConvertData:
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
-                logger.error(e)
+                logger.exception(e)
                 logger.error("Unable to convert series with UID: %s", series_uid)
 
                 for f in df_files.file_path.tolist():
                     logger.error(
                         "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
                     )
-                    copy_file_to_quarantine(f, self.output_directory, e)
+                    copy_file_to_quarantine(Path(f), self.output_directory, e)
