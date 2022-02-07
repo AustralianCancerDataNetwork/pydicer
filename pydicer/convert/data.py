@@ -280,11 +280,16 @@ class ConvertData:
                     )
                     output_dir.mkdir(exist_ok=True, parents=True)
 
-                    img_file_list = df_linked_series.file_path.tolist()
-                    img_file_list = [str(f) for f in img_file_list]
+                    linked_file_name = (
+                        f"{df_linked_series.iloc[0].modality}_{linked_uid_hash}.nii.gz"
+                    )
+                    linked_nifti_file = self.output_directory.joinpath(
+                        patient_id, "images", linked_file_name
+                    )
+                    img_file = sitk.ReadImage(str(linked_nifti_file))
 
                     convert_rtstruct(
-                        img_file_list,
+                        img_file,
                         rt_struct_file.file_path,
                         prefix="",
                         output_dir=output_dir,
