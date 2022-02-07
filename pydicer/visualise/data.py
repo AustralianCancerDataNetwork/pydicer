@@ -28,7 +28,7 @@ class VisualiseData:
             Defaults to None.
         """
 
-        if hasattr(patient, "__iter__"):
+        if isinstance(patient, list):
             if not all(isinstance(x, str) for x in patient):
                 raise ValueError("All patient IDs must be of type 'str'")
         else:
