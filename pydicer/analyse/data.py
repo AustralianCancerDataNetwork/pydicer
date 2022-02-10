@@ -74,14 +74,32 @@ class AnalyseData:
         image_meta_data=None,
         resample_to_image=False,
     ):
-        """Visualise the data in the working directory. PNG files are generates providing a
+        """
+        Visualise the data in the working directory. PNG files are generates providing a
         snapshot of the various data objects.
 
         Args:
             patient (list|str, optional): A patient ID (or list of patient IDs) to visualise.
             Defaults to None.
-        """
+            radiomics (dict, optional): A dictionary of the pyradiomics to compute. Format should
+                have the radiomic class name as the key and a list of feature names in the value.
+                See https://pyradiomics.readthedocs.io/en/latest/features.html for more
+                information.
+                Defaults to all first order features.
+            settings (dict, optional): Settings to pass to pyradiomics. Defaults to
+                PYRAD_DEFAULT_SETTINGS.
+            structure_meta_data (list, optional): A list of DICOM tags which will be extracted from
+                the structure DICOM headers and included in the resulting table of radiomics.
+                Defaults to None.
+            image_meta_data ([type], optional): A list of DICOM tags which will be extracted from
+                the image DICOM headers and included in the resulting table of radiomics.
+                Defaults to None.
+            resample_to_image (bool, optional): Define if mask should be resampled to image. If not
+                the image will be resampled to mask. Defaults to False.
 
+        Raises:
+            ValueError: Raised if patient is not None, a list of strings or a string.
+        """
         if isinstance(patient, list):
             if not all(isinstance(x, str) for x in patient):
                 raise ValueError("All patient IDs must be of type 'str'")
