@@ -133,3 +133,5 @@ dmypy.json
 *.dcm
 
 testdata/
+
+examples/data/

@@ -98,7 +98,7 @@ def rt_latest_struct(working_directory, dataset_name, patients=None, **kwargs):
         patients (list): If specfified, only select patients with ID in this list
     """
 
-    data_directory = working_directory.joinpath("data")
+    data_directory = working_directory.joinpath("nifti")
     target_directory = working_directory.joinpath(dataset_name)
     pat_dirs = [p for p in data_directory.glob("*") if p.is_dir() and not "quarantine" in p.name]
 
@@ -219,7 +219,7 @@ def rt_latest_dose(working_directory, dataset_name, patients=None, **kwargs):
         patients (list): If specfified, only select patients with ID in this list
     """
 
-    data_directory = working_directory.joinpath("data")
+    data_directory = working_directory.joinpath("nifti")
     target_directory = working_directory.joinpath(dataset_name)
     pat_dirs = [p for p in data_directory.glob("*") if p.is_dir() and not "quarantine" in p.name]
 
