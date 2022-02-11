@@ -182,7 +182,6 @@ class AnalyseData:
                     if interpolator is not None and resample_pixel_spacing is not None:
                         image, mask = imageoperations.resampleImage(image, mask, **settings)
 
-                    # output[contour_name] = {"Contour": contour_name}
                     df_contour = pd.DataFrame()
 
                     for rad in radiomics.keys():
