@@ -1,3 +1,4 @@
+numpy
 pydicom >= 2.1.2
 SimpleITK >= 2.0.2
 platipy >= 0.1.3
