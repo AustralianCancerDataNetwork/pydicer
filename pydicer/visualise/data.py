@@ -4,6 +4,8 @@ import SimpleITK as sitk
 import matplotlib.pyplot as plt
 from platipy.imaging import ImageVisualiser
 
+from pydicer.utils import find_linked_image
+
 logger = logging.getLogger(__name__)
 
 
@@ -72,18 +74,11 @@ class VisualiseData:
                 if not struct_dir.is_dir():
                     continue
 
-                img_id = struct_dir.name.split("_")[1]
+                img_file = find_linked_image(struct_dir)
 
-                img_links = list(struct_dir.parent.parent.glob(f"images/*{img_id}.nii.gz"))
-
-                # If we have multiple linked images (not sure if this can happen but it might?)
-                # then take the first one. If we find no linked images log and error and don't
-                # visualise for now
-                if len(img_links) == 0:
-                    logger.error("Linked image %s not found", img_id)
+                if img_file is None:
+                    logger.error("Linked image %s not found")
                     continue
-
-                img_file = img_links[0]
 
                 img = sitk.ReadImage(str(img_file))
 

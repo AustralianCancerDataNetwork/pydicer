@@ -7,6 +7,8 @@ import pydicom
 
 from radiomics import firstorder, shape, glcm, glrlm, glszm, ngtdm, gldm, imageoperations
 
+from pydicer.utils import find_linked_image
+
 logger = logging.getLogger(__name__)
 
 PYRAD_DEFAULT_SETTINGS = {
@@ -136,15 +138,11 @@ class AnalyseData:
             for struct_json in self.dataset_directory.glob(f"{pat_dir_match}/structures/*.json"):
                 struct_dir = struct_json.parent.joinpath(struct_json.name.replace(".json", ""))
 
-                img_id = struct_dir.name.split("_")[1]
+                img_file = find_linked_image(struct_dir)
 
-                img_links = list(struct_dir.parent.parent.glob(f"images/*{img_id}.nii.gz"))
-
-                if len(img_links) == 0:
-                    logger.error("Linked image %s not found", img_id)
+                if img_file is None:
+                    logger.error("Linked image %s not found")
                     continue
-
-                img_file = img_links[0]
                 img_json = img_file.parent.joinpath(img_file.name.replace(".nii.gz", ".json"))
 
                 with open(img_json, "r", encoding="utf8") as json_file:
