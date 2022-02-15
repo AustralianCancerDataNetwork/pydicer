@@ -92,7 +92,7 @@ def test_convert_rt_struct(test_data):
 
         assert brainstem.GetSize() == (512, 512, 174)
         assert brainstem.GetSpacing() == (0.9765625, 0.9765625, 2.5)
-        assert sitk.GetArrayFromImage(brainstem).sum() == 11533
+        assert sitk.GetArrayFromImage(brainstem).sum() == 12450
 
 
 def test_convert_pet(test_data_all):
