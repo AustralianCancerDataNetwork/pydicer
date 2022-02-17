@@ -1,7 +1,11 @@
 import logging
 from pathlib import Path
+import pydicom 
+import json
 import SimpleITK as sitk
+import numpy as np 
 import matplotlib.pyplot as plt
+import textwrap
 from platipy.imaging import ImageVisualiser
 
 logger = logging.getLogger(__name__)
@@ -47,12 +51,56 @@ class VisualiseData:
 
             # first stage: visualise each image individually
             for img_filename in self.output_directory.glob(f"{pat_dir_match}/images/*.nii.gz"):
-
                 img = sitk.ReadImage(str(img_filename))
 
                 vis = ImageVisualiser(img)
                 fig = vis.show()
+                
+                # load meta data from json file 
+                img_json = img_filename.parent.joinpath(img_filename.name.replace(".nii.gz", ".json"))
 
+                with open(img_json, "r", encoding="utf8") as json_file:
+                    ds_dict = json.load(json_file)
+
+                # load the metadata back into a pydicom dataset
+                img_meta_data = pydicom.Dataset.from_json(
+                    ds_dict, bulk_data_uri_handler=lambda _: None
+                )
+            
+                # print all attributes in pydicom dataset 
+                # print(img_meta_data)
+                # break
+                
+                # print study description, will cause error messages in some cases
+                # print("study description: ")
+                # print(img_meta_data.StudyDescription)
+                
+                # choose axis one
+                # (this is the top-right box that is blank)
+                ax = fig.axes[1]
+
+                # choose a sensible font size
+                # this will depend on the figure size you set
+                fs = 9
+                
+                # insert metadata information
+                txt = ax.text(
+                    x=0.03,
+                    y=0.90,
+                    s= "Patient ID: " + img_meta_data.PatientID + \
+                    "\nSeries Instance UID: \n" + img_meta_data.SeriesInstanceUID +
+                    "\nStudy Instance UID: \n" + img_meta_data.StudyInstanceUID + 
+                    "\nStudy Date: " + img_meta_data.StudyDate,
+                    color="black",
+                    ha="left",
+                    va="top",
+                    size=fs,
+                    wrap=True,
+                    bbox=dict(boxstyle='square', fc='w', ec='r')
+                )
+                
+                txt._get_wrap_line_width = lambda : 300.
+                
                 # save image alongside nifti
                 vis_filename = img_filename.parent / img_filename.name.replace(
                     "".join(img_filename.suffixes), ".png"
@@ -181,3 +229,8 @@ class VisualiseData:
                 plt.close(fig)
 
                 logger.debug("created visualisation: %s", vis_filename)
+
+
+if __name__ == "__main__":
+    visualise_data = VisualiseData()
+    visualise_data.visualise()
