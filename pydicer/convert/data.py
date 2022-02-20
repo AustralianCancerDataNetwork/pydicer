@@ -70,8 +70,31 @@ def handle_missing_slice(files):
     else:
         raise ValueError("This function requires a Dataframe or list")
 
-    # If duplicated slices locations are present in series, drop the duplicates
-    df_files = df_files.drop_duplicates(subset=["slice_location"])
+    # If duplicated slices locations are present in series, check if the first duplicates have the
+    # same pixel data. If they do, then assume all are the same and drop the duplicates. Otherwise
+    # we raise an error.
+    df_duplicated = df_files[df_files["slice_location"].duplicated()]
+    if len(df_duplicated) > 0:
+        check_slice_location = df_duplicated.iloc[0].slice_location
+        df_check_duplicates = df_files[df_files["slice_location"] == check_slice_location]
+
+        pix_array = None
+        for _, row in df_check_duplicates.iterrows():
+            this_pix_array = pydicom.read_file(row.file_path).pixel_array
+
+            if pix_array is None:
+                pix_array = this_pix_array
+            else:
+                if not np.allclose(pix_array, this_pix_array):
+                    raise (
+                        ValueError(
+                            f"{len(df_check_duplicates)} slices at location "
+                            f"{check_slice_location} containing different pixel data."
+                        )
+                    )
+
+        logger.warning("Duplicate slices detected, pixel array the same so dropping duplicates")
+        df_files = df_files.drop_duplicates(subset=["slice_location"])
 
     temp_dir = Path(tempfile.mkdtemp())
 
