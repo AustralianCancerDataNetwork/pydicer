@@ -158,14 +158,21 @@ class ConvertData:
     Class that facilitates the conversion of the data into its intended final type
 
     Args:
-        - df_preprocess (pd.DataFrame): the DataFrame which was produced by PreprocessData
-        - output_directory (str|pathlib.Path, optional): Directory in which to store converted data.
+        - working_directory (str|pathlib.Path, optional): Main working directory for pydicer.
             Defaults to ".".
     """
 
-    def __init__(self, df_preprocess, output_directory="."):
-        self.df_preprocess = df_preprocess
-        self.output_directory = Path(output_directory)
+    def __init__(self, working_directory="."):
+        self.working_directory = Path(working_directory)
+        self.pydicer_directory = working_directory.joinpath(".pydicer")
+        self.output_directory = working_directory.joinpath("data")
+        self.output_directory.mkdir(exist_ok=True)
+
+        # Load the preprocessed data
+        preprocessed_file = self.pydicer_directory.joinpath("preprocessed.csv")
+        if not preprocessed_file.exists():
+            raise SystemError("Preprocessed data not found, run Preprocess set first")
+        self.df_preprocess = pd.read_csv(preprocessed_file, index_col=0)
 
     def link_via_frame_of_reference(self, for_uid):
         """Find the image series linked to this FOR
@@ -279,7 +286,7 @@ class ConvertData:
 
                     # Get the linked image
                     df_linked_series = self.df_preprocess[
-                        self.df_preprocess.series_uid == rt_struct_file.referenced_uid
+                        self.df_preprocess["series_uid"] == rt_struct_file.referenced_uid
                     ]
 
                     # If not linked via referenced UID, then try to link via FOR
@@ -426,6 +433,6 @@ class ConvertData:
                     logger.error(
                         "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
                     )
-                    copy_file_to_quarantine(Path(f), self.output_directory, e)
+                    copy_file_to_quarantine(Path(f), self.working_directory, e)
 
         return df_data_objects

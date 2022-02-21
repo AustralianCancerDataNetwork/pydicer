@@ -13,12 +13,13 @@ class VisualiseData:
     Class that facilitates the visualisation of the data once converted
 
     Args:
-        output_directory (str|pathlib.Path, optional): Directory in which converted data is stored.
+        working_directory (str|pathlib.Path, optional): Main working directory for pydicer.
             Defaults to ".".
     """
 
-    def __init__(self, output_directory="."):
-        self.output_directory = Path(output_directory)
+    def __init__(self, working_directory="."):
+        self.working_directory = Path(working_directory)
+        self.output_directory = self.working_directory.joinpath("data")
 
     def visualise(self, patient=None):
         """Visualise the data in the working directory. PNG files are generates providing a

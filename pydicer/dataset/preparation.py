@@ -88,13 +88,11 @@ class PrepareDataset:
         logger.info("Preparing dataset %s using function: %s", dataset_name, preparation_function)
 
         # Grab the DataFrame containing all the converted data
-        df_converted = read_converted_data_frame(
-            self.working_directory.joinpath("nifti"), patients=patients
-        )
+        converted_path = self.working_directory.joinpath("data")
+        df_converted = read_converted_data_frame(converted_path, patients=patients)
 
         # Send to the prepare function which will return a DataFrame of the data objects to use for
         # the dataset
-        converted_path = self.working_directory.joinpath("nifti")
         df_clean_data = preparation_function(df_converted, **kwargs)
 
         # For each data object prepare the data in the clean directory (using symbolic links)
