@@ -194,6 +194,19 @@ class ConvertData:
         Function to convert the data into its intended form (eg. images into Nifti)
         """
 
+        df_data_objects = pd.DataFrame(
+            columns=[
+                "sop_instance_uid",
+                "hashed_uid",
+                "modality",
+                "patient_id",
+                "series_uid",
+                "for_uid",
+                "referenced_sop_instance_uid",
+                "path",
+            ]
+        )
+
         if patient is not None and not hasattr(patient, "__iter__"):
             patient = [patient]
 
@@ -207,13 +220,24 @@ class ConvertData:
             # Grab the patied_id, study_uid, sop_class_uid and modality (should be the same for all
             # files in series)
             patient_id = df_files.patient_id.unique()[0]
-            # study_uid = df_files.study_uid.unique()[0]
             sop_class_uid = df_files.sop_class_uid.unique()[0]
-            modality = df_files.sop_class_uid.unique()[0]
+            modality = df_files.modality.unique()[0]
+            for_uid = df_files.for_uid.unique()[0]
 
-            # Prepare some hashes of these UIDs to use for directory/file output paths
-            # study_id_hash = hash_uid(study_uid)
-            series_uid_hash = hash_uid(series_uid)
+            # Use the SOPInstanceUID as a hash for the output object. In case of a series (where
+            # multiple DICOM objects make up the converted object) then use the SOPInstanceUID of
+            # the first object.
+            sop_instance_uid = df_files.sop_instance_uid.unique()[0]
+            sop_instance_hash = hash_uid(sop_instance_uid)
+
+            entry = {
+                "sop_instance_uid": sop_instance_uid,
+                "hashed_uid": sop_instance_hash,
+                "modality": modality,
+                "patient_id": patient_id,
+                "series_uid": series_uid,
+                "for_uid": for_uid,
+            }
 
             try:
                 # TODO abstract this interpolation, apply to other image modalities
@@ -224,24 +248,27 @@ class ConvertData:
                     else:
                         raise ValueError("Slice Locations are not evenly spaced")
 
-                    # series_files = df_files.file_path.tolist()
                     series_files = [str(f) for f in series_files]
                     series = sitk.ReadImage(series_files)
 
-                    output_file_base = f"CT_{series_uid_hash}"
-                    nifti_file_name = f"{output_file_base}.nii.gz"
-                    nifti_file = self.output_directory.joinpath(
-                        patient_id, "images", nifti_file_name
+                    output_dir = self.output_directory.joinpath(
+                        patient_id, "images", sop_instance_hash
                     )
-                    nifti_file.parent.mkdir(exist_ok=True, parents=True)
+                    output_dir.mkdir(exist_ok=True, parents=True)
+
+                    nifti_file = output_dir.joinpath("CT.nii.gz")
                     sitk.WriteImage(series, str(nifti_file))
                     logger.debug("Writing CT Image Series to: %s", nifti_file)
 
-                    json_file_name = f"{output_file_base}.json"
-                    json_file = self.output_directory.joinpath(
-                        patient_id, "images", json_file_name
+                    json_file = output_dir.joinpath("metadata.json")
+                    convert_dicom_headers(
+                        series_files[0],
+                        str(nifti_file.relative_to(self.output_directory)),
+                        json_file,
                     )
-                    convert_dicom_headers(series_files[0], nifti_file_name, json_file)
+
+                    entry["path"] = str(output_dir)
+                    df_data_objects = df_data_objects.append(entry, ignore_index=True)
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
 
@@ -252,14 +279,13 @@ class ConvertData:
                     rt_struct_file = df_files.iloc[0]
 
                     # Get the linked image
-                    linked_uid = rt_struct_file.referenced_uid
                     df_linked_series = self.df_preprocess[
                         self.df_preprocess.series_uid == rt_struct_file.referenced_uid
                     ]
 
                     # If not linked via referenced UID, then try to link via FOR
                     if len(df_linked_series) == 0:
-                        for_uid = rt_struct_file.for_uid
+                        for_uid = rt_struct_file.referenced_for_uid
                         df_linked_series = self.link_via_frame_of_reference(for_uid)
 
                     # Check that the linked series is available
@@ -268,12 +294,8 @@ class ConvertData:
                     if len(df_linked_series) == 0:
                         raise ValueError("Series Referenced by RTSTRUCT not found")
 
-                    linked_uid_hash = hash_uid(linked_uid)
-
                     output_dir = self.output_directory.joinpath(
-                        patient_id,
-                        "structures",
-                        f"{series_uid_hash}_{linked_uid_hash}",
+                        patient_id, "structures", sop_instance_hash
                     )
                     output_dir.mkdir(exist_ok=True, parents=True)
 
@@ -290,119 +312,107 @@ class ConvertData:
                     )
 
                     # TODO Make generation of NRRD file optional
-                    nrrd_file = self.output_directory.joinpath(
-                        patient_id,
-                        "structures",
-                        f"{series_uid_hash}_{linked_uid_hash}.nrrd",
-                    )
+                    nrrd_file = output_dir.joinpath("STRUCTURE_SET.nrrd")
 
                     write_nrrd_from_mask_directory(output_dir, nrrd_file)
 
                     # Save JSON
-                    json_file_name = f"{series_uid_hash}_{linked_uid_hash}.nrrd"
-                    json_file = self.output_directory.joinpath(
-                        patient_id,
-                        "structures",
-                        f"{series_uid_hash}_{linked_uid_hash}.json",
-                    )
+                    json_file = output_dir.joinpath("metadata.json")
                     convert_dicom_headers(
-                        rt_struct_file.file_path, f"{series_uid_hash}_{linked_uid_hash}", json_file
+                        rt_struct_file.file_path,
+                        str(output_dir.relative_to(self.output_directory)),
+                        json_file,
                     )
+
+                    entry["path"] = str(output_dir)
+                    entry["for_uid"] = rt_struct_file.referenced_for_uid
+
+                    # Find the SOP Instance UID of the CT image to link to
+                    entry[
+                        "referenced_sop_instance_uid"
+                    ] = df_linked_series.sop_instance_uid.unique()[0]
+
+                    df_data_objects = df_data_objects.append(entry, ignore_index=True)
 
                 elif sop_class_uid == PET_IMAGE_STORAGE_UID:
 
                     series_files = df_files.file_path.tolist()
                     series_files = [str(f) for f in series_files]
 
-                    output_file_base = f"PT_{series_uid_hash}"
-                    nifti_file_name = f"{output_file_base}.nii.gz"
-                    nifti_file = self.output_directory.joinpath(
-                        patient_id, "images", nifti_file_name
+                    output_dir = self.output_directory.joinpath(
+                        patient_id, "images", sop_instance_hash
                     )
-                    nifti_file.parent.mkdir(exist_ok=True, parents=True)
+                    output_dir.mkdir(exist_ok=True, parents=True)
+                    nifti_file = output_dir.joinpath("PT.nii.gz")
 
                     convert_dicom_to_nifti_pt(
                         series_files,
                         nifti_file,
                     )
 
-                    json_file_name = f"{output_file_base}.json"
-                    json_file = self.output_directory.joinpath(
-                        patient_id, "images", json_file_name
+                    json_file = output_dir.joinpath("metadata.json")
+                    convert_dicom_headers(
+                        series_files[0],
+                        str(nifti_file.relative_to(self.output_directory)),
+                        json_file,
                     )
-                    convert_dicom_headers(series_files[0], nifti_file_name, json_file)
+
+                    entry["path"] = str(output_dir)
+                    df_data_objects = df_data_objects.append(entry, ignore_index=True)
 
                 elif sop_class_uid == RT_PLAN_STORAGE_UID:
 
                     # No Nifti to create here, just save the JSON
 
-                    # Should only be one file per RTPLAN series
-                    if not len(df_files) == 1:
-                        ValueError("More than one RTPLAN with the same SeriesInstanceUID")
+                    # If there are multiple RTPLANs in the same series then just save them all
+                    for _, rt_plan_file in df_files.iterrows():
 
-                    rt_plan_file = df_files.iloc[0]
+                        sop_instance_hash = hash_uid(rt_plan_file.sop_instance_uid)
 
-                    # Get the linked structure set
-                    linked_uid = rt_plan_file.referenced_uid
-                    df_linked_series = self.df_preprocess[
-                        self.df_preprocess.sop_instance_uid == rt_plan_file.referenced_uid
-                    ]
+                        output_dir = self.output_directory.joinpath(
+                            patient_id, "plans", sop_instance_hash
+                        )
+                        output_dir.mkdir(exist_ok=True, parents=True)
 
-                    # If not linked via referenced UID, then try to link via FOR
-                    if len(df_linked_series) == 0:
-                        for_uid = rt_plan_file.for_uid
-                        df_linked_series = self.link_via_frame_of_reference(for_uid)
+                        json_file = output_dir.joinpath("metadata.json")
 
-                    # Check that the linked series is available
-                    if len(df_linked_series) == 0:
-                        raise ValueError("Series Referenced by RTPLAN not found")
+                        convert_dicom_headers(rt_plan_file.file_path, "", json_file)
 
-                    linked_uid_hash = hash_uid(df_linked_series.iloc[0].series_uid)
-
-                    output_file_base = f"RP_{series_uid_hash}_{linked_uid_hash}"
-                    json_file_name = f"{output_file_base}.json"
-                    json_file = self.output_directory.joinpath(patient_id, "plans", json_file_name)
-                    json_file.parent.mkdir(exist_ok=True, parents=True)
-
-                    convert_dicom_headers(rt_plan_file.file_path, "", json_file)
+                        entry["sop_instance_uid"] = rt_plan_file.sop_instance_uid
+                        entry["hashed_uid"] = sop_instance_hash
+                        entry["referenced_sop_instance_uid"] = rt_plan_file.referenced_uid
+                        entry["path"] = str(output_dir)
+                        df_data_objects = df_data_objects.append(entry, ignore_index=True)
 
                 elif sop_class_uid == RT_DOSE_STORAGE_UID:
 
-                    # Should only be one file per RTDOSE series
-                    if not len(df_files) == 1:
-                        ValueError("More than one RTDOSE with the same SeriesInstanceUID")
+                    # If there are multiple RTDOSEs in the same series then just save them all
+                    for _, rt_dose_file in df_files.iterrows():
 
-                    rt_dose_file = df_files.iloc[0]
+                        sop_instance_hash = hash_uid(rt_dose_file.sop_instance_uid)
 
-                    # Get the linked plan
-                    linked_uid = rt_dose_file.referenced_uid
-                    df_linked_series = self.df_preprocess[
-                        self.df_preprocess.sop_instance_uid == rt_dose_file.referenced_uid
-                    ]
+                        output_dir = self.output_directory.joinpath(
+                            patient_id, "doses", sop_instance_hash
+                        )
+                        output_dir.mkdir(exist_ok=True, parents=True)
 
-                    # If not linked via referenced UID, then try to link via FOR
-                    if len(df_linked_series) == 0:
-                        for_uid = rt_dose_file.for_uid
-                        df_linked_series = self.link_via_frame_of_reference(for_uid)
+                        nifti_file = output_dir.joinpath("RTDOSE.nii.gz")
+                        nifti_file.parent.mkdir(exist_ok=True, parents=True)
+                        logger.debug("Writing RTDOSE to: %s", nifti_file)
+                        convert_rtdose(rt_dose_file.file_path, nifti_file)
 
-                    # Check that the linked series is available
-                    if len(df_linked_series) == 0:
-                        raise ValueError("Series Referenced by RTDOSE not found")
+                        json_file = output_dir.joinpath("metadata.json")
+                        convert_dicom_headers(
+                            rt_dose_file.file_path,
+                            str(nifti_file.relative_to(self.output_directory)),
+                            json_file,
+                        )
 
-                    linked_uid_hash = hash_uid(df_linked_series.iloc[0].series_uid)
-
-                    output_file_base = f"RD_{series_uid_hash}_{linked_uid_hash}"
-                    nifti_file_name = f"{output_file_base}.nii.gz"
-                    nifti_file = self.output_directory.joinpath(
-                        patient_id, "doses", nifti_file_name
-                    )
-                    nifti_file.parent.mkdir(exist_ok=True, parents=True)
-                    logger.debug("Writing RTDOSE to: %s", nifti_file)
-                    convert_rtdose(rt_dose_file.file_path, nifti_file)
-
-                    json_file_name = f"{output_file_base}.json"
-                    json_file = self.output_directory.joinpath(patient_id, "doses", json_file_name)
-                    convert_dicom_headers(rt_dose_file.file_path, nifti_file_name, json_file)
+                        entry["sop_instance_uid"] = rt_plan_file.sop_instance_uid
+                        entry["hashed_uid"] = sop_instance_hash
+                        entry["referenced_sop_instance_uid"] = rt_plan_file.referenced_uid
+                        entry["path"] = str(output_dir)
+                        df_data_objects = df_data_objects.append(entry, ignore_index=True)
                 else:
                     raise NotImplementedError(
                         "Unable to convert Series with SOP Class UID: {sop_class_uid} / "
@@ -420,3 +430,5 @@ class ConvertData:
                         "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
                     )
                     copy_file_to_quarantine(Path(f), self.output_directory, e)
+
+        return df_data_objects
