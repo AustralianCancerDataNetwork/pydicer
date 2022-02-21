@@ -217,9 +217,10 @@ class ConvertData:
             if patient is not None and patient_id not in patient:
                 continue
 
-            # Grab the patied_id, study_uid, sop_class_uid and modality (should be the same for all
-            # files in series)
-            patient_id = df_files.patient_id.unique()[0]
+            patient_directory = self.output_directory.joinpath(patient_id)
+
+            # Grab the sop_class_uid, modality and for_uid (should be the same for all files in
+            # series)
             sop_class_uid = df_files.sop_class_uid.unique()[0]
             modality = df_files.modality.unique()[0]
             for_uid = df_files.for_uid.unique()[0]
@@ -251,9 +252,7 @@ class ConvertData:
                     series_files = [str(f) for f in series_files]
                     series = sitk.ReadImage(series_files)
 
-                    output_dir = self.output_directory.joinpath(
-                        patient_id, "images", sop_instance_hash
-                    )
+                    output_dir = patient_directory.joinpath("images", sop_instance_hash)
                     output_dir.mkdir(exist_ok=True, parents=True)
 
                     nifti_file = output_dir.joinpath("CT.nii.gz")
@@ -294,9 +293,7 @@ class ConvertData:
                     if len(df_linked_series) == 0:
                         raise ValueError("Series Referenced by RTSTRUCT not found")
 
-                    output_dir = self.output_directory.joinpath(
-                        patient_id, "structures", sop_instance_hash
-                    )
+                    output_dir = patient_directory.joinpath("structures", sop_instance_hash)
                     output_dir.mkdir(exist_ok=True, parents=True)
 
                     img_file_list = df_linked_series.file_path.tolist()
@@ -339,9 +336,7 @@ class ConvertData:
                     series_files = df_files.file_path.tolist()
                     series_files = [str(f) for f in series_files]
 
-                    output_dir = self.output_directory.joinpath(
-                        patient_id, "images", sop_instance_hash
-                    )
+                    output_dir = patient_directory.joinpath("images", sop_instance_hash)
                     output_dir.mkdir(exist_ok=True, parents=True)
                     nifti_file = output_dir.joinpath("PT.nii.gz")
 
@@ -369,9 +364,7 @@ class ConvertData:
 
                         sop_instance_hash = hash_uid(rt_plan_file.sop_instance_uid)
 
-                        output_dir = self.output_directory.joinpath(
-                            patient_id, "plans", sop_instance_hash
-                        )
+                        output_dir = patient_directory.joinpath("plans", sop_instance_hash)
                         output_dir.mkdir(exist_ok=True, parents=True)
 
                         json_file = output_dir.joinpath("metadata.json")
@@ -391,9 +384,7 @@ class ConvertData:
 
                         sop_instance_hash = hash_uid(rt_dose_file.sop_instance_uid)
 
-                        output_dir = self.output_directory.joinpath(
-                            patient_id, "doses", sop_instance_hash
-                        )
+                        output_dir = patient_directory.joinpath("doses", sop_instance_hash)
                         output_dir.mkdir(exist_ok=True, parents=True)
 
                         nifti_file = output_dir.joinpath("RTDOSE.nii.gz")
@@ -408,9 +399,9 @@ class ConvertData:
                             json_file,
                         )
 
-                        entry["sop_instance_uid"] = rt_plan_file.sop_instance_uid
+                        entry["sop_instance_uid"] = rt_dose_file.sop_instance_uid
                         entry["hashed_uid"] = sop_instance_hash
-                        entry["referenced_sop_instance_uid"] = rt_plan_file.referenced_uid
+                        entry["referenced_sop_instance_uid"] = rt_dose_file.referenced_uid
                         entry["path"] = str(output_dir)
                         df_data_objects = df_data_objects.append(entry, ignore_index=True)
                 else:
@@ -418,6 +409,12 @@ class ConvertData:
                         "Unable to convert Series with SOP Class UID: {sop_class_uid} / "
                         f"Modality: {modality}"
                     )
+
+                # Save off the converted data frame for this patient
+                converted_df_path = patient_directory.joinpath("converted.csv")
+                df_data_objects[df_data_objects["patient_id"] == patient_id].to_csv(
+                    converted_df_path
+                )
 
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
