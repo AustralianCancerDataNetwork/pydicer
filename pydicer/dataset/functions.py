@@ -212,6 +212,12 @@ def rt_latest_dose(df, **kwargs):
         df_linked_struct = df[df["sop_instance_uid"] == plan_row.referenced_sop_instance_uid]
 
         if len(df_linked_struct) == 0:
+            # Try to link via Frame of Reference instead
+            df_linked_struct = df[
+                (df["modality"] == "RTSTRUCT") & (df["for_uid"] == dose_row.for_uid)
+            ]
+
+        if len(df_linked_struct) == 0:
             logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
             continue
 
