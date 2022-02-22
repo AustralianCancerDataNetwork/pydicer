@@ -59,6 +59,7 @@ def test_input_invalid_working_dir():
     assert not invalid_work_dir_tcia_input.working_directory.is_dir()
 
 
+@pytest.mark.skip
 def test_tcia_input():
     invalid_collection_tcia_input = TCIAInput(
         collection="INVALID_COLLECTION", patient_ids=[], modalities=[]
@@ -90,6 +91,7 @@ def test_dicom_pacs_invalid_host():
     # data consistently
     with pytest.raises(ConnectionError):
         DICOMPACSInput("INCORRECT_HOST", 1234)
+
 
 @pytest.mark.skip
 def test_dicom_pacs_fetch():

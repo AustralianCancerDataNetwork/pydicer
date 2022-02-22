@@ -82,6 +82,7 @@ class OrthancInput(InputBase):
 
             if len(orthanc_patient_ids) == 0:
                 logger.warning("Patient not found in Orthanc: %s", patient)
+                continue
 
             if len(orthanc_patient_ids) > 1:
                 logger.warning(
