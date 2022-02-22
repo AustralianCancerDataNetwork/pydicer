@@ -27,7 +27,7 @@ def copy_file_to_quarantine(file, working_directory, error_msg):
 
         val = None
         if k in ds:
-            val = ds[k]
+            val = ds[k].value
 
         summary_dict[k] = val
 
