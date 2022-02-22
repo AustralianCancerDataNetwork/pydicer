@@ -332,11 +332,13 @@ class ConvertData:
                     output_dir = patient_directory.joinpath("structures", sop_instance_hash)
                     output_dir.mkdir(exist_ok=True, parents=True)
 
-                    linked_file_name = (
-                        f"{df_linked_series.iloc[0].modality}_{linked_uid_hash}.nii.gz"
-                    )
+                    img_row = df_linked_series.iloc[0]
+                    hashed_linked_id = hash_uid(img_row.sop_instance_uid)
                     linked_nifti_file = self.output_directory.joinpath(
-                        patient_id, "images", linked_file_name
+                        patient_id,
+                        "images",
+                        hashed_linked_id,
+                        f"{img_row.modality}.nii.gz",
                     )
                     img_file = sitk.ReadImage(str(linked_nifti_file))
 
