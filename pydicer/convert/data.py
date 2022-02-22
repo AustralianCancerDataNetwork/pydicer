@@ -70,6 +70,32 @@ def handle_missing_slice(files):
     else:
         raise ValueError("This function requires a Dataframe or list")
 
+    # If duplicated slices locations are present in series, check if the first duplicates have the
+    # same pixel data. If they do, then assume all are the same and drop the duplicates. Otherwise
+    # we raise an error.
+    df_duplicated = df_files[df_files["slice_location"].duplicated()]
+    if len(df_duplicated) > 0:
+        check_slice_location = df_duplicated.iloc[0].slice_location
+        df_check_duplicates = df_files[df_files["slice_location"] == check_slice_location]
+
+        pix_array = None
+        for _, row in df_check_duplicates.iterrows():
+            this_pix_array = pydicom.read_file(row.file_path).pixel_array
+
+            if pix_array is None:
+                pix_array = this_pix_array
+            else:
+                if not np.allclose(pix_array, this_pix_array):
+                    raise (
+                        ValueError(
+                            f"{len(df_check_duplicates)} slices at location "
+                            f"{check_slice_location} containing different pixel data."
+                        )
+                    )
+
+        logger.warning("Duplicate slices detected, pixel array the same so dropping duplicates")
+        df_files = df_files.drop_duplicates(subset=["slice_location"])
+
     temp_dir = Path(tempfile.mkdtemp())
 
     slice_location_diffs = np.diff(df_files.slice_location.to_numpy(dtype=float))
@@ -217,9 +243,9 @@ class ConvertData:
         if patient is not None and not hasattr(patient, "__iter__"):
             patient = [patient]
 
-        for key, df_files in self.df_preprocess.groupby(["patient_id", "series_uid"]):
+        for key, df_files in self.df_preprocess.groupby(["patient_id", "modality", "series_uid"]):
 
-            patient_id, series_uid = key
+            patient_id, _, series_uid = key
 
             if patient is not None and patient_id not in patient:
                 continue
@@ -306,11 +332,16 @@ class ConvertData:
                     output_dir = patient_directory.joinpath("structures", sop_instance_hash)
                     output_dir.mkdir(exist_ok=True, parents=True)
 
-                    img_file_list = df_linked_series.file_path.tolist()
-                    img_file_list = [str(f) for f in img_file_list]
+                    linked_file_name = (
+                        f"{df_linked_series.iloc[0].modality}_{linked_uid_hash}.nii.gz"
+                    )
+                    linked_nifti_file = self.output_directory.joinpath(
+                        patient_id, "images", linked_file_name
+                    )
+                    img_file = sitk.ReadImage(str(linked_nifti_file))
 
                     convert_rtstruct(
-                        img_file_list,
+                        img_file,
                         rt_struct_file.file_path,
                         prefix="",
                         output_dir=output_dir,

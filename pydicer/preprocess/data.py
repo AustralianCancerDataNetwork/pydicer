@@ -164,7 +164,7 @@ class PreprocessData:
 
         # Sort the the DataFrame by the patient then series uid and the slice location, ensuring
         # that the slices are ordered correctly
-        df = df.sort_values(["patient_id", "series_uid", "slice_location"])
+        df = df.sort_values(["patient_id", "modality", "series_uid", "slice_location"])
 
         # Save the Preprocessed DataFrame
         df.to_csv(self.pydicer_directory.joinpath("preprocessed.csv"))
