@@ -141,6 +141,13 @@ class VisualiseData:
                 ]
 
                 if len(df_linked_struct) == 0:
+                    # Try to link via Frame of Reference instead
+                    df_linked_struct = df_converted[
+                        (df_converted["modality"] == "RTSTRUCT")
+                        & (df_converted["for_uid"] == row.for_uid)
+                    ]
+
+                if len(df_linked_struct) == 0:
                     logger.warning(
                         "No structures found, dose won't be visualised: %s", row.sop_instance_uid
                     )
