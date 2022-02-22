@@ -285,6 +285,9 @@ class ConvertData:
                     rt_struct_file = df_files.iloc[0]
 
                     # Get the linked image
+                    # Need to disable this pylint check here only, seems to be a bug in
+                    # pylint/pandas
+                    # pylint: disable=unsubscriptable-object
                     df_linked_series = self.df_preprocess[
                         self.df_preprocess["series_uid"] == rt_struct_file.referenced_uid
                     ]
