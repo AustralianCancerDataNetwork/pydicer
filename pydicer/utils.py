@@ -1,4 +1,9 @@
 import hashlib
+import json
+from datetime import datetime
+from pathlib import Path
+
+import pydicom
 
 
 def hash_uid(uid, truncate=6):
@@ -17,24 +22,54 @@ def hash_uid(uid, truncate=6):
     return hash_sha.hexdigest()[:truncate]
 
 
-def find_linked_image(struct_dir):
-    """Returns the image file linked to a structure directory
+def determine_dcm_datetime(ds, require_time=False):
+    """Get a date/time value from a DICOM dataset. Will attempt to pull from SeriesDate/SeriesTime
+    field first. Will fallback to StudyDate/StudyTime or InstanceCreationDate/InstanceCreationTime
+    if not available.
 
     Args:
-        struct_dir (pathlib.Path): The structure directory
+        ds (pydicom.Dataset): DICOM dataset
+        require_time (bool): Flag to require the time component along with the date
 
     Returns:
-        pathlib.Path: The image linked to the structure. None if not image is found.
+        datetime: The date/time
     """
 
-    img_id = struct_dir.name.split("_")[1]
+    date_type_preference = ["Series", "Study", "InstanceCreation"]
 
-    img_links = list(struct_dir.parent.parent.glob(f"images/*{img_id}.nii.gz"))
+    for date_type in date_type_preference:
 
-    # If we have multiple linked images (not sure if this can happen but it might?)
-    # then take the first one. If we find no linked images log and error and don't
-    # visualise for now
-    if len(img_links) == 0:
-        return None
+        type_date = f"{date_type}Date"
+        type_time = f"{date_type}Time"
+        if type_date in ds and len(ds[type_date].value) > 0:
 
-    return img_links[0]
+            if type_time in ds and len(ds[type_time].value) > 0:
+                date_time_str = f"{ds[type_date].value}{ds[type_time].value}"
+                if "." in date_time_str:
+                    return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
+
+                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
+
+            if require_time:
+                continue
+
+            return datetime.strptime(ds[type_date].value, "%Y%m%d")
+
+    return None
+
+
+def load_object_metadata(row):
+    """Loads the object's metadata
+
+    Args:
+        row (pd.Series): The row of the converted DataFrame for which to load the metadata
+
+    Returns:
+        pydicom.Dataset: The dataset object containing the original DICOM metadata
+    """
+
+    metadata_path = Path(row.path).joinpath("metadata.json")
+    with open(metadata_path, "r", encoding="utf8") as json_file:
+        ds_dict = json.load(json_file)
+
+    return pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
