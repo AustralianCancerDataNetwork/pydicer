@@ -22,50 +22,38 @@ def hash_uid(uid, truncate=6):
     return hash_sha.hexdigest()[:truncate]
 
 
-def determine_dcm_datetime(ds):
+def determine_dcm_datetime(ds, require_time=False):
     """Get a date/time value from a DICOM dataset. Will attempt to pull from SeriesDate/SeriesTime
     field first. Will fallback to StudyDate/StudyTime or InstanceCreationDate/InstanceCreationTime
     if not available.
 
     Args:
         ds (pydicom.Dataset): DICOM dataset
+        require_time (bool): Flag to require the time component along with the date
 
     Returns:
         datetime: The date/time
     """
 
-    if "SeriesDate" in ds and len(ds.SeriesDate) > 0:
+    date_type_preference = ["Series", "Study", "InstanceCreation"]
 
-        if "SeriesTime" in ds and len(ds.SeriesTime) > 0:
-            date_time_str = f"{ds.SeriesDate}{ds.SeriesTime}"
-            if "." in date_time_str:
-                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
+    for date_type in date_type_preference:
 
-            return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
+        type_date = f"{date_type}Date"
+        type_time = f"{date_type}Time"
+        if type_date in ds and len(ds[type_date].value) > 0:
 
-        return datetime.strptime(ds.SeriesDate, "%Y%m%d")
+            if type_time in ds and len(ds[type_time].value) > 0:
+                date_time_str = f"{ds[type_date].value}{ds[type_time].value}"
+                if "." in date_time_str:
+                    return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
 
-    if "StudyDate" in ds and len(ds.StudyDate) > 0:
+                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
 
-        if "StudyTime" in ds and len(ds.StudyTime) > 0:
-            date_time_str = f"{ds.StudyDate}{ds.StudyTime}"
-            if "." in date_time_str:
-                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
+            if require_time:
+                continue
 
-            return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
-
-        return datetime.strptime(ds.StudyDate, "%Y%m%d")
-
-    if "InstanceCreationDate" in ds and len(ds.InstanceCreationDate) > 0:
-
-        if "InstanceCreationTime" in ds and len(ds.InstanceCreationTime) > 0:
-            date_time_str = f"{ds.InstanceCreationDate}{ds.InstanceCreationTime}"
-            if "." in date_time_str:
-                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
-
-            return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
-
-        return datetime.strptime(ds.InstanceCreationDate, "%Y%m%d")
+            return datetime.strptime(ds[type_date].value, "%Y%m%d")
 
     return None
 
