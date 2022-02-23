@@ -464,8 +464,10 @@ class ConvertData:
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
+                logger.error(
+                    "Unable to convert series for patient: %s with UID: %s", patient_id, series_uid
+                )
                 logger.exception(e)
-                logger.error("Unable to convert series with UID: %s", series_uid)
 
                 for f in df_files.file_path.tolist():
                     logger.error(
