@@ -433,7 +433,7 @@ class ConvertData:
                         nifti_file = output_dir.joinpath("RTDOSE.nii.gz")
                         nifti_file.parent.mkdir(exist_ok=True, parents=True)
                         logger.debug("Writing RTDOSE to: %s", nifti_file)
-                        convert_rtdose(rt_dose_file.file_path, True, nifti_file)
+                        convert_rtdose(rt_dose_file.file_path, force=True, dose_output_path=nifti_file)
 
                         json_file = output_dir.joinpath("metadata.json")
                         convert_dicom_headers(
