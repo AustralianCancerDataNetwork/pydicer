@@ -1,82 +1,11 @@
-import os
-import json
 import logging
-from datetime import datetime
-from pathlib import Path
 
-import pydicom
+from pydicer.utils import load_object_metadata, determine_dcm_datetime
 
 logger = logging.getLogger(__name__)
 
 
-def get_linked_series(file_path):
-    """Find the files linked to the file in the path supplied
-
-    Args:
-        file_path (pathlib.Path): Path to the file for which to find links
-
-    Returns:
-        list: List of linked files found
-    """
-
-    file_name = file_path.name.split(".")[0]
-    linked_hash = file_name.split("_")[-1]
-
-    # Find the series based on the linked hash
-    linked_images = list(file_path.parent.parent.parent.glob(f"**/images/**/*{linked_hash}.*"))
-    linked_objects = list(file_path.parent.parent.parent.glob(f"**/*{linked_hash}_*"))
-    return linked_images + linked_objects
-
-
-def determine_dcm_datetime(ds):
-    """Get a date/time value from a DICOM dataset. Will attempt to pull from SeriesDate/SeriesTime
-    field first. Will fallback to StudyDate/StudyTime or InstanceCreationDate/InstanceCreationTime
-    if not available.
-
-    Args:
-        ds (pydicom.Dataset): DICOM dataset
-
-    Returns:
-        datetime: The date/time
-    """
-
-    if "SeriesDate" in ds and len(ds.SeriesDate) > 0:
-
-        if "SeriesTime" in ds and len(ds.SeriesTime) > 0:
-            date_time_str = f"{ds.SeriesDate}{ds.SeriesTime}"
-            if "." in date_time_str:
-                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
-
-            return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
-
-        return datetime.strptime(ds.SeriesDate, "%Y%m%d")
-
-    if "StudyDate" in ds and len(ds.StudyDate) > 0:
-
-        if "StudyTime" in ds and len(ds.StudyTime) > 0:
-            date_time_str = f"{ds.StudyDate}{ds.StudyTime}"
-            if "." in date_time_str:
-                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
-
-            return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
-
-        return datetime.strptime(ds.StudyDate, "%Y%m%d")
-
-    if "InstanceCreationDate" in ds and len(ds.InstanceCreationDate) > 0:
-
-        if "InstanceCreationTime" in ds and len(ds.InstanceCreationTime) > 0:
-            date_time_str = f"{ds.InstanceCreationDate}{ds.InstanceCreationTime}"
-            if "." in date_time_str:
-                return datetime.strptime(date_time_str, "%Y%m%d%H%M%S.%f")
-
-            return datetime.strptime(date_time_str, "%Y%m%d%H%M%S")
-
-        return datetime.strptime(ds.InstanceCreationDate, "%Y%m%d")
-
-    return None
-
-
-def rt_latest_struct(working_directory, dataset_name, patients=None, **kwargs):
+def rt_latest_struct(df, **kwargs):
     """Select the latest Structure set and the image which it is linked to. You can specify keyword
     arguments to for a match on any top level DICOM attributes. You may also supply lists of values
     to these, one of which should match to select that series.
@@ -85,52 +14,45 @@ def rt_latest_struct(working_directory, dataset_name, patients=None, **kwargs):
     "APPROVED"
     .. code-block:: python
 
-        prepare_dataset = PrepareDataset(output_directory)
+        prepare_dataset = PrepareDataset(working_directory)
         prepare_dataset.prepare(
-            "./clean",
+            "clean",
             "rt_latest_struct",
             SeriesDescription=["FINAL", "APPROVED"]
         )
 
     Args:
-        working_directory (pathlib.Path): The directory holding the converted data
-        dataset_name (str): The name of the dataset being prepared
-        patients (list): If specfified, only select patients with ID in this list
+        df (pd.DataFrame): DataFrame of converted data objects available for dataset
+
+    Returns:
+        pd.DataFrame: The filtered DataFrame containing only the objects to select
     """
 
-    data_directory = working_directory.joinpath("nifti")
-    target_directory = working_directory.joinpath(dataset_name)
-    pat_dirs = [p for p in data_directory.glob("*") if p.is_dir() and not "quarantine" in p.name]
+    patients = df.patient_id.unique()
 
-    if len(pat_dirs) == 0:
-        logger.warning("No patient directories found in directory")
+    keep_rows = []
 
-    for pat_dir in pat_dirs:
-
-        pat_id = pat_dir.name
-
-        if patients:
-            if not pat_id in patients:
-                continue
+    for pat_id in patients:
 
         logger.debug("Selecting data for patient: %s", pat_id)
 
-        structure_metadata = list(pat_dir.glob("**/structures/*.json"))
+        df_patient = df[df["patient_id"] == pat_id]
 
-        pat_structs = []
-        for struct_md in structure_metadata:
+        df_structures = df_patient[df_patient["modality"] == "RTSTRUCT"]
 
-            with open(struct_md, "r", encoding="utf8") as json_file:
-                ds_dict = json.load(json_file)
+        struct_indicies = []
+        struct_dates = []
+        for idx, row in df_structures.iterrows():
 
-            struct_ds = pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
+            struct_ds = load_object_metadata(row)
             ds_date = determine_dcm_datetime(struct_ds)
+            struct_dates.append(ds_date)
 
             skip_series = False
             for k, item in kwargs.items():
 
                 if not k in struct_ds:
-                    logger.debug("Attribute %s not in %s", k, struct_md)
+                    logger.debug("Attribute %s not in metadata", k)
                     skip_series = True
                     continue
 
@@ -152,53 +74,42 @@ def rt_latest_struct(working_directory, dataset_name, patients=None, **kwargs):
                     )
 
             if skip_series:
-                logger.debug("Skipping series based on filters: %s", struct_md)
+                logger.debug("Skipping series based on filters")
                 continue
 
-            pat_structs.append({"metadata": struct_md, "datetime": ds_date})
+            struct_indicies.append(idx)
 
-            logger.debug("Found structure metadata: %s with date: %s", struct_md, ds_date)
+        df_structures.loc[:, "datetime"] = struct_dates
+        df_structures = df_structures.loc[struct_indicies]
+        df_structures.sort_values("datetime", ascending=False, inplace=True)
 
-        pat_structs = sorted(pat_structs, key=lambda d: d["datetime"], reverse=True)
-
-        if len(pat_structs) == 0:
+        if len(df_structures) == 0:
             logger.warning("No data selected for patient: %s", pat_id)
             continue
 
         # Select the latest structure
-        pat_struct = pat_structs[0]
+        struct_row = df_structures.iloc[0]
         logger.debug(
-            "Selecting structure metadata: %s with date: %s",
-            pat_struct["metadata"],
-            pat_struct["datetime"],
+            "Selecting structure: %s with date: %s",
+            struct_row["hashed_uid"],
+            struct_row["datetime"],
         )
+        keep_rows.append(struct_row.name)  # Track index of row to keep
 
-        struct_md = pat_struct["metadata"]
-        struct_dir_name = struct_md.name.replace(struct_md.suffix, "")
-        struct_parts = struct_dir_name.split("_")
-        referenced_img_id = struct_parts[1]
+        # Find the linked image
 
-        pat_prep_dir = target_directory.joinpath(pat_id)
+        df_linked_img = df[df["sop_instance_uid"] == struct_row.referenced_sop_instance_uid]
 
-        files_to_link = list(pat_dir.glob(f"**/images/*{referenced_img_id}*")) + list(
-            pat_dir.glob(f"**/structures/*{struct_dir_name}*")
-        )
+        if len(df_linked_img) == 0:
+            logger.warning("No linked images found for structure: %s", struct_row.hashed_uid)
+            continue
 
-        for file_path in files_to_link:
-            symlink_path = pat_prep_dir.joinpath(file_path.parent.name, file_path.name)
-            if symlink_path.exists():
-                os.remove(symlink_path)
+        keep_rows.append(df_linked_img.iloc[0].name)  # Keep the index of the row of the image too
 
-            rel_part = os.sep.join(
-                [".." for _ in symlink_path.parent.relative_to(working_directory).parts]
-            )
-            src_path = Path(f"{rel_part}{os.sep}{file_path.relative_to(working_directory)}")
-
-            symlink_path.parent.mkdir(parents=True, exist_ok=True)
-            symlink_path.symlink_to(src_path)
+    return df.loc[keep_rows]
 
 
-def rt_latest_dose(working_directory, dataset_name, patients=None, **kwargs):
+def rt_latest_dose(df, **kwargs):
     """Select the latest RTDOSE and the image, structure and plan which it is linked to. You can
     specify keyword arguments to for a match on any top level DICOM attributes. You may also supply
     lists of values to these, one of which should match to select that series.
@@ -206,52 +117,45 @@ def rt_latest_dose(working_directory, dataset_name, patients=None, **kwargs):
     Example of matching the latest dose with Series Description being "FINAL" or "APPROVED"
     .. code-block:: python
 
-        prepare_dataset = PrepareDataset(output_directory)
+        prepare_dataset = PrepareDataset(working_directory)
         prepare_dataset.prepare(
-            "./clean",
+            "clean",
             "rt_latest_dose",
             SeriesDescription=["FINAL", "APPROVED"]
         )
 
     Args:
-        working_directory (pathlib.Path): The directory holding the converted data
-        dataset_name (str): The name of the dataset being prepared
-        patients (list): If specfified, only select patients with ID in this list
+        df (pd.DataFrame): DataFrame of converted data objects available for dataset
+
+    Returns:
+        pd.DataFrame: The filtered DataFrame containing only the objects to select
     """
 
-    data_directory = working_directory.joinpath("nifti")
-    target_directory = working_directory.joinpath(dataset_name)
-    pat_dirs = [p for p in data_directory.glob("*") if p.is_dir() and not "quarantine" in p.name]
+    patients = df.patient_id.unique()
 
-    if len(pat_dirs) == 0:
-        logger.warning("No patient directories found in directory")
+    keep_rows = []
 
-    for pat_dir in pat_dirs:
-
-        pat_id = pat_dir.name
-
-        if patients:
-            if not pat_id in patients:
-                continue
+    for pat_id in patients:
 
         logger.debug("Selecting data for patient: %s", pat_id)
 
-        dose_metadata = list(pat_dir.glob("**/doses/*.json"))
+        df_patient = df[df["patient_id"] == pat_id]
 
-        pat_doses = []
-        for dose_md in dose_metadata:
+        df_doses = df_patient[df_patient["modality"] == "RTDOSE"]
 
-            with open(dose_md, "r", encoding="utf8") as json_file:
-                ds_dict = json.load(json_file)
+        dose_indicies = []
+        dose_dates = []
+        for idx, row in df_doses.iterrows():
 
-            dose_ds = pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
+            dose_ds = load_object_metadata(row)
             ds_date = determine_dcm_datetime(dose_ds)
+            dose_dates.append(ds_date)
 
             skip_series = False
             for k, item in kwargs.items():
 
                 if not k in dose_ds:
-                    logger.debug("Attribute %s not in %s", k, dose_md)
+                    logger.debug("Attribute %s not in metadata", k)
                     skip_series = True
                     continue
 
@@ -273,58 +177,59 @@ def rt_latest_dose(working_directory, dataset_name, patients=None, **kwargs):
                     )
 
             if skip_series:
-                logger.debug("Skipping series based on filters: %s", dose_md)
+                logger.debug("Skipping series based on filters")
                 continue
 
-            pat_doses.append({"metadata": dose_md, "datetime": ds_date})
+            dose_indicies.append(idx)
 
-            logger.debug("Found structure metadata: %s with date: %s", dose_md, ds_date)
+        df_doses = df_doses.assign(datetime = dose_dates)
+        df_doses = df_doses.loc[dose_indicies]
+        df_doses.sort_values("datetime", ascending=False, inplace=True)
 
-        pat_doses = sorted(pat_doses, key=lambda d: d["datetime"], reverse=True)
-
-        if len(pat_doses) == 0:
-            logger.warning("No dose selected for patient: %s", pat_id)
+        if len(df_doses) == 0:
+            logger.warning("No data selected for patient: %s", pat_id)
             continue
 
         # Select the latest structure
-        pat_dose = pat_doses[0]
+        dose_row = df_doses.iloc[0]
         logger.debug(
-            "Selecting dose metadata: %s with date: %s",
-            pat_dose["metadata"],
-            pat_dose["datetime"],
+            "Selecting dose: %s with date: %s",
+            dose_row["hashed_uid"],
+            dose_row["datetime"],
         )
+        keep_rows.append(dose_row.name)  # Track index of row of dose to keep
 
-        dose_md = pat_dose["metadata"]
-        dose_files = list(pat_dir.glob(f"**/doses/{dose_md.name.split('.')[0]}*"))
+        # Find the linked plan
+        df_linked_plan = df[df["sop_instance_uid"] == dose_row.referenced_sop_instance_uid]
 
-        plan_files = get_linked_series(dose_md)
-        if len(plan_files) == 0:
-            logger.warning("No plan linked to dose for patient %s", pat_id)
+        if len(df_linked_plan) == 0:
+            logger.warning("No linked plans found for dose: %s", dose_row.sop_instance_uid)
             continue
 
-        structure_files = get_linked_series(plan_files[0])
-        if len(structure_files) == 0:
-            logger.warning("No structures linked to plan for patient %s", pat_id)
+        # Find the linked structure set
+        plan_row = df_linked_plan.iloc[0]
+        keep_rows.append(plan_row.name)  # Keep the index of the row of the plan
+        df_linked_struct = df[df["sop_instance_uid"] == plan_row.referenced_sop_instance_uid]
+
+        if len(df_linked_struct) == 0:
+            # Try to link via Frame of Reference instead
+            df_linked_struct = df[
+                (df["modality"] == "RTSTRUCT") & (df["for_uid"] == dose_row.for_uid)
+            ]
+
+        if len(df_linked_struct) == 0:
+            logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
             continue
 
-        image_files = get_linked_series(structure_files[0])
-        if len(image_files) == 0:
-            logger.warning("No image linked to structures for patient %s", pat_id)
+        # Find the linked image
+        struct_row = df_linked_struct.iloc[0]
+        keep_rows.append(struct_row.name)  # Keep the index of the row of the structure
+        df_linked_img = df[df["sop_instance_uid"] == struct_row.referenced_sop_instance_uid]
+
+        if len(df_linked_img) == 0:
+            logger.warning("No linked images found for structure: %s", struct_row.hashed_uid)
             continue
 
-        pat_prep_dir = target_directory.joinpath(pat_id)
+        keep_rows.append(df_linked_img.iloc[0].name)  # Keep the index of the row of the image too
 
-        files_to_link = image_files + structure_files + plan_files + dose_files
-
-        for file_path in files_to_link:
-            symlink_path = pat_prep_dir.joinpath(file_path.parent.name, file_path.name)
-            if symlink_path.exists():
-                os.remove(symlink_path)
-
-            rel_part = os.sep.join(
-                [".." for _ in symlink_path.parent.relative_to(working_directory).parts]
-            )
-            src_path = Path(f"{rel_part}{os.sep}{file_path.relative_to(working_directory)}")
-
-            symlink_path.parent.mkdir(parents=True, exist_ok=True)
-            symlink_path.symlink_to(src_path)
+    return df.loc[keep_rows]
