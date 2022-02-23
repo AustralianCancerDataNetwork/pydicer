@@ -68,7 +68,8 @@ class PreprocessData:
                 "referenced_for_uid",
             ]
         )
-        files = self.input_directory.glob("**/*.dcm")
+        files = list(self.input_directory.glob("**/*.dcm"))
+        files += list(self.input_directory.glob("**/*.DCM"))
 
         for file in files:
             ds = pydicom.read_file(file, force=True)

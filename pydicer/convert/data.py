@@ -80,7 +80,7 @@ def handle_missing_slice(files):
 
         pix_array = None
         for _, row in df_check_duplicates.iterrows():
-            this_pix_array = pydicom.read_file(row.file_path).pixel_array
+            this_pix_array = pydicom.read_file(row.file_path, force=True).pixel_array
 
             if pix_array is None:
                 pix_array = this_pix_array
@@ -240,7 +240,7 @@ class ConvertData:
             ]
         )
 
-        if patient is not None and not hasattr(patient, "__iter__"):
+        if patient is not None and not isinstance(patient, list):
             patient = [patient]
 
         for key, df_files in self.df_preprocess.groupby(["patient_id", "modality", "series_uid"]):
@@ -433,7 +433,7 @@ class ConvertData:
                         nifti_file = output_dir.joinpath("RTDOSE.nii.gz")
                         nifti_file.parent.mkdir(exist_ok=True, parents=True)
                         logger.debug("Writing RTDOSE to: %s", nifti_file)
-                        convert_rtdose(rt_dose_file.file_path, nifti_file)
+                        convert_rtdose(rt_dose_file.file_path, True, nifti_file)
 
                         json_file = output_dir.joinpath("metadata.json")
                         convert_dicom_headers(
