@@ -47,7 +47,7 @@ def read_converted_data_frame(data_directory, patients=None):
         else:
             df_result = df_result.append(df_converted)
 
-    return df_result
+    return df_result.reset_index(drop=True)
 
 
 class PrepareDataset:
