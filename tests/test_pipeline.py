@@ -21,7 +21,7 @@ def test_data():
     directory = Path("./testdata")
     directory.mkdir(exist_ok=True, parents=True)
 
-    working_directory = directory.joinpath("working")
+    working_directory = directory.joinpath("dicom")
     working_directory.mkdir(exist_ok=True, parents=True)
 
     test_input = TestInput(working_directory)
@@ -37,19 +37,19 @@ def test_pipeline(test_data):
 
         directory = Path(directory)
 
-        output_directory = directory.joinpath("output")
-        output_directory.mkdir(exist_ok=True, parents=True)
+        dicom_directory = directory.joinpath("dicom")
+        dicom_directory.symlink_to(test_data)
 
         # Preprocess the data fetch to prepare it for conversion
-        preprocessed_data = PreprocessData(test_data, output_directory)
-        preprocessed_result = preprocessed_data.preprocess()
+        preprocessed_data = PreprocessData(directory)
+        preprocessed_data.preprocess()
 
         # Convert the data into the output directory
-        convert_data = ConvertData(preprocessed_result, output_directory=output_directory)
+        convert_data = ConvertData(directory)
         convert_data.convert()
 
         # Visualise the converted data
-        visualise_data = VisualiseData(output_directory)
+        visualise_data = VisualiseData(directory)
         visualise_data.visualise()
 
         # Dataset selection and preparation
