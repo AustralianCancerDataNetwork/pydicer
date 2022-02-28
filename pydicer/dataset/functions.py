@@ -182,7 +182,7 @@ def rt_latest_dose(df, **kwargs):
 
             dose_indicies.append(idx)
 
-        df_doses = df_doses.assign(datetime = dose_dates)
+        df_doses = df_doses.assign(datetime=dose_dates)
         df_doses = df_doses.loc[dose_indicies]
         df_doses.sort_values("datetime", ascending=False, inplace=True)
 
