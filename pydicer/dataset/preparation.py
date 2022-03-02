@@ -21,7 +21,7 @@ def read_converted_data_frame(data_directory, patients=None):
         pd.DataFrame: The DataFrame with the converted data objects.
     """
 
-    df_result = None
+    df = pd.DataFrame()
 
     for pat_dir in data_directory.glob("*"):
 
@@ -41,13 +41,9 @@ def read_converted_data_frame(data_directory, patients=None):
             continue
 
         df_converted = pd.read_csv(converted_csv, index_col=0)
+        df = pd.concat([df, df_converted])
 
-        if df_result is None:
-            df_result = df_converted
-        else:
-            df_result = df_result.append(df_converted)
-
-    return df_result.reset_index(drop=True)
+    return df.reset_index(drop=True)
 
 
 class PrepareDataset:
