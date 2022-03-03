@@ -200,6 +200,9 @@ class ConvertData:
             raise SystemError("Preprocessed data not found, run Preprocess set first")
         self.df_preprocess = pd.read_csv(preprocessed_file, index_col=0)
 
+        # Make sure patient id is a string
+        self.df_preprocess.patient_id = self.df_preprocess.patient_id.astype(str)
+
     def link_via_frame_of_reference(self, for_uid):
         """Find the image series linked to this FOR
 
