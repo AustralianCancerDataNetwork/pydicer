@@ -1,5 +1,7 @@
 import logging
 from pathlib import Path
+import re
+
 import SimpleITK as sitk
 import pandas as pd
 
@@ -74,6 +76,7 @@ class AnalyseData:
         patient=None,
         radiomics=None,
         settings=None,
+        structure_match_regex=None,
         structure_meta_data=None,
         image_meta_data=None,
         resample_to_image=False,
@@ -92,6 +95,8 @@ class AnalyseData:
                 Defaults to all first order features.
             settings (dict, optional): Settings to pass to pyradiomics. Defaults to
                 PYRAD_DEFAULT_SETTINGS.
+            structure_match_regex (str, optional): Regular expression to select structures to
+                compute radiomics for. Defaults to None.
             structure_meta_data (list, optional): A list of DICOM tags which will be extracted from
                 the structure DICOM headers and included in the resulting table of radiomics.
                 Defaults to None.
@@ -170,6 +175,11 @@ class AnalyseData:
                     for struct_nii in struct_dir.glob("*.nii.gz"):
 
                         struct_name = struct_nii.name.replace(".nii.gz", "")
+
+                        # If a regex is set, make sure this structure name matches it
+                        if structure_match_regex:
+                            if re.search(structure_match_regex, struct_name) is None:
+                                continue
 
                         # Reload the image for each new contour in case resampling is occuring,
                         # should start fresh each time.
