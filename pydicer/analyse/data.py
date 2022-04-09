@@ -67,7 +67,7 @@ class AnalyseData:
                 dfs.append(pd.read_csv(radiomics_file, index_col=0))
 
         df = pd.concat(dfs)
-        df.sort_values(["Patient", "ImageHashedUID", "Contour"], inplace=True)
+        df.sort_values(["Patient", "ImageHashedUID", "StructHashedUID", "Contour"], inplace=True)
 
         return df
 
@@ -266,6 +266,9 @@ class AnalyseData:
                         if col_key not in meta_data_cols:
                             meta_data_cols.append(col_key)
 
+                    output_frame.insert(
+                        loc=0, column="StructHashedUID", value=struct_row.hashed_uid
+                    )
                     output_frame.insert(loc=0, column="ImageHashedUID", value=img_row.hashed_uid)
                     output_frame.insert(loc=0, column="Patient", value=pat)
                     output_frame.reset_index(inplace=True)
