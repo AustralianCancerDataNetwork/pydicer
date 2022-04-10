@@ -64,7 +64,14 @@ class AnalyseData:
         dfs = []
         for struct_dir in self.dataset_directory.glob("*/structures/*"):
             for radiomics_file in struct_dir.glob("radiomics_*.csv"):
-                dfs.append(pd.read_csv(radiomics_file, index_col=0))
+                col_types = {
+                    "Contour": str,
+                    "Patient": str,
+                    "ImageHashedUID": str,
+                    "StructHashedUID": str,
+                }
+                df_rad = pd.read_csv(radiomics_file, index_col=0, dtype=col_types)
+                dfs.append(df_rad)
 
         df = pd.concat(dfs)
         df.sort_values(["Patient", "ImageHashedUID", "StructHashedUID", "Contour"], inplace=True)
