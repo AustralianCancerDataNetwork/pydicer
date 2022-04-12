@@ -46,7 +46,7 @@ def test_pipeline(test_data):
 
         # Convert the data into the output directory
         convert_data = ConvertData(directory)
-        convert_data.convert()
+        convert_data.convert(patient="HNSCC-01-0199")
 
         # Visualise the converted data
         visualise_data = VisualiseData(directory)
@@ -90,24 +90,4 @@ def test_pipeline(test_data):
                 ].iloc[0]
             ),
             0.0914752043992083,
-        )
-
-        assert np.isclose(
-            (
-                df.loc[
-                    (df.Contour == "ptv57") & (df.Patient == "HNSCC-01-0176"),
-                    "firstorder|Variance",
-                ].iloc[0]
-            ),
-            32984.8590714468,
-        )
-
-        assert np.isclose(
-            (
-                df.loc[
-                    (df.Contour == "brainstem") & (df.Patient == "HNSCC-01-0176"),
-                    "firstorder|MeanAbsoluteDeviation",
-                ].iloc[0]
-            ),
-            7.575101352660104,
         )
