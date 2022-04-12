@@ -99,7 +99,7 @@ def test_pipeline(test_data):
                     "firstorder|Variance",
                 ].iloc[0]
             ),
-            32857.812370113126,
+            32984.8590714468,
         )
 
         assert np.isclose(
@@ -109,5 +109,5 @@ def test_pipeline(test_data):
                     "firstorder|MeanAbsoluteDeviation",
                 ].iloc[0]
             ),
-            7.591863524408501,
+            7.575101352660104,
         )
