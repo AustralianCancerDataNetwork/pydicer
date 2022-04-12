@@ -298,18 +298,7 @@ class AnalyseData:
             ValueError: Raised if patient is not None, a list of strings or a string.
         """
 
-        if isinstance(patient, list):
-            if not all(isinstance(x, str) for x in patient):
-                raise ValueError("All patient IDs must be of type 'str'")
-        elif patient is None:
-            patient = [p.name for p in self.dataset_directory.glob("*") if p.is_dir()]
-        else:
-
-            if not isinstance(patient, str) and patient is not None:
-                raise ValueError(
-                    "Patient ID must be list or str. None is a valid to process all patients"
-                )
-            patient = [patient]
+        patient = parse_patient_kwarg(patient, self.dataset_directory)
 
         if structure_meta_data_cols is None:
             structure_meta_data_cols = []
