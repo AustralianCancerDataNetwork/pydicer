@@ -38,7 +38,7 @@ def test_pipeline(test_data):
         directory = Path(directory)
 
         dicom_directory = directory.joinpath("dicom")
-        dicom_directory.symlink_to(test_data)
+        dicom_directory.symlink_to(test_data.absolute(), target_is_directory=True)
 
         # Preprocess the data fetch to prepare it for conversion
         preprocessed_data = PreprocessData(directory)
