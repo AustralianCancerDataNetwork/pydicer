@@ -66,10 +66,10 @@ def test_pipeline(test_data):
         assert np.isclose(
             (
                 df.loc[
-                    (df.Contour == "Brain") & (df.Patient == "HNSCC-01-0019"), "firstorder|Energy"
+                    (df.Contour == "Cord") & (df.Patient == "HNSCC-01-0199"), "firstorder|Energy"
                 ].iloc[0]
             ),
-            503558387.0,
+            16604633.0,
         )
 
         assert np.isclose(
@@ -85,11 +85,11 @@ def test_pipeline(test_data):
         assert np.isclose(
             (
                 df.loc[
-                    (df.Contour == "CTV63") & (df.Patient == "HNSCC-01-0019"),
+                    (df.Contour == "PTV_63_Gy") & (df.Patient == "HNSCC-01-0199"),
                     "firstorder|Skewness",
                 ].iloc[0]
             ),
-            0.4697397883056055,
+            0.0914752043992083,
         )
 
         assert np.isclose(
