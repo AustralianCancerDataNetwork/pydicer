@@ -54,19 +54,20 @@ def test_pipeline(test_data):
 
         # Dataset selection and preparation
         prepare_dataset = PrepareDataset(directory)
-        prepare_dataset.prepare("clean", "rt_latest_struct")
+        prepare_dataset.prepare("clean", "rt_latest_dose")
 
         # Analysis computing Radiomics and DVH
         analyse = AnalyseData(directory, "clean")
         analyse.compute_radiomics()
-        df = analyse.get_all_computed_radiomics_for_dataset()
+        df_rad = analyse.get_all_computed_radiomics_for_dataset()
 
         # Do some spot checks on the radiomics computed for the dataset to confirm the end-to-end
         # test worked
         assert np.isclose(
             (
-                df.loc[
-                    (df.Contour == "Cord") & (df.Patient == "HNSCC-01-0199"), "firstorder|Energy"
+                df_rad.loc[
+                    (df_rad.Contour == "Cord") & (df_rad.Patient == "HNSCC-01-0199"),
+                    "firstorder|Energy",
                 ].iloc[0]
             ),
             16604633.0,
@@ -74,8 +75,8 @@ def test_pipeline(test_data):
 
         assert np.isclose(
             (
-                df.loc[
-                    (df.Contour == "post_neck") & (df.Patient == "HNSCC-01-0199"),
+                df_rad.loc[
+                    (df_rad.Contour == "post_neck") & (df_rad.Patient == "HNSCC-01-0199"),
                     "firstorder|Median",
                 ].iloc[0]
             ),
@@ -84,10 +85,40 @@ def test_pipeline(test_data):
 
         assert np.isclose(
             (
-                df.loc[
-                    (df.Contour == "PTV_63_Gy") & (df.Patient == "HNSCC-01-0199"),
+                df_rad.loc[
+                    (df_rad.Contour == "PTV_63_Gy") & (df_rad.Patient == "HNSCC-01-0199"),
                     "firstorder|Skewness",
                 ].iloc[0]
             ),
             0.0914752043992083,
+        )
+
+        analyse.compute_dvh()
+        df_dose_metrics = analyse.compute_dose_metrics(
+            d_point=[50, 95, 99], v_point=[1, 10], d_cc_point=[1, 5, 10]
+        )
+
+        assert np.isclose(
+            (df_dose_metrics.loc[df_dose_metrics.label == "Brainstem", "V10"].iloc[0]),
+            27.496815,
+        )
+
+        assert np.isclose(
+            (df_dose_metrics.loc[df_dose_metrics.label == "PTV_57_Gy", "cc"].iloc[0]),
+            132.961273,
+        )
+
+        assert np.isclose(
+            (df_dose_metrics.loc[df_dose_metrics.label == "Lt_Parotid", "D95"].iloc[0]),
+            8.4,
+        )
+
+        assert np.isclose(
+            (df_dose_metrics.loc[df_dose_metrics.label == "GTV", "D99"].iloc[0]),
+            70.2,
+        )
+
+        assert np.isclose(
+            (df_dose_metrics.loc[df_dose_metrics.label == "Rt_Parotid", "D5cc"].iloc[0]),
+            70.2,
         )
