@@ -100,17 +100,17 @@ def test_pipeline(test_data):
 
         assert np.isclose(
             (df_dose_metrics.loc[df_dose_metrics.label == "Brainstem", "V10"].iloc[0]),
-            27.496815,
+            29.68311309814453,
         )
 
         assert np.isclose(
             (df_dose_metrics.loc[df_dose_metrics.label == "PTV_57_Gy", "cc"].iloc[0]),
-            132.961273,
+            145.16115188598633,
         )
 
         assert np.isclose(
             (df_dose_metrics.loc[df_dose_metrics.label == "Lt_Parotid", "D95"].iloc[0]),
-            8.4,
+            8.3,
         )
 
         assert np.isclose(
@@ -120,5 +120,5 @@ def test_pipeline(test_data):
 
         assert np.isclose(
             (df_dose_metrics.loc[df_dose_metrics.label == "Rt_Parotid", "D5cc"].iloc[0]),
-            70.2,
+            70.4,
         )
