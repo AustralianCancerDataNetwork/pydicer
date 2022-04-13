@@ -152,7 +152,7 @@ class PreprocessData:
                     )
 
                 # Add as a row to the DataFrame
-                df = df.append(res_dict, ignore_index=True)
+                df = pd.concat([df, pd.DataFrame([res_dict])])
 
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
