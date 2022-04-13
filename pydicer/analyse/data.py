@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from radiomics import firstorder, shape, glcm, glrlm, glszm, ngtdm, gldm, imageoperations
-from platipy.imaging.dose.dvh import calculate_dvh_for_labels
+from platipy.imaging.dose.dvh import calculate_dvh_for_labels, calculate_d_x, calculate_v_x
 
 from pydicer.utils import load_object_metadata, parse_patient_kwarg
 
@@ -75,6 +75,109 @@ class AnalyseData:
 
         df = pd.concat(dfs)
         df.sort_values(["Patient", "ImageHashedUID", "StructHashedUID", "Contour"], inplace=True)
+
+        return df
+
+    def get_all_dvhs_for_dataset(self):
+        """Return a DataFrame of DVHs computed for this dataset
+
+        Returns:
+            pd.DataFrame: The DataFrame of all DVHs computed for dataset
+        """
+
+        dfs = []
+        for dose_dir in self.dataset_directory.glob("*/doses/*"):
+            for dvh_file in dose_dir.glob("dvh_*.csv"):
+                col_types = {"patient": str, "struct_hash": str, "label": str}
+                df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
+                dfs.append(df_dvh)
+
+        df = pd.concat(dfs)
+        df.sort_values(["patient", "struct_hash", "label"], inplace=True)
+        df.reset_index(drop=True, inplace=True)
+
+        # Change the type of the columns which indicate the dose bins, useful for dose metric
+        # computation later
+        df.columns = [float(c) if "." in c else c for c in df.columns]
+
+        return df
+
+    def compute_dose_metrics(self, d_point=None, v_point=None, d_cc_point=None, dvh=None):
+        """Compute Dose metrics from a DVH
+
+        Args:
+            d_point (float|int|list, optional): The point or list of points at which to compute the
+              D metric. E.g. to compute D50, D95 and D99, supply [50, 95, 99]. Defaults to None.
+            v_point (float|int|list, optional): The point or list of points at which to compute the
+              V metric. E.g. to compute V5, V10 and V50, supply [5, 10, 50]. Defaults to None.
+            d_cc_point (float|int|list, optional): The point or list of points at which to compute
+              the Dcc metric. E.g. to compute Dcc5, Dcc10 and Dcc50, supply [5, 10, 50]. Defaults \
+              to None.
+            dvh (pd.DataFrame, optional): The DataFrame containing the DVH. If None is supplied the
+              DVH will be fetched using the `get_all_dvhs_for_dataset` function. Defaults to None.
+
+        Raises:
+            ValueError: One of d_point, v_point or d_cc_point should be set
+            ValueError: Points must be of type float or int
+
+        Returns:
+            pd.DataFrame: The DataFrame containing the requested metrics.
+        """
+
+        if d_point is None and v_point is None and d_cc_point is None:
+            raise ValueError("One of d_point, v_point or d_cc_point should be set")
+
+        if dvh is None:
+            dvh = self.get_all_dvhs_for_dataset()
+
+        if not isinstance(d_point, list):
+            if d_point is None:
+                d_point = []
+            else:
+                d_point = [d_point]
+
+        if not all(isinstance(x, (int, float)) for x in d_point):
+            raise ValueError("D point must be of type int or float")
+
+        if not isinstance(v_point, list):
+            if v_point is None:
+                v_point = []
+            else:
+                v_point = [v_point]
+
+        if not all(isinstance(x, (int, float)) for x in v_point):
+            raise ValueError("V point must be of type int or float")
+
+        if not isinstance(d_cc_point, list):
+            if d_cc_point is None:
+                d_cc_point = []
+            else:
+                d_cc_point = [d_cc_point]
+
+        if not all(isinstance(x, (int, float)) for x in d_cc_point):
+            raise ValueError("D_cc point must be of type int or float")
+
+        df = dvh[["patient", "struct_hash", "label", "cc", "mean"]]
+
+        for d in d_point:
+            df.insert(
+                loc=len(df.columns), column=f"D{d:0.0f}", value=calculate_d_x(dvh, d)["value"]
+            )
+
+        for v in v_point:
+            df.insert(
+                loc=len(df.columns), column=f"V{v:0.0f}", value=calculate_v_x(dvh, v)["value"]
+            )
+
+        for cc_point in d_cc_point:
+            cc_col = []
+            for label in dvh.label:
+                cc_at = (cc_point / dvh[dvh.label == label].cc.iloc[0]) * 100
+                cc_at = min(cc_at, 100)
+                cc_val = calculate_d_x(dvh[dvh.label == label], cc_at).value.iloc[0]
+                cc_col.append(cc_val)
+
+            df.insert(loc=len(df.columns), column=f"D{cc_point}cc", value=cc_col)
 
         return df
 
