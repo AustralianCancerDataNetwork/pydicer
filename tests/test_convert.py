@@ -25,7 +25,7 @@ def test_data():
     directory = Path("./testdata")
     directory.mkdir(exist_ok=True, parents=True)
 
-    working_directory = directory.joinpath("working")
+    working_directory = directory.joinpath("dicom")
     working_directory.mkdir(exist_ok=True, parents=True)
 
     test_input = TestInput(working_directory)

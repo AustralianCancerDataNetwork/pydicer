@@ -4,3 +4,4 @@ sphinx
 pytest
 m2r2
 sphinx_rtd_theme
+numpy

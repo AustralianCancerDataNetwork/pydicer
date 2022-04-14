@@ -174,7 +174,7 @@ def handle_missing_slice(files):
                 interp_df_row["slice_location"] = slice_location
                 interp_df_row["file_path"] = str(interp_dcm_file)
 
-                df_files = df_files.append(interp_df_row, ignore_index=True)
+                df_files = pd.concat([df_files, pd.DataFrame([interp_df_row])])
                 df_files.sort_values(by="slice_location", inplace=True)
     return df_files.file_path.tolist()
 
@@ -199,6 +199,9 @@ class ConvertData:
         if not preprocessed_file.exists():
             raise SystemError("Preprocessed data not found, run Preprocess set first")
         self.df_preprocess = pd.read_csv(preprocessed_file, index_col=0)
+
+        # Make sure patient id is a string
+        self.df_preprocess.patient_id = self.df_preprocess.patient_id.astype(str)
 
     def link_via_frame_of_reference(self, for_uid):
         """Find the image series linked to this FOR
@@ -300,7 +303,7 @@ class ConvertData:
                     )
 
                     entry["path"] = str(output_dir)
-                    df_data_objects = df_data_objects.append(entry, ignore_index=True)
+                    df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
 
@@ -372,7 +375,7 @@ class ConvertData:
                         "referenced_sop_instance_uid"
                     ] = df_linked_series.sop_instance_uid.unique()[0]
 
-                    df_data_objects = df_data_objects.append(entry, ignore_index=True)
+                    df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
 
                 elif sop_class_uid == PET_IMAGE_STORAGE_UID:
 
@@ -396,7 +399,7 @@ class ConvertData:
                     )
 
                     entry["path"] = str(output_dir)
-                    df_data_objects = df_data_objects.append(entry, ignore_index=True)
+                    df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
 
                 elif sop_class_uid == RT_PLAN_STORAGE_UID:
 
@@ -418,7 +421,7 @@ class ConvertData:
                         entry["hashed_uid"] = sop_instance_hash
                         entry["referenced_sop_instance_uid"] = rt_plan_file.referenced_uid
                         entry["path"] = str(output_dir)
-                        df_data_objects = df_data_objects.append(entry, ignore_index=True)
+                        df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
 
                 elif sop_class_uid == RT_DOSE_STORAGE_UID:
 
@@ -448,7 +451,7 @@ class ConvertData:
                         entry["hashed_uid"] = sop_instance_hash
                         entry["referenced_sop_instance_uid"] = rt_dose_file.referenced_uid
                         entry["path"] = str(output_dir)
-                        df_data_objects = df_data_objects.append(entry, ignore_index=True)
+                        df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
                 else:
                     raise NotImplementedError(
                         "Unable to convert Series with SOP Class UID: {sop_class_uid} / "

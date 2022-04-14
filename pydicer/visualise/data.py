@@ -5,6 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from platipy.imaging import ImageVisualiser
 
+from pydicer.utils import parse_patient_kwarg
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,18 +32,7 @@ class VisualiseData:
             Defaults to None.
         """
 
-        if isinstance(patient, list):
-            if not all(isinstance(x, str) for x in patient):
-                raise ValueError("All patient IDs must be of type 'str'")
-        elif patient is None:
-            patient = [p.name for p in self.output_directory.glob("*") if p.is_dir()]
-        else:
-
-            if not isinstance(patient, str) and patient is not None:
-                raise ValueError(
-                    "Patient ID must be list or str. None is a valid to process all patients"
-                )
-            patient = [patient]
+        patient = parse_patient_kwarg(patient, self.output_directory)
 
         for pat in patient:
 
