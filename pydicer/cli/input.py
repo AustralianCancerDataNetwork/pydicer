@@ -29,10 +29,8 @@ def run_pipeline(input_method, *args):
     directory = Path(args[0])
     directory.mkdir(exist_ok=True, parents=True)
 
-    working_dir = directory.joinpath("working")
-    working_dir.mkdir(exist_ok=True, parents=True)
-    output_dir = directory.joinpath("output")
-    output_dir.mkdir(exist_ok=True, parents=True)
+    dicom_dir = directory.joinpath("dicom")
+    dicom_dir.mkdir(exist_ok=True, parents=True)
 
     if input_method == "test":
         input_obj = testinput_cli(*args)
@@ -43,19 +41,21 @@ def run_pipeline(input_method, *args):
     else:
         input_obj = FileSystemInput(*args)
 
+    input_obj.fetch_data()
+
     # Preprocess the data fetch to prepare it for conversion
     logger.info("Running Pipeline preprocessing")
-    preprocessed_data = PreprocessData(input_obj.working_directory, output_dir)
-    preprocessed_result = preprocessed_data.preprocess()
+    preprocessed_data = PreprocessData(directory)
+    preprocessed_data.preprocess()
 
     # Convert the data into the output directory
     logger.info("Running Pipeline conversion")
-    convert_data = ConvertData(preprocessed_result, output_directory=output_dir)
+    convert_data = ConvertData(directory)
     convert_data.convert()
 
     # TODO Visualise the converted data
     logger.info("Running Pipeline visualisation")
-    visualise_data = VisualiseData(output_dir)
+    visualise_data = VisualiseData(directory)
     visualise_data.visualise()
 
 

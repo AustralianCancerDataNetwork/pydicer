@@ -128,8 +128,12 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+.DS_Store
+
 # Nifti
 *.nii.gz
 *.dcm
 
 testdata/
+
+examples/data/

@@ -11,7 +11,7 @@ from pydicer.dataset.preparation import PrepareDataset
 logger = logging.getLogger(__name__)
 
 
-def run(input_object, output_directory="."):
+def run(input_object, working_directory="."):
     """Run the pipeline to convert some data
 
     Args:
@@ -23,21 +23,20 @@ def run(input_object, output_directory="."):
     input_object.fetch_data()
 
     # Preprocess the data fetch to prepare it for conversion
-    preprocessed_data = PreprocessData(input_object.working_directory, output_directory)
-    preprocessed_result = preprocessed_data.preprocess()
+    preprocessed_data = PreprocessData(working_directory)
+    preprocessed_data.preprocess()
 
     # Convert the data into the output directory
-    convert_data = ConvertData(preprocessed_result, output_directory=output_directory)
+    convert_data = ConvertData(working_directory)
     convert_data.convert()
 
     # Visualise the converted data
-    visualise_data = VisualiseData(output_directory)
+    visualise_data = VisualiseData(working_directory)
     visualise_data.visualise()
 
     # Dataset selection and preparation
-    prepare_dataset = PrepareDataset(output_directory.parent)
-    clean_directory = Path(output_directory.parent.joinpath("clean_and_ready"))
-    prepare_dataset.prepare(clean_directory, "rt_latest_struct")
+    prepare_dataset = PrepareDataset(working_directory)
+    prepare_dataset.prepare("clean", "rt_latest_struct")
 
 
 def run_test(directory="./testdata"):
@@ -53,14 +52,12 @@ def run_test(directory="./testdata"):
     directory = Path(directory)
     directory.mkdir(exist_ok=True, parents=True)
 
-    working_directory = directory.joinpath("working")
-    working_directory.mkdir(exist_ok=True, parents=True)
-    output_directory = directory.joinpath("output")
-    output_directory.mkdir(exist_ok=True, parents=True)
+    dicom_directory = directory.joinpath("dicom")
+    dicom_directory.mkdir(exist_ok=True, parents=True)
 
-    test_input = TestInput(working_directory)
+    test_input = TestInput(dicom_directory)
 
-    run(test_input, output_directory=output_directory)
+    run(test_input, directory)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,11 @@
 import logging
 from pathlib import Path
 import SimpleITK as sitk
+import pandas as pd
 import matplotlib.pyplot as plt
 from platipy.imaging import ImageVisualiser
+
+from pydicer.utils import parse_patient_kwarg
 
 logger = logging.getLogger(__name__)
 
@@ -12,144 +15,181 @@ class VisualiseData:
     Class that facilitates the visualisation of the data once converted
 
     Args:
-        output_directory (str|pathlib.Path, optional): Directory in which converted data is stored.
+        working_directory (str|pathlib.Path, optional): Main working directory for pydicer.
             Defaults to ".".
     """
 
-    def __init__(self, output_directory="."):
-        self.output_directory = Path(output_directory)
+    def __init__(self, working_directory="."):
+        self.working_directory = Path(working_directory)
+        self.output_directory = self.working_directory.joinpath("data")
 
-    def visualise(self):
+    def visualise(self, patient=None):
+        """Visualise the data in the working directory. PNG files are generates providing a
+        snapshot of the various data objects.
+
+        Args:
+            patient (list|str, optional): A patient ID (or list of patient IDs) to visualise.
+            Defaults to None.
         """
-        Function to visualise the data
-        """
 
-        # first stage: visualise each image individually
-        for img_filename in self.output_directory.glob("**/images/*.nii.gz"):
+        patient = parse_patient_kwarg(patient, self.output_directory)
 
-            img = sitk.ReadImage(str(img_filename))
+        for pat in patient:
 
-            vis = ImageVisualiser(img)
-            fig = vis.show()
-
-            # save image alongside nifti
-            vis_filename = img_filename.parent / img_filename.name.replace(
-                "".join(img_filename.suffixes), ".png"
-            )
-            fig.savefig(
-                vis_filename,
-                dpi=fig.dpi,
-            )
-            plt.close(fig)
-
-            logger.debug("created visualisation: %s", vis_filename)
-
-        # Next visualise the structures on top of their linked image
-        for struct_dir in self.output_directory.glob("**/structures/*"):
-
-            # Make sure this is a structure directory
-            if not struct_dir.is_dir():
+            # Read in the DataFrame storing the converted data for this patient
+            converted_csv = self.output_directory.joinpath(pat, "converted.csv")
+            if not converted_csv.exists():
+                logger.warning("Converted CSV doesn't exist for %s", pat)
                 continue
 
-            img_id = struct_dir.name.split("_")[1]
+            df_converted = pd.read_csv(converted_csv, index_col=0)
 
-            img_links = list(struct_dir.parent.parent.glob(f"images/*{img_id}.nii.gz"))
+            # first stage: visualise each image individually
+            for _, row in df_converted[df_converted["modality"] == "CT"].iterrows():
 
-            # If we have multiple linked images (not sure if this can happen but it might?) then
-            # take the first one. If we find no linked images log and error and don't visualise for
-            # now
-            if len(img_links) == 0:
-                logger.error("Linked image %s not found", img_id)
-                continue
+                img_path = Path(row.path)
 
-            img_file = img_links[0]
+                img = sitk.ReadImage(str(img_path.joinpath(f"{row.modality}.nii.gz")))
 
-            img = sitk.ReadImage(str(img_file))
+                vis = ImageVisualiser(img)
+                fig = vis.show()
 
-            vis = ImageVisualiser(img)
-            masks = {
-                f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
-                for f in struct_dir.glob("*.nii.gz")
-            }
+                # save image alongside nifti
+                vis_filename = img_path.joinpath("CT.png")
+                fig.savefig(
+                    vis_filename,
+                    dpi=fig.dpi,
+                )
+                plt.close(fig)
 
-            if len(masks) == 0:
-                logger.warning("No contours found in structure directory: %s", {struct_dir})
-                continue
+                logger.debug("created visualisation: %s", vis_filename)
 
-            vis.add_contour(masks)
-            fig = vis.show()
+            # Next visualise the structures on top of their linked image
+            for _, row in df_converted[df_converted["modality"] == "RTSTRUCT"].iterrows():
 
-            # save image inside structure directory
-            vis_filename = struct_dir.parent.joinpath(f"{struct_dir.name}.png")
-            fig.savefig(
-                vis_filename,
-                dpi=fig.dpi,
-            )
-            plt.close(fig)
+                struct_dir = Path(row.path)
 
-            logger.debug("created visualisation: %s", vis_filename)
+                # Find the linked image
+                # TODO also render on images linked by Frame of Reference
+                df_linked_img = df_converted[
+                    df_converted["sop_instance_uid"] == row.referenced_sop_instance_uid
+                ]
 
-        # Next visualise the doses on top of their linked image
-        for dose_file in self.output_directory.glob("**/doses/*.nii.gz"):
+                if len(df_linked_img) == 0:
+                    logger.warning(
+                        "No linked images found, structures won't be visualised: %s",
+                        row.sop_instance_uid,
+                    )
 
-            ## Currently doses are linked via: plan -> struct -> image
+                for _, img_row in df_linked_img.iterrows():
 
-            # Find the linked plan
-            plan_id = dose_file.name.replace(".nii.gz", "").split("_")[-1]
-            plan_links = list(dose_file.parent.parent.glob(f"plans/*{plan_id}_*.json"))
+                    img_path = Path(img_row.path)
 
-            if len(plan_links) == 0:
-                logger.error("Linked plan %s not found", plan_id)
-                continue
+                    img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
 
-            # Find the linked struct
-            struct_id = plan_links[0].name.replace(".json", "").split("_")[-1]
-            struct_links = [
-                p for p in dose_file.parent.parent.glob(f"structures/{struct_id}_*/") if p.is_dir()
-            ]
+                    vis = ImageVisualiser(img)
+                    masks = {
+                        f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
+                        for f in struct_dir.glob("*.nii.gz")
+                    }
 
-            if len(struct_links) == 0:
-                logger.error("Linked structure %s not found", struct_id)
-                continue
+                    if len(masks) == 0:
+                        logger.warning(
+                            "No contours found in structure directory: %s", {struct_dir}
+                        )
+                        continue
 
-            # Finally find the linked image
-            struct_dir = struct_links[0]
-            img_id = struct_dir.name.split("_")[1]
-            img_links = list(struct_dir.parent.parent.glob(f"images/*{img_id}.nii.gz"))
+                    vis.add_contour(masks)
+                    fig = vis.show()
 
-            if len(img_links) == 0:
-                logger.error("Linked image %s not found", img_id)
-                continue
+                    # save image inside structure directory
+                    vis_filename = struct_dir.joinpath(f"vis_{img_row.hashed_uid}.png")
+                    fig.savefig(vis_filename, dpi=fig.dpi)
+                    plt.close(fig)
 
-            img_file = img_links[0]
+                    logger.debug("created visualisation: %s", vis_filename)
 
-            img = sitk.ReadImage(str(img_file))
-            dose_img = sitk.ReadImage(str(dose_file))
-            dose_img = sitk.Resample(dose_img, img)
+            # Next visualise the doses on top of their linked image
+            for _, row in df_converted[df_converted["modality"] == "RTDOSE"].iterrows():
 
-            vis = ImageVisualiser(img)
+                ## Currently doses are linked via: plan -> struct -> image
 
-            vis.add_scalar_overlay(
-                dose_img, "Dose", discrete_levels=20, colormap=plt.cm.get_cmap("inferno")
-            )
+                # Find the linked plan
+                df_linked_plan = df_converted[
+                    df_converted["sop_instance_uid"] == row.referenced_sop_instance_uid
+                ]
 
-            masks = {
-                f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
-                for f in struct_dir.glob("*.nii.gz")
-            }
+                if len(df_linked_plan) == 0:
+                    logger.warning(
+                        "No linked plans found, dose won't be visualised: %s", row.sop_instance_uid
+                    )
+                    continue
 
-            if len(masks) > 0:
-                vis.add_contour(masks, linewidth=1)
+                # Find the linked structure set
+                plan_row = df_linked_plan.iloc[0]
+                df_linked_struct = df_converted[
+                    df_converted["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
+                ]
 
-            fig = vis.show()
+                if len(df_linked_struct) == 0:
+                    # Try to link via Frame of Reference instead
+                    df_linked_struct = df_converted[
+                        (df_converted["modality"] == "RTSTRUCT")
+                        & (df_converted["for_uid"] == row.for_uid)
+                    ]
 
-            # save image inside doses directory
-            file_name = dose_file.name.replace(".nii.gz", ".png")
-            vis_filename = dose_file.parent.joinpath(f"{file_name}")
-            fig.savefig(
-                vis_filename,
-                dpi=fig.dpi,
-            )
-            plt.close(fig)
+                if len(df_linked_struct) == 0:
+                    logger.warning(
+                        "No structures found, dose won't be visualised: %s", row.sop_instance_uid
+                    )
+                    continue
 
-            logger.debug("created visualisation: %s", vis_filename)
+                # Find the linked image
+                struct_row = df_linked_struct.iloc[0]
+                df_linked_img = df_converted[
+                    df_converted["sop_instance_uid"] == struct_row.referenced_sop_instance_uid
+                ]
+
+                if len(df_linked_img) == 0:
+                    logger.warning(
+                        "No linked images found, dose won't be visualised: %s",
+                        row.sop_instance_uid,
+                    )
+
+                dose_path = Path(row.path)
+                struct_dir = Path(struct_row.path)
+
+                for _, img_row in df_linked_img.iterrows():
+
+                    img_path = Path(img_row.path)
+
+                    img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
+                    dose_img = sitk.ReadImage(str(dose_path.joinpath("RTDOSE.nii.gz")))
+                    dose_img = sitk.Resample(dose_img, img)
+
+                    vis = ImageVisualiser(img)
+
+                    vis.add_scalar_overlay(
+                        dose_img, "Dose", discrete_levels=20, colormap=plt.cm.get_cmap("inferno")
+                    )
+
+                    masks = {
+                        f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
+                        for f in struct_dir.glob("*.nii.gz")
+                    }
+
+                    if len(masks) == 0:
+                        logger.warning(
+                            "No contours found in structure directory: %s", {struct_dir}
+                        )
+                        continue
+
+                    vis.add_contour(masks)
+                    fig = vis.show()
+
+                    # save image inside structure directory
+                    vis_filename = dose_path.joinpath(f"vis_{struct_row.hashed_uid}.png")
+                    fig.savefig(vis_filename, dpi=fig.dpi)
+                    plt.close(fig)
+
+                    logger.debug("created visualisation: %s", vis_filename)

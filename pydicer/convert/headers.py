@@ -15,7 +15,7 @@ def convert_dicom_headers(dcm_file, binary_path, json_file):
     """
 
     # Write the DICOM headers (of the first slice) to JSON
-    dcm_ds = pydicom.read_file(dcm_file)
+    dcm_ds = pydicom.read_file(dcm_file, force=True)
     dcm_dict = dcm_ds.to_json_dict(
         bulk_data_threshold=4096, bulk_data_element_handler=lambda _: binary_path
     )

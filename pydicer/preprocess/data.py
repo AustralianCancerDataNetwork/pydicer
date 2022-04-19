@@ -23,15 +23,16 @@ class PreprocessData:
     structured hierarchy
 
     Args:
-        working_directory (Path): The working directory in which the data is stored (Output of the
-        Input module)
+        working_directory (Path): The pydicer working directory (contains 'dicom' directory in
+            which input module(s) placed their data)
     """
 
-    def __init__(self, working_directory, output_directory):
+    def __init__(self, working_directory):
         self.working_directory = working_directory
-        self.output_directory = output_directory
+        self.input_directory = working_directory.joinpath("dicom")
+        self.pydicer_directory = working_directory.joinpath(".pydicer")
+        self.pydicer_directory.mkdir(exist_ok=True)
 
-    # TODO: need to find the linked series UID
     def preprocess(self):
         """
         Function to preprocess information regarding the data located in an Input working directory
@@ -67,7 +68,8 @@ class PreprocessData:
                 "referenced_for_uid",
             ]
         )
-        files = self.working_directory.glob("**/*.dcm")
+        files = list(self.input_directory.glob("**/*.dcm"))
+        files += list(self.input_directory.glob("**/*.DCM"))
 
         for file in files:
             ds = pydicom.read_file(file, force=True)
@@ -115,17 +117,23 @@ class PreprocessData:
 
                 elif dicom_type_uid == RT_PLAN_STORAGE_UID:
 
-                    referenced_sop_instance_uid = ds.ReferencedStructureSetSequence[
-                        0
-                    ].ReferencedSOPInstanceUID
-                    res_dict["referenced_uid"] = referenced_sop_instance_uid
+                    try:
+                        referenced_sop_instance_uid = ds.ReferencedStructureSetSequence[
+                            0
+                        ].ReferencedSOPInstanceUID
+                        res_dict["referenced_uid"] = referenced_sop_instance_uid
+                    except AttributeError:
+                        logger.warning("Unable to determine Reference Series UID")
 
                 elif dicom_type_uid == RT_DOSE_STORAGE_UID:
 
-                    referenced_sop_instance_uid = ds.ReferencedRTPlanSequence[
-                        0
-                    ].ReferencedSOPInstanceUID
-                    res_dict["referenced_uid"] = referenced_sop_instance_uid
+                    try:
+                        referenced_sop_instance_uid = ds.ReferencedRTPlanSequence[
+                            0
+                        ].ReferencedSOPInstanceUID
+                        res_dict["referenced_uid"] = referenced_sop_instance_uid
+                    except AttributeError:
+                        logger.warning("Unable to determine Reference Series UID")
 
                 elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID):
 
@@ -144,18 +152,20 @@ class PreprocessData:
                     )
 
                 # Add as a row to the DataFrame
-                df = df.append(res_dict, ignore_index=True)
+                df = pd.concat([df, pd.DataFrame([res_dict])])
 
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
-                logger.error(
-                    "Error parsing file %s: %s. Placing file into Quarantine folder...", file, e
-                )
-                copy_file_to_quarantine(file, self.output_directory, e)
+                logger.error("Unable to preprocess file: %s", file)
+                logger.exception(e)
+                copy_file_to_quarantine(file, self.working_directory, e)
 
         # Sort the the DataFrame by the patient then series uid and the slice location, ensuring
         # that the slices are ordered correctly
-        df = df.sort_values(["patient_id", "series_uid", "slice_location"])
+        df = df.sort_values(["patient_id", "modality", "series_uid", "slice_location"])
+
+        # Save the Preprocessed DataFrame
+        df.to_csv(self.pydicer_directory.joinpath("preprocessed.csv"))
 
         return df
