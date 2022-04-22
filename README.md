@@ -8,12 +8,22 @@ Welcome to pydicer, a tool to ease the process of converting DICOM data objects 
 
 ## Requirements
 
-pydicer currently supports Python 3.7 and 3.8 (better compatibility with newer Python versions will be provided in the future). Make sure you install the library and developer requirements:
+pydicer currently supports Python 3.7, 3.8 and 3.9. Make sure you install the library and developer requirements:
 
 ```bash
 pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
+
+## pydicer Directory Structure
+
+pydicer will place converted and intermediate files into a specific directory structure. Within a pydicer working directory `[working]`, the following directories will be generated:
+
+- `[working]/dicom`: Directory in which DICOM data will be placed and fetched for conversion
+- `[working]/data`: Directory in which converted data will be placed
+- `[working]/quarantine`: Files which couldn't be preprocessed or converted will be placed in here for you to investigate further
+- `[working]/.pydicer`: Intermediate files as well as log output will be stored in here
+- `[working]/[dataset_name]`: Clean datasets prepared using the Dataset Preparation Module will be stored in a directory with their name and will symbolically link to converted in the `[working]/data` directory
 
 ## pydicer Pipeline
 
@@ -46,14 +56,12 @@ from pydicer.pipeline import run
 directory = Path("./testdata")
 directory.mkdir(exist_ok=True, parents=True)
 
-working_directory = directory.joinpath("working")
-working_directory.mkdir(exist_ok=True, parents=True)
-output_directory = directory.joinpath("output")
-output_directory.mkdir(exist_ok=True, parents=True)
+dicom_directory = directory.joinpath("dicom")
+dicom_directory.mkdir(exist_ok=True, parents=True)
 
-test_input = TestInput(working_directory)
+test_input = TestInput(dicom_directory)
 
-run(test_input, output_directory=output_directory)
+run(test_input, directory)
 ```
 
 ## Coding standards

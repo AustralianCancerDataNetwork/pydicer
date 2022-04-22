@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def convert_rtstruct(
-    dcm_img_list,
+    dcm_img,
     dcm_rt_file,
     prefix="Struct_",
     output_dir=".",
@@ -23,7 +23,8 @@ def convert_rtstruct(
     The masks are stored as NIFTI files in the output directory
 
     Args:
-        dcm_img_list (list): List of DICOM paths (as str) to use as the reference image series.
+        dcm_img (list|SimpleITK.Image): List of DICOM paths (as str) to use as the reference image
+            series or a SimpleITK image of the already converted image.
         dcm_rt_file (str|pathlib.Path): Path to the DICOM RTSTRUCT file
         prefix (str, optional): The prefix to give the output files. Defaults to "Struct" +
             underscore.
@@ -36,7 +37,13 @@ def convert_rtstruct(
     logger.debug("Converting RTStruct: %s", dcm_rt_file)
     logger.debug("Output file prefix: %s", prefix)
 
-    dicom_image = sitk.ReadImage(dcm_img_list)
+    if isinstance(dcm_img, list):
+        dicom_image = sitk.ReadImage(dcm_img)
+    elif isinstance(dcm_img, sitk.Image):
+        dicom_image = dcm_img
+    else:
+        raise ValueError("dcm_img must be list or SimpleITK.Image")
+
     dicom_struct = pydicom.read_file(dcm_rt_file, force=True)
 
     if not isinstance(output_dir, Path):

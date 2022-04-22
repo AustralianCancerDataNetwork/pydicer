@@ -25,7 +25,7 @@ def test_data():
     directory = Path("./testdata")
     directory.mkdir(exist_ok=True, parents=True)
 
-    working_directory = directory.joinpath("working")
+    working_directory = directory.joinpath("dicom")
     working_directory.mkdir(exist_ok=True, parents=True)
 
     test_input = TestInput(working_directory)
@@ -92,7 +92,7 @@ def test_convert_rt_struct(test_data):
 
         assert brainstem.GetSize() == (512, 512, 174)
         assert brainstem.GetSpacing() == (0.9765625, 0.9765625, 2.5)
-        assert sitk.GetArrayFromImage(brainstem).sum() == 11533
+        assert sitk.GetArrayFromImage(brainstem).sum() == 12450
 
 
 def test_convert_pet(test_data_all):
