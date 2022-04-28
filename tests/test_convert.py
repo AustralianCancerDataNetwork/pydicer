@@ -44,7 +44,7 @@ def test_data_all():
     working_directory = directory.joinpath("working2")
     working_directory.mkdir(exist_ok=True, parents=True)
 
-    data_url = "http://shorturl.at/acvNQ"
+    data_url = "https://zenodo.org/record/5574640/files/HNSCC-01-0019.zip"
     web_input = WebInput(data_url, working_directory)
     web_input.fetch_data()
 
