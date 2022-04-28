@@ -19,6 +19,7 @@ platipy = ">=0.2.1"
 pyorthanc = ">=0.2.14"
 argparse = ">=1.4.0"
 pyradiomics = ">=3.0.1"
+scikit-image = ">=0.19.2"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.13.5"
