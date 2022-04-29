@@ -19,21 +19,25 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.7, 3.8, 3.9]
-
+        poetry-version: [1.1.12]
+        # os: [ubuntu-20.04, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Python modules via pip
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install Python modules with poetry
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-          pip install -r requirements.txt
+          poetry run pip install --upgrade pip
+          poetry install
       - name: Lint with Pylint
         run: |
-          pylint pydicer
+          poetry run pylint pydicer
       - name: Pytest validation
         run: |
-          pytest
+          poetry run pytest
