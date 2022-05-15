@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-import pydicom
 import SimpleITK as sitk
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -53,14 +52,11 @@ class VisualiseData:
 
                 vis = ImageVisualiser(img)
                 fig = vis.show()
-                
                 # load meta data from json file
                 ds_dict = load_object_metadata(row)
-             
                 # deal with missing value in study description
                 if "StudyDescription" not in ds_dict:
                     ds_dict.StudyDescription = "NaN"
-                
                 # choose axis one
                 # (this is the top-right box that is blank)
                 ax = fig.axes[1]
