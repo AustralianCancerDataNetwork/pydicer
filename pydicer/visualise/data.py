@@ -1,13 +1,12 @@
 import logging
 from pathlib import Path
-import json
 import pydicom
 import SimpleITK as sitk
 import pandas as pd
 import matplotlib.pyplot as plt
 from platipy.imaging import ImageVisualiser
 
-from pydicer.utils import parse_patient_kwarg
+from pydicer.utils import parse_patient_kwarg, load_object_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -48,31 +47,20 @@ class VisualiseData:
 
             # first stage: visualise each image individually
             for _, row in df_converted[df_converted["modality"] == "CT"].iterrows():
-
                 img_path = Path(row.path)
 
                 img = sitk.ReadImage(str(img_path.joinpath(f"{row.modality}.nii.gz")))
 
                 vis = ImageVisualiser(img)
                 fig = vis.show()
-
+                
                 # load meta data from json file
-                img_json = img_filename.parent.joinpath(
-                    img_filename.name.replace(".nii.gz", ".json")
-                )
-
-                with open(img_json, "r", encoding="utf8") as json_file:
-                    ds_dict = json.load(json_file)
-
+                ds_dict = load_object_metadata(row)
+             
                 # deal with missing value in study description
-                if "00081030" not in ds_dict:
-                    ds_dict["00081030"] = {"vr": "LO", "Value": ["NaN"]}
-
-                # load the metadata back into a pydicom dataset
-                img_meta_data = pydicom.Dataset.from_json(
-                    ds_dict, bulk_data_uri_handler=lambda _: None
-                )
-
+                if "StudyDescription" not in ds_dict:
+                    ds_dict.StudyDescription = "NaN"
+                
                 # choose axis one
                 # (this is the top-right box that is blank)
                 ax = fig.axes[1]
@@ -85,11 +73,11 @@ class VisualiseData:
                 ax.text(
                     x=0.02,
                     y=0.90,
-                    s=f"Patient ID: {img_meta_data.PatientID}\n"
+                    s=f"Patient ID: {ds_dict.PatientID}\n"
                     f"Series Instance UID: \n"
-                    f"{img_meta_data.SeriesInstanceUID}\n"
-                    f"Study Description: {img_meta_data.StudyDescription}\n"
-                    f"Study Date: {img_meta_data.StudyDate}",
+                    f"{ds_dict.SeriesInstanceUID}\n"
+                    f"Study Description: {ds_dict.StudyDescription}\n"
+                    f"Study Date: {ds_dict.StudyDate}",
                     color="black",
                     ha="left",
                     va="top",
