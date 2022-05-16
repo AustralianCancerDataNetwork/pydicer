@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from platipy.imaging import ImageVisualiser
 
-from pydicer.utils import parse_patient_kwarg
+from pydicer.utils import parse_patient_kwarg, load_object_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -46,13 +46,41 @@ class VisualiseData:
 
             # first stage: visualise each image individually
             for _, row in df_converted[df_converted["modality"] == "CT"].iterrows():
-
                 img_path = Path(row.path)
 
                 img = sitk.ReadImage(str(img_path.joinpath(f"{row.modality}.nii.gz")))
 
                 vis = ImageVisualiser(img)
                 fig = vis.show()
+                # load meta data from json file
+                ds_dict = load_object_metadata(row)
+                # deal with missing value in study description
+                if "StudyDescription" not in ds_dict:
+                    ds_dict.StudyDescription = "NaN"
+                # choose axis one
+                # (this is the top-right box that is blank)
+                ax = fig.axes[1]
+
+                # choose a sensible font size
+                # this will depend on the figure size you set
+                fs = 9
+
+                # insert metadata information
+                ax.text(
+                    x=0.02,
+                    y=0.90,
+                    s=f"Patient ID: {ds_dict.PatientID}\n"
+                    f"Series Instance UID: \n"
+                    f"{ds_dict.SeriesInstanceUID}\n"
+                    f"Study Description: {ds_dict.StudyDescription}\n"
+                    f"Study Date: {ds_dict.StudyDate}",
+                    color="black",
+                    ha="left",
+                    va="top",
+                    size=fs,
+                    wrap=True,
+                    bbox=dict(boxstyle="square", fc="w", ec="r"),
+                )
 
                 # save image alongside nifti
                 vis_filename = img_path.joinpath("CT.png")
