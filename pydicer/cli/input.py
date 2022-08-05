@@ -45,7 +45,7 @@ def run_pipeline(input_method, *args):
 
     # Preprocess the data fetch to prepare it for conversion
     logger.info("Running Pipeline preprocessing")
-    preprocessed_data = PreprocessData(directory)
+    preprocessed_data = PreprocessData(directory, dicom_dir)
     preprocessed_data.preprocess()
 
     # Convert the data into the output directory

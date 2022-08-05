@@ -4,6 +4,7 @@ import pandas as pd
 
 import pydicom
 import numpy as np
+from pydicer.config import PyDicerConfig
 
 from pydicer.constants import (
     PET_IMAGE_STORAGE_UID,
@@ -23,13 +24,13 @@ class PreprocessData:
     structured hierarchy
 
     Args:
-        working_directory (Path): The pydicer working directory (contains 'dicom' directory in
-            which input module(s) placed their data)
+        working_directory (Path): The pydicer working directory
+        input_directory (Path): The directory containing the DICOM input data
     """
 
-    def __init__(self, working_directory):
+    def __init__(self, working_directory, input_directory):
         self.working_directory = working_directory
-        self.input_directory = working_directory.joinpath("dicom")
+        self.input_directory = input_directory
         self.pydicer_directory = working_directory.joinpath(".pydicer")
         self.pydicer_directory.mkdir(exist_ok=True)
 
@@ -68,8 +69,17 @@ class PreprocessData:
                 "referenced_for_uid",
             ]
         )
-        files = list(self.input_directory.glob("**/*.dcm"))
-        files += list(self.input_directory.glob("**/*.DCM"))
+
+        config = PyDicerConfig()
+        if config.get_config("enforce_dcm_ext"):
+            files = list(self.input_directory.glob("**/*.dcm"))
+            files += list(self.input_directory.glob("**/*.DCM"))
+            files += list(self.input_directory.glob("**/*.dcim"))
+            files += list(self.input_directory.glob("**/*.DCIM"))
+            files += list(self.input_directory.glob("**/*.dicom"))
+            files += list(self.input_directory.glob("**/*.DICOM"))
+        else:
+            files += list(self.input_directory.glob("**/*"))
 
         for file in files:
             ds = pydicom.read_file(file, force=True)

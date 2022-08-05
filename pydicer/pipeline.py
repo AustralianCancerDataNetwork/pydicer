@@ -11,7 +11,7 @@ from pydicer.dataset.preparation import PrepareDataset
 logger = logging.getLogger(__name__)
 
 
-def run(input_object, working_directory="."):
+def run(input_object, working_directory=".", dicom_directory="./dicom"):
     """Run the pipeline to convert some data
 
     Args:
@@ -23,7 +23,7 @@ def run(input_object, working_directory="."):
     input_object.fetch_data()
 
     # Preprocess the data fetch to prepare it for conversion
-    preprocessed_data = PreprocessData(working_directory)
+    preprocessed_data = PreprocessData(working_directory, dicom_directory)
     preprocessed_data.preprocess()
 
     # Convert the data into the output directory
@@ -57,7 +57,7 @@ def run_test(directory="./testdata"):
 
     test_input = TestInput(dicom_directory)
 
-    run(test_input, directory)
+    run(test_input, directory, dicom_directory)
 
 
 if __name__ == "__main__":

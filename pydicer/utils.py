@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+import pandas as pd
 import pydicom
 
 
@@ -74,6 +75,31 @@ def load_object_metadata(row):
 
     return pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
 
+def read_preprocessed_data(working_directory: Path):
+    """Reads the pydicer preprocessed data
+
+    Args:
+        working_directory (Path): Working directory for project
+
+    Raises:
+        SystemError: Error raised when preprocessed data doesn't yet exist
+
+    Returns:
+        pd.DataFrame: The preprocessed data
+    """
+
+    pydicer_directory = working_directory.joinpath(".pydicer")
+    preprocessed_file = pydicer_directory.joinpath("preprocessed.csv")
+    if not preprocessed_file.exists():
+        raise SystemError("Preprocessed data not found, run preprocess step first")
+
+    # Read the csv
+    df_preprocess = pd.read_csv(preprocessed_file, index_col=0)
+
+    # Make sure patient id is a string
+    df_preprocess.patient_id = df_preprocess.patient_id.astype(str)
+
+    return df_preprocess
 
 def parse_patient_kwarg(patient, dataset_directory):
     """Helper function to prepare patient list from kwarg used in functions throughout pydicer.

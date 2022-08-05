@@ -41,7 +41,7 @@ def test_pipeline(test_data):
         dicom_directory.symlink_to(test_data.absolute(), target_is_directory=True)
 
         # Preprocess the data fetch to prepare it for conversion
-        preprocessed_data = PreprocessData(directory)
+        preprocessed_data = PreprocessData(directory, dicom_directory)
         preprocessed_data.preprocess()
 
         # Convert the data into the output directory

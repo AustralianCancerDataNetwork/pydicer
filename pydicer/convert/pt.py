@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 def convert_dicom_to_nifti_pt(
     input_filepaths,
     output_filepath,
-    patient_weight_from_ct=None,
+    default_patient_weight=None,
 ):
     """Function to convert the dicom files contained in input_filepaths to one NIFTI image.
 
     Args:
         input_filepaths (list): list of the dicom paths
         output_filepath (str): path to the output file path where to store the NIFTI file.
-        patient_weight_from_ct (float, optional): If the patient's weight is missing from the PT
+        default_patient_weight (float, optional): If the patient's weight is missing from the PT
             DICOM it can be provided through this argument. Defaults to None.
 
     Raises:
@@ -35,8 +35,8 @@ def convert_dicom_to_nifti_pt(
     if not hasattr(slices[0], "PatientWeight") or slices[0].PatientWeight is None:
         if hasattr(slices[0], "PatientsWeight"):
             patient_weight = float(slices[0].PatientsWeight)
-        elif patient_weight_from_ct is not None:
-            patient_weight = patient_weight_from_ct
+        elif default_patient_weight is not None:
+            patient_weight = default_patient_weight
         else:
             raise ValueError("Cannot compute SUV the weight is missing")
     else:
