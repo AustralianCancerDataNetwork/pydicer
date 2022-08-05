@@ -8,11 +8,12 @@ import SimpleITK as sitk
 import pydicom
 
 from platipy.dicom.io.rtdose_to_nifti import convert_rtdose
+from pydicer.config import PyDicerConfig
 
 from pydicer.convert.pt import convert_dicom_to_nifti_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.convert.headers import convert_dicom_headers
-from pydicer.utils import hash_uid
+from pydicer.utils import hash_uid, read_preprocessed_data
 from pydicer.quarantine.treat import copy_file_to_quarantine
 
 from pydicer.constants import (
@@ -195,13 +196,7 @@ class ConvertData:
         self.output_directory.mkdir(exist_ok=True)
 
         # Load the preprocessed data
-        preprocessed_file = self.pydicer_directory.joinpath("preprocessed.csv")
-        if not preprocessed_file.exists():
-            raise SystemError("Preprocessed data not found, run Preprocess set first")
-        self.df_preprocess = pd.read_csv(preprocessed_file, index_col=0)
-
-        # Make sure patient id is a string
-        self.df_preprocess.patient_id = self.df_preprocess.patient_id.astype(str)
+        self.df_preprocess = read_preprocessed_data(self.working_directory)
 
     def link_via_frame_of_reference(self, for_uid):
         """Find the image series linked to this FOR
@@ -229,6 +224,8 @@ class ConvertData:
         """
         Function to convert the data into its intended form (eg. images into Nifti)
         """
+
+        config = PyDicerConfig()
 
         df_data_objects = pd.DataFrame(
             columns=[
@@ -354,10 +351,10 @@ class ConvertData:
                         spacing=None,
                     )
 
-                    # TODO Make generation of NRRD file optional
-                    nrrd_file = output_dir.joinpath("STRUCTURE_SET.nrrd")
-
-                    write_nrrd_from_mask_directory(output_dir, nrrd_file)
+                    if config.get_config("generate_nrrd"):
+                        nrrd_file = output_dir.joinpath("STRUCTURE_SET.nrrd")
+                        logger.info("Saving structures in nrrd format: %s", nrrd_file)
+                        write_nrrd_from_mask_directory(output_dir, nrrd_file, colormap=config.get_config("nrrd_colormap"))
 
                     # Save JSON
                     json_file = output_dir.joinpath("metadata.json")
@@ -389,6 +386,7 @@ class ConvertData:
                     convert_dicom_to_nifti_pt(
                         series_files,
                         nifti_file,
+                        default_patient_weight=config.get_config("default_patient_weight")
                     )
 
                     json_file = output_dir.joinpath("metadata.json")
