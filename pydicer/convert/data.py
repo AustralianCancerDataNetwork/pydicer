@@ -354,7 +354,11 @@ class ConvertData:
                     if config.get_config("generate_nrrd"):
                         nrrd_file = output_dir.joinpath("STRUCTURE_SET.nrrd")
                         logger.info("Saving structures in nrrd format: %s", nrrd_file)
-                        write_nrrd_from_mask_directory(output_dir, nrrd_file, colormap=config.get_config("nrrd_colormap"))
+                        write_nrrd_from_mask_directory(
+                            output_dir,
+                            nrrd_file,
+                            colormap=config.get_config("nrrd_colormap")
+                        )
 
                     # Save JSON
                     json_file = output_dir.joinpath("metadata.json")
