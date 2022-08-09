@@ -6,9 +6,7 @@ from pydicer.input.pacs import DICOMPACSInput
 from pydicer.input.test import TestInput
 from pydicer.input.web import WebInput
 from pydicer.input.filesystem import FileSystemInput
-from pydicer.preprocess.data import PreprocessData
-from pydicer.convert.data import ConvertData
-from pydicer.visualise.data import VisualiseData
+from pydicer import PyDicer
 
 
 logger = logging.getLogger(__name__)
@@ -43,20 +41,12 @@ def run_pipeline(input_method, *args):
 
     input_obj.fetch_data()
 
+    pydicer = PyDicer(directory)
+    pydicer.add_input(input_obj)
+
     # Preprocess the data fetch to prepare it for conversion
-    logger.info("Running Pipeline preprocessing")
-    preprocessed_data = PreprocessData(directory, dicom_dir)
-    preprocessed_data.preprocess()
-
-    # Convert the data into the output directory
-    logger.info("Running Pipeline conversion")
-    convert_data = ConvertData(directory)
-    convert_data.convert()
-
-    # TODO Visualise the converted data
-    logger.info("Running Pipeline visualisation")
-    visualise_data = VisualiseData(directory)
-    visualise_data.visualise()
+    logger.info("Running Pipeline")
+    pydicer.run_pipeline()
 
 
 def testinput_cli(working_dir):

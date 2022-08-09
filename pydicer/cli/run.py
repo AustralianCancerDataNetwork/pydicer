@@ -17,7 +17,6 @@ import sys
 
 from pydicer.cli.contants import get_sub_help_mesg
 from pydicer.cli.input import testinput_cli, pacs_cli, tcia_cli, web_cli, run_pipeline
-from pydicer.pipeline import run_test
 
 # Sub command types for the Input command
 INPUT_TOOLS = {
@@ -28,7 +27,7 @@ INPUT_TOOLS = {
 }
 
 PIPELINE_TOOLS = {
-    "e2e": run_test,
+    # "e2e": run_test, TODO This broke due to some changes. Either we need to fix or remove.
     "filesystem": run_pipeline,
     "test": run_pipeline,
     "pacs": run_pipeline,
