@@ -39,29 +39,31 @@ The pipeline handles fetching of the DICOM data to conversion and preparation of
 
 5. **Dataset Preparation**: The appropriate files from the converted data are selected to prepare a clean dataset ready for use in your research project!
 
-Running the pipeline is easy. You can run the pipeline using the provided test data with the following command from the command line:
+6. **Analysis**: Radiomics and Dose Metrics are computed on the converted data.
 
-```bash
-python -m pydicer.pipeline
-```
-
-Alternatively, you may want to prepare a script to have finer control of some functionality you are implementing. The following script will get you started:
+Running the pipeline is easy. The following script will get you started:
 
 ```python
 from pathlib import Path
 
 from pydicer.input.test import TestInput
-from pydicer.pipeline import run
+from pydicer import PyDicer
 
+# Configure working directory
 directory = Path("./testdata")
 directory.mkdir(exist_ok=True, parents=True)
 
+# Fetch some test DICOM data to convert
 dicom_directory = directory.joinpath("dicom")
 dicom_directory.mkdir(exist_ok=True, parents=True)
-
 test_input = TestInput(dicom_directory)
 
-run(test_input, directory)
+# Create the PyDicer tool object and add the dicom directory as an input location
+pydicer = PyDicer(directory)
+pydicer.add_input(dicom_directory)
+
+# Run the pipeline
+pydicer.run_pipeline()
 ```
 
 ## Coding standards

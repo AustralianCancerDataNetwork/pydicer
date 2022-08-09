@@ -207,6 +207,7 @@ class ConvertData:
 
         Args:
             for_uid (str): The Frame of Reference UID
+            df_preprocess (pd.DataFrame): The DataFrame containing the preprocessed DICOM data.
 
         Returns:
             pd.DataFrame: DataFrame of the linked series entries
@@ -225,8 +226,16 @@ class ConvertData:
         return df_linked_series
 
     def convert(self, patient=None, force=True):
-        """
-        Function to convert the data into its intended form (eg. images into Nifti)
+        """Converts the DICOM which was preprocessed into the pydicer output directory.
+
+        Args:
+            patient (str|list, optional): Patient ID or list of patient IDs to convert. Defaults to
+              None.
+            force (bool, optional): When True objects will be converted even if the output files
+              already exist. Defaults to True.
+
+        Returns:
+            pd.DataFrame: DataFrame describing the objects converted
         """
 
         # Create the output directory if it hasn't already been created

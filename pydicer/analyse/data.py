@@ -44,17 +44,19 @@ class AnalyseData:
     Class that performs common analysis on converted data
 
     Args:
-        data_directory (str|pathlib.Path, optional): Directory in which data is stored. Defaults to
-            ".".
-        dataset (str, optional): The name of the dataset on which to run analysis. Defaults to
-            "nifti".
+        working_directory (str|pathlib.Path, optional): Directory in which data is stored. Defaults
+          to ".".
     """
 
-    def __init__(self, data_directory="."):
-        self.working_directory = Path(data_directory)
+    def __init__(self, working_directory="."):
+        self.working_directory = Path(working_directory)
 
     def get_all_computed_radiomics_for_dataset(self, dataset_name="data"):
         """Return a DataFrame of radiomics computed for this dataset
+
+        Args:
+            dataset (str, optional): The name of the dataset on which to run analysis. Defaults to
+                "data".
 
         Returns:
             pd.DataFrame: The DataFrame of all radiomics computed for dataset
@@ -197,12 +199,16 @@ class AnalyseData:
         resample_to_image=False,
     ):
         """
-        Compute radiomics for the data in the working directory. PNG files are generates providing a
-        snapshot of the various data objects.
+        Compute radiomics for the data in the working directory. Results are saved as csv files in
+        the structure directories processed.
 
         Args:
-            patient (list|str, optional): A patient ID (or list of patient IDs) to visualise.
-            Defaults to None.
+            dataset_name (str, optional): The name of the dataset to compute radiomics on. Defaults
+              to "data" (runs on all data).
+            patient (list|str, optional): A patient ID (or list of patient IDs) to compute
+              radiomics for. Defaults to None (all patients).
+            force (bool, optional): When True, radiomics will be recomputed even if the output file
+              already exists. Defaults to True.
             radiomics (dict, optional): A dictionary of the pyradiomics to compute. Format should
                 have the radiomic class name as the key and a list of feature names in the value.
                 See https://pyradiomics.readthedocs.io/en/latest/features.html for more
@@ -407,13 +413,17 @@ class AnalyseData:
         Compute the Dose Volume Histogram (DVH) for dose volumes and linked structures.
 
         Args:
+            dataset_name (str, optional): The name of the dataset to compute DVHs on. Defaults to
+              "data" (runs on all data).
             patient (list|str, optional): A patient ID (or list of patient IDs) to compute DVH for.
-            Defaults to None.
+              Defaults to None.
+            force (bool, optional): When True, DVHs will be recomputed even if the output file
+              already exists. Defaults to True.
             bin_width (float, optional): The bin width of the Dose Volume Histogram.
-            structure_meta_data (list, optional): A list of DICOM tags which will be extracted from
-                the structure DICOM headers and included in the resulting table of radiomics.
+            structure_meta_data_cols (list, optional): A list of DICOM tags which will be extracted
+                from the structure DICOM headers and included in the resulting table of radiomics.
                 Defaults to None.
-            structure_meta_data (list, optional): A list of DICOM tags which will be extracted from
+            dose_meta_data_cols (list, optional): A list of DICOM tags which will be extracted from
                 the Dose DICOM headers and included in the resulting table of radiomics.
                 Defaults to None.
 

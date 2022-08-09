@@ -29,7 +29,9 @@ class VisualiseData:
 
         Args:
             patient (list|str, optional): A patient ID (or list of patient IDs) to visualise.
-            Defaults to None.
+              Defaults to None.
+            force (bool, optional): When True objects will be visualised even if the output files
+              already exist. Defaults to True.
         """
 
         patient = parse_patient_kwarg(patient, self.output_directory)

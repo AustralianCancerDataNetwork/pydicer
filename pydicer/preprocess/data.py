@@ -26,7 +26,6 @@ class PreprocessData:
 
     Args:
         working_directory (Path): The pydicer working directory
-        input_directory (Path): The directory containing the DICOM input data
     """
 
     def __init__(self, working_directory):

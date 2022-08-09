@@ -9,65 +9,64 @@ PYDICER_CONFIG = {
     "display_progress": {
         "module": "general",
         "description": "Display a progress bar when executing steps of pipeline. If True, logs "
-                       "will be writtin to log files only and hidden from standard output.",
+        "will be writtin to log files only and hidden from standard output.",
         "type": bool,
         "default": True,
-        "choices": None
+        "choices": None,
     },
     "for_fallback_linkage": {
         "module": "general",
         "description": "Determine whether to fallback on linking objects via their Frame of "
-                       "Reference if no more stable link exists.",
+        "Reference if no more stable link exists.",
         "type": bool,
         "default": True,
-        "choices": None
+        "choices": None,
     },
     "enforce_dcm_ext": {
         "module": "preprocess",
         "description": "If True only files with the .dcm or .DCM extension will be preprocessed. "
-                       "otherwise any file in the DICOM directory will be preprocessed.",
+        "otherwise any file in the DICOM directory will be preprocessed.",
         "type": bool,
         "default": True,
-        "choices": None
+        "choices": None,
     },
     "interp_missing_slices": {
         "module": "convert",
         "description": "When missing slices are detected these will be interpolated if True. "
-                        "otherwise these cases will be sent to quarantine.",
+        "otherwise these cases will be sent to quarantine.",
         "type": bool,
         "default": True,
-        "choices": None
+        "choices": None,
     },
     "default_patient_weight": {
         "module": "convert",
         "description": "Default patient weight to use for PET conversion if it cannot be "
-                       "determined from the DICOM headers. If None, those cases will be sent to "
-                       "quarantine.",
+        "determined from the DICOM headers. If None, those cases will be sent to "
+        "quarantine.",
         "type": float,
         "default": None,
-        "choices": None
+        "choices": None,
     },
     "generate_nrrd": {
         "module": "convert",
         "description": "Whether or not to generate an additional NRRD file when converting "
-                       "RTSTRUCT. This allows loading easily into 3D slicer.",
+        "RTSTRUCT. This allows loading easily into 3D slicer.",
         "type": bool,
         "default": True,
-        "choices": None
+        "choices": None,
     },
     "nrrd_colormap": {
         "module": "convert",
         "description": "Matplotlib colormap to use when saving NRRD file of structures.",
         "type": str,
         "default": "rainbow",
-        "choices": None
+        "choices": None,
     },
 }
 
+
 class PyDicerConfig:
-
-    class __PyDicerConfig: # pylint: disable=invalid-name
-
+    class __PyDicerConfig:  # pylint: disable=invalid-name
         def __init__(self, working_dir=None):
 
             if working_dir is None:
@@ -92,7 +91,15 @@ class PyDicerConfig:
                     self.pydicer_config[key] = item["default"]
 
     instance = None
+
     def __init__(self, *arg):
+        """Return the singleton instance of PyDicerConfig
+
+        Args:
+            working_dir (str|pathlib.Path, optional): The working directory for project. Required
+            on first initialisation. Defaults to None.
+        """
+
         if not PyDicerConfig.instance:
             PyDicerConfig.instance = PyDicerConfig.__PyDicerConfig(*arg)
 
@@ -138,18 +145,18 @@ class PyDicerConfig:
             raise AttributeError(f"{name} does not exist in config")
 
         if not isinstance(value, PYDICER_CONFIG[name]["type"]) and not value is None:
-            raise ValueError(f"Config {name} must be of type "
-                f"{type(self.instance.pydicer_config[name])}")
+            raise ValueError(
+                f"Config {name} must be of type " f"{type(self.instance.pydicer_config[name])}"
+            )
 
         self.instance.pydicer_config[name] = value
         self.save_config()
 
     def save_config(self):
-        """Save the config to the pydicer directory
-        """
+        """Save the config to the pydicer directory"""
 
         if not self.instance.config_path.parent.exists():
             self.instance.config_path.parent.mkdir()
 
-        with open(self.instance.config_path, 'w', encoding="utf-8") as fp:
+        with open(self.instance.config_path, "w", encoding="utf-8") as fp:
             json.dump(self.instance.pydicer_config, fp, indent=2)
