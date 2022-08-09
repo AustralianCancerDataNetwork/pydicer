@@ -35,10 +35,10 @@ def test_config_not_exists():
             config.set_config("doesn't_exist", 123)
 
 
-def test_config_invalid_value(test_data):
+def test_config_invalid_value():
 
     with tempfile.TemporaryDirectory() as directory:
-        
+
         config = PyDicerConfig(directory)
 
         with pytest.raises(ValueError):
