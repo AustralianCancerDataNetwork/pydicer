@@ -188,6 +188,30 @@ def handle_missing_slice(files):
     return df_files.file_path.tolist()
 
 
+def link_via_frame_of_reference(for_uid, df_preprocess):
+    """Find the image series linked to this FOR
+
+    Args:
+        for_uid (str): The Frame of Reference UID
+        df_preprocess (pd.DataFrame): The DataFrame containing the preprocessed DICOM data.
+
+    Returns:
+        pd.DataFrame: DataFrame of the linked series entries
+    """
+
+    df_linked_series = df_preprocess[df_preprocess.for_uid == for_uid]
+
+    # Find the image series to link to in this order of perference
+    modality_prefs = ["CT", "MR", "PT"]
+
+    df_linked_series = df_linked_series[df_linked_series.modality.isin(modality_prefs)]
+    df_linked_series.loc[:, "modality"] = df_linked_series.modality.astype("category")
+    df_linked_series.modality.cat.set_categories(modality_prefs, inplace=True)
+    df_linked_series.sort_values(["modality"])
+
+    return df_linked_series
+
+
 class ConvertData:
     """
     Class that facilitates the conversion of the data into its intended final type
@@ -201,29 +225,6 @@ class ConvertData:
         self.working_directory = Path(working_directory)
         self.pydicer_directory = working_directory.joinpath(".pydicer")
         self.output_directory = working_directory.joinpath("data")
-
-    def link_via_frame_of_reference(self, for_uid, df_preprocess):
-        """Find the image series linked to this FOR
-
-        Args:
-            for_uid (str): The Frame of Reference UID
-            df_preprocess (pd.DataFrame): The DataFrame containing the preprocessed DICOM data.
-
-        Returns:
-            pd.DataFrame: DataFrame of the linked series entries
-        """
-
-        df_linked_series = df_preprocess[df_preprocess.for_uid == for_uid]
-
-        # Find the image series to link to in this order of perference
-        modality_prefs = ["CT", "MR", "PT"]
-
-        df_linked_series = df_linked_series[df_linked_series.modality.isin(modality_prefs)]
-        df_linked_series.loc[:, "modality"] = df_linked_series.modality.astype("category")
-        df_linked_series.modality.cat.set_categories(modality_prefs, inplace=True)
-        df_linked_series.sort_values(["modality"])
-
-        return df_linked_series
 
     def convert(self, patient=None, force=True):
         """Converts the DICOM which was preprocessed into the pydicer output directory.
@@ -354,7 +355,7 @@ class ConvertData:
                     # If not linked via referenced UID, then try to link via FOR
                     if len(df_linked_series) == 0:
                         for_uid = rt_struct_file.referenced_for_uid
-                        df_linked_series = self.link_via_frame_of_reference(for_uid, df_preprocess)
+                        df_linked_series = link_via_frame_of_reference(for_uid, df_preprocess)
 
                     # Check that the linked series is available
                     # TODO handle rendering the masks even if we don't have an image series it's
