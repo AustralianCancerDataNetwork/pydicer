@@ -1,57 +1,45 @@
 # pylint: disable=redefined-outer-name,missing-function-docstring
 
-from pathlib import Path
+import tempfile
 
 import pytest
 from pydicer.config import PyDicerConfig
 
-from pydicer.input.test import TestInput
+
+def test_generate_nrrd_config():
+
+    with tempfile.TemporaryDirectory() as directory:
+
+        config = PyDicerConfig(directory)
+
+        # Assert that generate NRRD is True (default)
+        assert config.get_config("generate_nrrd")
+
+        # Update the config
+        config.set_config("generate_nrrd", False)
+
+        # Assert that it is now False
+        assert not config.get_config("generate_nrrd")
 
 
-@pytest.fixture
-def test_data():
-    """Fixture to grab the test data"""
+def test_config_not_exists():
 
-    directory = Path("./testdata")
-    directory.mkdir(exist_ok=True, parents=True)
+    with tempfile.TemporaryDirectory() as directory:
 
-    dicom_directory = directory.joinpath("dicom")
-    dicom_directory.mkdir(exist_ok=True, parents=True)
+        config = PyDicerConfig(directory)
 
-    test_input = TestInput(dicom_directory)
-    test_input.fetch_data()
+        with pytest.raises(AttributeError):
+            config.get_config("doesn't_exist")
 
-    return directory
-
-
-def test_generate_nrrd_config(test_data):
-
-    config = PyDicerConfig(test_data)
-
-    # Assert that generate NRRD is True (default)
-    assert config.get_config("generate_nrrd")
-
-    # Update the config
-    config.set_config("generate_nrrd", False)
-
-    # Assert that it is now False
-    assert not config.get_config("generate_nrrd")
-
-
-def test_config_not_exists(test_data):
-
-    config = PyDicerConfig(test_data)
-
-    with pytest.raises(AttributeError):
-        config.get_config("doesn't_exist")
-
-    with pytest.raises(AttributeError):
-        config.set_config("doesn't_exist", 123)
+        with pytest.raises(AttributeError):
+            config.set_config("doesn't_exist", 123)
 
 
 def test_config_invalid_value(test_data):
 
-    config = PyDicerConfig(test_data)
+    with tempfile.TemporaryDirectory() as directory:
+        
+        config = PyDicerConfig(directory)
 
-    with pytest.raises(ValueError):
-        config.set_config("generate_nrrd", 123)
+        with pytest.raises(ValueError):
+            config.set_config("generate_nrrd", 123)
