@@ -488,7 +488,7 @@ class AnalyseData:
 
                     struct_hash = struct_row.hashed_uid
                     dvh_csv = dose_file.parent.joinpath(f"dvh_{struct_hash}.csv")
-                    
+
                     if dvh_csv.exists() and not force:
                         logger.info("DVH already computed at %s", dvh_csv)
                         continue

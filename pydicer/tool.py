@@ -137,8 +137,3 @@ class PyDicer:
         # Check that references sop uid exists, only warning if not
 
         # Once ready, add to converted.csv for each dataset specified
-        pass
-
-    def prepare_for_nnunet(self, dataset):
-        # Needs own class???
-        pass
