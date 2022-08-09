@@ -55,8 +55,8 @@ class AnalyseData:
         """Return a DataFrame of radiomics computed for this dataset
 
         Args:
-            dataset (str, optional): The name of the dataset on which to run analysis. Defaults to
-                "data".
+            dataset_name (str, optional): The name of the dataset on which to run analysis.
+              Defaults to "data".
 
         Returns:
             pd.DataFrame: The DataFrame of all radiomics computed for dataset
@@ -65,16 +65,21 @@ class AnalyseData:
         dataset_directory = self.working_directory.joinpath(dataset_name)
 
         dfs = []
-        for struct_dir in dataset_directory.glob("*/structures/*"):
-            for radiomics_file in struct_dir.glob("radiomics_*.csv"):
-                col_types = {
-                    "Contour": str,
-                    "Patient": str,
-                    "ImageHashedUID": str,
-                    "StructHashedUID": str,
-                }
-                df_rad = pd.read_csv(radiomics_file, index_col=0, dtype=col_types)
-                dfs.append(df_rad)
+        for converted_csv in dataset_directory.glob("*/converted.csv"):
+
+            df_converted = pd.read_csv(converted_csv)
+            for _, struct_row in df_converted[df_converted["modality"] == "RTSTRUCT"].iterrows():
+                struct_dir = self.working_directory.joinpath(struct_row.path)
+
+                for radiomics_file in struct_dir.glob("radiomics_*.csv"):
+                    col_types = {
+                        "Contour": str,
+                        "Patient": str,
+                        "ImageHashedUID": str,
+                        "StructHashedUID": str,
+                    }
+                    df_rad = pd.read_csv(radiomics_file, index_col=0, dtype=col_types)
+                    dfs.append(df_rad)
 
         df = pd.concat(dfs)
         df.sort_values(["Patient", "ImageHashedUID", "StructHashedUID", "Contour"], inplace=True)
@@ -84,6 +89,10 @@ class AnalyseData:
     def get_all_dvhs_for_dataset(self, dataset_name="data"):
         """Return a DataFrame of DVHs computed for this dataset
 
+        Args:
+            dataset_name (str, optional): The name of the dataset on which to run analysis.
+              Defaults to "data".
+
         Returns:
             pd.DataFrame: The DataFrame of all DVHs computed for dataset
         """
@@ -91,11 +100,17 @@ class AnalyseData:
         dataset_directory = self.working_directory.joinpath(dataset_name)
 
         dfs = []
-        for dose_dir in dataset_directory.glob("*/doses/*"):
-            for dvh_file in dose_dir.glob("dvh_*.csv"):
-                col_types = {"patient": str, "struct_hash": str, "label": str}
-                df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
-                dfs.append(df_dvh)
+        for converted_csv in dataset_directory.glob("*/converted.csv"):
+
+            df_converted = pd.read_csv(converted_csv)
+            for _, dose_row in df_converted[df_converted["modality"] == "RTDOSE"].iterrows():
+
+                dose_dir = self.working_directory.joinpath(dose_row.path)
+
+                for dvh_file in dose_dir.glob("dvh_*.csv"):
+                    col_types = {"patient": str, "struct_hash": str, "label": str}
+                    df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
+                    dfs.append(df_dvh)
 
         df = pd.concat(dfs)
         df.sort_values(["patient", "struct_hash", "label"], inplace=True)
@@ -107,10 +122,14 @@ class AnalyseData:
 
         return df
 
-    def compute_dose_metrics(self, d_point=None, v_point=None, d_cc_point=None, dvh=None):
+    def compute_dose_metrics(
+        self, dataset_name="data", d_point=None, v_point=None, d_cc_point=None, dvh=None
+    ):
         """Compute Dose metrics from a DVH
 
         Args:
+            dataset_name (str, optional): The name of the dataset from which to extract dose
+               metrics. Defaults to "data".
             d_point (float|int|list, optional): The point or list of points at which to compute the
               D metric. E.g. to compute D50, D95 and D99, supply [50, 95, 99]. Defaults to None.
             v_point (float|int|list, optional): The point or list of points at which to compute the
@@ -133,7 +152,7 @@ class AnalyseData:
             raise ValueError("One of d_point, v_point or d_cc_point should be set")
 
         if dvh is None:
-            dvh = self.get_all_dvhs_for_dataset()
+            dvh = self.get_all_dvhs_for_dataset(dataset_name=dataset_name)
 
         if not isinstance(d_point, list):
             if d_point is None:

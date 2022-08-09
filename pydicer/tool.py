@@ -30,8 +30,7 @@ class PyDicer:
                     {self.working_directory},
                 )
 
-        else:
-            self.pydicer_directory.mkdir(parents=True)
+        self.pydicer_directory.mkdir(parents=True, exist_ok=True)
 
         self.dicom_directories = []
 
