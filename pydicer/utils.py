@@ -6,6 +6,8 @@ from pathlib import Path
 import pandas as pd
 import pydicom
 
+from pydicer.config import PyDicerConfig
+
 
 def hash_uid(uid, truncate=6):
     """Hash a UID and truncate it
@@ -69,7 +71,8 @@ def load_object_metadata(row):
         pydicom.Dataset: The dataset object containing the original DICOM metadata
     """
 
-    metadata_path = Path(row.path).joinpath("metadata.json")
+    config = PyDicerConfig()
+    metadata_path = Path(config.get_working_dir(), row.path).joinpath("metadata.json")
     with open(metadata_path, "r", encoding="utf8") as json_file:
         ds_dict = json.load(json_file)
 

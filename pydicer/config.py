@@ -96,6 +96,14 @@ class PyDicerConfig:
         if not PyDicerConfig.instance:
             PyDicerConfig.instance = PyDicerConfig.__PyDicerConfig(*arg)
 
+    def get_working_dir(self):
+        """Get the working directory configured for the project.
+
+        Returns:
+            pathlib.Path: The working directory
+        """
+        return self.instance.working_dir
+
     def get_config(self, name):
         """Get the value of the config item with the specified name
 

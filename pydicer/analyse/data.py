@@ -50,19 +50,20 @@ class AnalyseData:
             "nifti".
     """
 
-    def __init__(self, data_directory=".", dataset_name="data"):
+    def __init__(self, data_directory="."):
         self.working_directory = Path(data_directory)
-        self.dataset_directory = self.working_directory.joinpath(dataset_name)
 
-    def get_all_computed_radiomics_for_dataset(self):
+    def get_all_computed_radiomics_for_dataset(self, dataset_name="data"):
         """Return a DataFrame of radiomics computed for this dataset
 
         Returns:
             pd.DataFrame: The DataFrame of all radiomics computed for dataset
         """
 
+        dataset_directory = self.working_directory.joinpath(dataset_name)
+
         dfs = []
-        for struct_dir in self.dataset_directory.glob("*/structures/*"):
+        for struct_dir in dataset_directory.glob("*/structures/*"):
             for radiomics_file in struct_dir.glob("radiomics_*.csv"):
                 col_types = {
                     "Contour": str,
@@ -78,15 +79,17 @@ class AnalyseData:
 
         return df
 
-    def get_all_dvhs_for_dataset(self):
+    def get_all_dvhs_for_dataset(self, dataset_name="data"):
         """Return a DataFrame of DVHs computed for this dataset
 
         Returns:
             pd.DataFrame: The DataFrame of all DVHs computed for dataset
         """
 
+        dataset_directory = self.working_directory.joinpath(dataset_name)
+
         dfs = []
-        for dose_dir in self.dataset_directory.glob("*/doses/*"):
+        for dose_dir in dataset_directory.glob("*/doses/*"):
             for dvh_file in dose_dir.glob("dvh_*.csv"):
                 col_types = {"patient": str, "struct_hash": str, "label": str}
                 df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
@@ -183,7 +186,9 @@ class AnalyseData:
 
     def compute_radiomics(
         self,
+        dataset_name="data",
         patient=None,
+        force=True,
         radiomics=None,
         settings=None,
         structure_match_regex=None,
@@ -192,7 +197,7 @@ class AnalyseData:
         resample_to_image=False,
     ):
         """
-        Visualise the data in the working directory. PNG files are generates providing a
+        Compute radiomics for the data in the working directory. PNG files are generates providing a
         snapshot of the various data objects.
 
         Args:
@@ -220,7 +225,9 @@ class AnalyseData:
             ValueError: Raised if patient is not None, a list of strings or a string.
         """
 
-        patient = parse_patient_kwarg(patient, self.dataset_directory)
+        dataset_directory = self.working_directory.joinpath(dataset_name)
+
+        patient = parse_patient_kwarg(patient, dataset_directory)
 
         if radiomics is None:
             radiomics = DEFAULT_RADIOMICS
@@ -239,20 +246,20 @@ class AnalyseData:
         for pat in patient:
 
             # Read in the DataFrame storing the converted data for this patient
-            converted_csv = self.dataset_directory.joinpath(pat, "converted.csv")
+            converted_csv = dataset_directory.joinpath(pat, "converted.csv")
             if not converted_csv.exists():
                 logger.warning("Converted CSV doesn't exist for %s", pat)
                 continue
 
             df_converted = pd.read_csv(converted_csv, index_col=0)
 
-            # Next visualise the structures on top of their linked image
+            # Next compute the radiomics for each structure using their linked image
             for _, struct_row in df_converted[df_converted["modality"] == "RTSTRUCT"].iterrows():
 
-                struct_dir = Path(struct_row.path)
+                struct_dir = self.working_directory.joinpath(struct_row.path)
 
                 # Find the linked image
-                # TODO also render on images linked by Frame of Reference
+                # TODO also compute radiomics on images linked by Frame of Reference
                 df_linked_img = df_converted[
                     df_converted["sop_instance_uid"] == struct_row.referenced_sop_instance_uid
                 ]
@@ -265,7 +272,17 @@ class AnalyseData:
 
                 for _, img_row in df_linked_img.iterrows():
 
-                    img_file = Path(img_row.path).joinpath(f"{img_row.modality}.nii.gz")
+                    struct_radiomics_path = struct_dir.joinpath(
+                        f"radiomics_{img_row.hashed_uid}.csv"
+                    )
+
+                    if struct_radiomics_path.exists() and not force:
+                        logger.info("Radiomics already computed at %s", struct_radiomics_path)
+                        continue
+
+                    img_file = self.working_directory.joinpath(
+                        img_row.path, f"{img_row.modality}.nii.gz"
+                    )
                     img_meta_data = load_object_metadata(img_row)
 
                     struct_meta_data = load_object_metadata(struct_row)
@@ -375,13 +392,16 @@ class AnalyseData:
                     columns[0] = "Contour"
                     output_frame.columns = columns
 
-                    struct_radiomics_path = struct_dir.joinpath(
-                        f"radiomics_{img_row.hashed_uid}.csv"
-                    )
                     output_frame.to_csv(struct_radiomics_path)
 
     def compute_dvh(
-        self, patient=None, bin_width=0.1, structure_meta_data_cols=None, dose_meta_data_cols=None
+        self,
+        dataset_name="data",
+        patient=None,
+        force=True,
+        bin_width=0.1,
+        structure_meta_data_cols=None,
+        dose_meta_data_cols=None,
     ):
         """
         Compute the Dose Volume Histogram (DVH) for dose volumes and linked structures.
@@ -401,7 +421,9 @@ class AnalyseData:
             ValueError: Raised if patient is not None, a list of strings or a string.
         """
 
-        patient = parse_patient_kwarg(patient, self.dataset_directory)
+        dataset_directory = self.working_directory.joinpath(dataset_name)
+
+        patient = parse_patient_kwarg(patient, dataset_directory)
 
         if structure_meta_data_cols is None:
             structure_meta_data_cols = []
@@ -414,7 +436,7 @@ class AnalyseData:
         for pat in patient:
 
             # Read in the DataFrame storing the converted data for this patient
-            converted_csv = self.dataset_directory.joinpath(pat, "converted.csv")
+            converted_csv = dataset_directory.joinpath(pat, "converted.csv")
             if not converted_csv.exists():
                 logger.warning("Converted CSV doesn't exist for %s", pat)
                 continue
@@ -458,14 +480,20 @@ class AnalyseData:
                 if len(df_linked_struct) == 0:
                     logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
 
-                dose_file = Path(dose_row.path).joinpath("RTDOSE.nii.gz")
+                dose_file = self.working_directory.joinpath(dose_row.path).joinpath(
+                    "RTDOSE.nii.gz"
+                )
 
                 for _, struct_row in df_linked_struct.iterrows():
 
                     struct_hash = struct_row.hashed_uid
                     dvh_csv = dose_file.parent.joinpath(f"dvh_{struct_hash}.csv")
+                    
+                    if dvh_csv.exists() and not force:
+                        logger.info("DVH already computed at %s", dvh_csv)
+                        continue
 
-                    struct_dir = Path(struct_row.path)
+                    struct_dir = self.working_directory.joinpath(struct_row.path)
 
                     struct_meta_data = load_object_metadata(struct_row)
 

@@ -23,7 +23,7 @@ class VisualiseData:
         self.working_directory = Path(working_directory)
         self.output_directory = self.working_directory.joinpath("data")
 
-    def visualise(self, patient=None):
+    def visualise(self, patient=None, force=True):
         """Visualise the data in the working directory. PNG files are generates providing a
         snapshot of the various data objects.
 
@@ -47,8 +47,15 @@ class VisualiseData:
             # first stage: visualise each image individually
             for _, row in df_converted[df_converted["modality"] == "CT"].iterrows():
                 img_path = Path(row.path)
+                vis_filename = self.working_directory.joinpath(img_path, "CT.png")
 
-                img = sitk.ReadImage(str(img_path.joinpath(f"{row.modality}.nii.gz")))
+                if vis_filename.exists() and not force:
+                    logger.info("Visualisation already exists at %s", vis_filename)
+                    continue
+
+                img = sitk.ReadImage(
+                    str(self.working_directory.joinpath(img_path, f"{row.modality}.nii.gz"))
+                )
 
                 vis = ImageVisualiser(img)
                 fig = vis.show()
@@ -82,15 +89,13 @@ class VisualiseData:
                     bbox=dict(boxstyle="square", fc="w", ec="r"),
                 )
 
-                # save image alongside nifti
-                vis_filename = img_path.joinpath("CT.png")
                 fig.savefig(
                     vis_filename,
                     dpi=fig.dpi,
                 )
                 plt.close(fig)
 
-                logger.debug("created visualisation: %s", vis_filename)
+                logger.debug("Created visualisation: %s", vis_filename)
 
             # Next visualise the structures on top of their linked image
             for _, row in df_converted[df_converted["modality"] == "RTSTRUCT"].iterrows():
@@ -113,12 +118,25 @@ class VisualiseData:
 
                     img_path = Path(img_row.path)
 
-                    img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
+                    # save image inside structure directory
+                    vis_filename = self.working_directory.joinpath(
+                        struct_dir, f"vis_{img_row.hashed_uid}.png"
+                    )
+
+                    if vis_filename.exists() and not force:
+                        logger.info("Visualisation already exists at %s", vis_filename)
+                        continue
+
+                    img = sitk.ReadImage(
+                        str(
+                            self.working_directory.joinpath(img_path, f"{img_row.modality}.nii.gz")
+                        )
+                    )
 
                     vis = ImageVisualiser(img)
                     masks = {
                         f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
-                        for f in struct_dir.glob("*.nii.gz")
+                        for f in self.working_directory.joinpath(struct_dir).glob("*.nii.gz")
                     }
 
                     if len(masks) == 0:
@@ -130,12 +148,10 @@ class VisualiseData:
                     vis.add_contour(masks)
                     fig = vis.show()
 
-                    # save image inside structure directory
-                    vis_filename = struct_dir.joinpath(f"vis_{img_row.hashed_uid}.png")
                     fig.savefig(vis_filename, dpi=fig.dpi)
                     plt.close(fig)
 
-                    logger.debug("created visualisation: %s", vis_filename)
+                    logger.debug("Created visualisation: %s", vis_filename)
 
             # Next visualise the doses on top of their linked image
             for _, row in df_converted[df_converted["modality"] == "RTDOSE"].iterrows():
@@ -191,8 +207,23 @@ class VisualiseData:
 
                     img_path = Path(img_row.path)
 
-                    img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
-                    dose_img = sitk.ReadImage(str(dose_path.joinpath("RTDOSE.nii.gz")))
+                    # save image inside dose directory
+                    vis_filename = self.working_directory.joinpath(
+                        dose_path, f"vis_{struct_row.hashed_uid}.png"
+                    )
+
+                    if vis_filename.exists() and not force:
+                        logger.info("Visualisation already exists at %s", vis_filename)
+                        continue
+
+                    img = sitk.ReadImage(
+                        str(
+                            self.working_directory.joinpath(img_path, f"{img_row.modality}.nii.gz")
+                        )
+                    )
+                    dose_img = sitk.ReadImage(
+                        str(self.working_directory.joinpath(dose_path, "RTDOSE.nii.gz"))
+                    )
                     dose_img = sitk.Resample(dose_img, img)
 
                     vis = ImageVisualiser(img)
@@ -203,7 +234,7 @@ class VisualiseData:
 
                     masks = {
                         f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
-                        for f in struct_dir.glob("*.nii.gz")
+                        for f in self.working_directory.joinpath(struct_dir).glob("*.nii.gz")
                     }
 
                     if len(masks) == 0:
@@ -215,9 +246,7 @@ class VisualiseData:
                     vis.add_contour(masks)
                     fig = vis.show()
 
-                    # save image inside structure directory
-                    vis_filename = dose_path.joinpath(f"vis_{struct_row.hashed_uid}.png")
                     fig.savefig(vis_filename, dpi=fig.dpi)
                     plt.close(fig)
 
-                    logger.debug("created visualisation: %s", vis_filename)
+                    logger.debug("Created visualisation: %s", vis_filename)

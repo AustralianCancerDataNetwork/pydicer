@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import SimpleITK as sitk
 import pydicom
+from matplotlib import cm
 
 from platipy.dicom.io.rtdose_to_nifti import convert_rtdose
 from pydicer.config import PyDicerConfig
@@ -28,6 +29,13 @@ logger = logging.getLogger(__name__)
 
 # TODO make this user-selected
 INTERPOLATE_MISSING_DATA = True
+
+OBJECT_TYPES = {
+    "images": [CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID],
+    "structures": [RT_STRUCTURE_STORAGE_UID],
+    "plans": [RT_PLAN_STORAGE_UID],
+    "doses": [RT_DOSE_STORAGE_UID],
+}
 
 
 def handle_missing_slice(files):
@@ -193,12 +201,8 @@ class ConvertData:
         self.working_directory = Path(working_directory)
         self.pydicer_directory = working_directory.joinpath(".pydicer")
         self.output_directory = working_directory.joinpath("data")
-        self.output_directory.mkdir(exist_ok=True)
 
-        # Load the preprocessed data
-        self.df_preprocess = read_preprocessed_data(self.working_directory)
-
-    def link_via_frame_of_reference(self, for_uid):
+    def link_via_frame_of_reference(self, for_uid, df_preprocess):
         """Find the image series linked to this FOR
 
         Args:
@@ -208,7 +212,7 @@ class ConvertData:
             pd.DataFrame: DataFrame of the linked series entries
         """
 
-        df_linked_series = self.df_preprocess[self.df_preprocess.for_uid == for_uid]
+        df_linked_series = df_preprocess[df_preprocess.for_uid == for_uid]
 
         # Find the image series to link to in this order of perference
         modality_prefs = ["CT", "MR", "PT"]
@@ -220,10 +224,16 @@ class ConvertData:
 
         return df_linked_series
 
-    def convert(self, patient=None):
+    def convert(self, patient=None, force=True):
         """
         Function to convert the data into its intended form (eg. images into Nifti)
         """
+
+        # Create the output directory if it hasn't already been created
+        self.output_directory.mkdir(exist_ok=True)
+
+        # Load the preprocessed data
+        df_preprocess = read_preprocessed_data(self.working_directory)
 
         config = PyDicerConfig()
 
@@ -243,7 +253,7 @@ class ConvertData:
         if patient is not None and not isinstance(patient, list):
             patient = [patient]
 
-        for key, df_files in self.df_preprocess.groupby(["patient_id", "modality", "series_uid"]):
+        for key, df_files in df_preprocess.groupby(["patient_id", "modality", "series_uid"]):
 
             patient_id, _, series_uid = key
 
@@ -264,6 +274,21 @@ class ConvertData:
             sop_instance_uid = df_files.sop_instance_uid.unique()[0]
             sop_instance_hash = hash_uid(sop_instance_uid)
 
+            # Determine the output type to decide in which directory the object should be placed
+            object_type = "other"
+            for ot, sops in OBJECT_TYPES.items():
+                if sop_class_uid in sops:
+                    object_type = ot
+            output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
+
+            # If aren't forcing this, and the object has already been created (ie the folder
+            # exists), then skip conversion.
+            if output_dir.exists() and not force:
+                logger.info("Object already converted at %s", output_dir)
+                continue
+
+            output_dir.mkdir(exist_ok=True, parents=True)
+
             entry = {
                 "sop_instance_uid": sop_instance_uid,
                 "hashed_uid": sop_instance_hash,
@@ -274,19 +299,18 @@ class ConvertData:
             }
 
             try:
-                # TODO abstract this interpolation, apply to other image modalities
                 if sop_class_uid == CT_IMAGE_STORAGE_UID:
-                    # TODO Handle inconsistent slice spacing
-                    if INTERPOLATE_MISSING_DATA:
+                    if config.get_config("interp_missing_slices"):
                         series_files = handle_missing_slice(df_files)
                     else:
-                        raise ValueError("Slice Locations are not evenly spaced")
+                        # TODO Handle inconsistent slice spacing
+                        raise ValueError(
+                            "Slice Locations are not evenly spaced. Set "
+                            "interp_missing_slices to True to interpolate slices."
+                        )
 
                     series_files = [str(f) for f in series_files]
                     series = sitk.ReadImage(series_files)
-
-                    output_dir = patient_directory.joinpath("images", sop_instance_hash)
-                    output_dir.mkdir(exist_ok=True, parents=True)
 
                     nifti_file = output_dir.joinpath("CT.nii.gz")
                     sitk.WriteImage(series, str(nifti_file))
@@ -299,7 +323,7 @@ class ConvertData:
                         json_file,
                     )
 
-                    entry["path"] = str(output_dir)
+                    entry["path"] = str(output_dir.relative_to(self.working_directory))
                     df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
@@ -314,23 +338,20 @@ class ConvertData:
                     # Need to disable this pylint check here only, seems to be a bug in
                     # pylint/pandas
                     # pylint: disable=unsubscriptable-object
-                    df_linked_series = self.df_preprocess[
-                        self.df_preprocess["series_uid"] == rt_struct_file.referenced_uid
+                    df_linked_series = df_preprocess[
+                        df_preprocess["series_uid"] == rt_struct_file.referenced_uid
                     ]
 
                     # If not linked via referenced UID, then try to link via FOR
                     if len(df_linked_series) == 0:
                         for_uid = rt_struct_file.referenced_for_uid
-                        df_linked_series = self.link_via_frame_of_reference(for_uid)
+                        df_linked_series = self.link_via_frame_of_reference(for_uid, df_preprocess)
 
                     # Check that the linked series is available
                     # TODO handle rendering the masks even if we don't have an image series it's
                     # linked to
                     if len(df_linked_series) == 0:
                         raise ValueError("Series Referenced by RTSTRUCT not found")
-
-                    output_dir = patient_directory.joinpath("structures", sop_instance_hash)
-                    output_dir.mkdir(exist_ok=True, parents=True)
 
                     img_row = df_linked_series.iloc[0]
                     hashed_linked_id = hash_uid(img_row.sop_instance_uid)
@@ -357,7 +378,7 @@ class ConvertData:
                         write_nrrd_from_mask_directory(
                             output_dir,
                             nrrd_file,
-                            colormap=config.get_config("nrrd_colormap")
+                            colormap=cm.get_cmap(config.get_config("nrrd_colormap")),
                         )
 
                     # Save JSON
@@ -368,7 +389,7 @@ class ConvertData:
                         json_file,
                     )
 
-                    entry["path"] = str(output_dir)
+                    entry["path"] = str(output_dir.relative_to(self.working_directory))
                     entry["for_uid"] = rt_struct_file.referenced_for_uid
 
                     # Find the SOP Instance UID of the CT image to link to
@@ -383,14 +404,12 @@ class ConvertData:
                     series_files = df_files.file_path.tolist()
                     series_files = [str(f) for f in series_files]
 
-                    output_dir = patient_directory.joinpath("images", sop_instance_hash)
-                    output_dir.mkdir(exist_ok=True, parents=True)
                     nifti_file = output_dir.joinpath("PT.nii.gz")
 
                     convert_dicom_to_nifti_pt(
                         series_files,
                         nifti_file,
-                        default_patient_weight=config.get_config("default_patient_weight")
+                        default_patient_weight=config.get_config("default_patient_weight"),
                     )
 
                     json_file = output_dir.joinpath("metadata.json")
@@ -400,7 +419,7 @@ class ConvertData:
                         json_file,
                     )
 
-                    entry["path"] = str(output_dir)
+                    entry["path"] = str(output_dir.relative_to(self.working_directory))
                     df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
 
                 elif sop_class_uid == RT_PLAN_STORAGE_UID:
@@ -412,9 +431,6 @@ class ConvertData:
 
                         sop_instance_hash = hash_uid(rt_plan_file.sop_instance_uid)
 
-                        output_dir = patient_directory.joinpath("plans", sop_instance_hash)
-                        output_dir.mkdir(exist_ok=True, parents=True)
-
                         json_file = output_dir.joinpath("metadata.json")
 
                         convert_dicom_headers(rt_plan_file.file_path, "", json_file)
@@ -422,7 +438,7 @@ class ConvertData:
                         entry["sop_instance_uid"] = rt_plan_file.sop_instance_uid
                         entry["hashed_uid"] = sop_instance_hash
                         entry["referenced_sop_instance_uid"] = rt_plan_file.referenced_uid
-                        entry["path"] = str(output_dir)
+                        entry["path"] = str(output_dir.relative_to(self.working_directory))
                         df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
 
                 elif sop_class_uid == RT_DOSE_STORAGE_UID:
@@ -431,9 +447,6 @@ class ConvertData:
                     for _, rt_dose_file in df_files.iterrows():
 
                         sop_instance_hash = hash_uid(rt_dose_file.sop_instance_uid)
-
-                        output_dir = patient_directory.joinpath("doses", sop_instance_hash)
-                        output_dir.mkdir(exist_ok=True, parents=True)
 
                         nifti_file = output_dir.joinpath("RTDOSE.nii.gz")
                         nifti_file.parent.mkdir(exist_ok=True, parents=True)
@@ -452,7 +465,7 @@ class ConvertData:
                         entry["sop_instance_uid"] = rt_dose_file.sop_instance_uid
                         entry["hashed_uid"] = sop_instance_hash
                         entry["referenced_sop_instance_uid"] = rt_dose_file.referenced_uid
-                        entry["path"] = str(output_dir)
+                        entry["path"] = str(output_dir.relative_to(self.working_directory))
                         df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
                 else:
                     raise NotImplementedError(
