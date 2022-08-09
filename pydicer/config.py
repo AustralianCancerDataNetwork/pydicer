@@ -92,7 +92,7 @@ class PyDicerConfig:
 
     instance = None
 
-    def __init__(self, *arg):
+    def __init__(self, working_dir=None):
         """Return the singleton instance of PyDicerConfig
 
         Args:
@@ -100,8 +100,13 @@ class PyDicerConfig:
             on first initialisation. Defaults to None.
         """
 
-        if not PyDicerConfig.instance:
-            PyDicerConfig.instance = PyDicerConfig.__PyDicerConfig(*arg)
+        if working_dir is not None and PyDicerConfig.instance is not None:
+            # If we already have a config instance, but the working directory has changed, we will
+            # recreate the instance with the new working directory.
+            if not working_dir == PyDicerConfig.instance.working_dir:
+                PyDicerConfig.instance = PyDicerConfig.__PyDicerConfig(working_dir)
+        elif PyDicerConfig.instance is None:
+            PyDicerConfig.instance = PyDicerConfig.__PyDicerConfig(working_dir)
 
     def get_working_dir(self):
         """Get the working directory configured for the project.
