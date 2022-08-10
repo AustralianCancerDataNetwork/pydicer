@@ -48,8 +48,7 @@ class PrepareDataset:
         logger.info("Preparing dataset %s using function: %s", dataset_name, preparation_function)
 
         # Grab the DataFrame containing all the converted data
-        converted_path = self.working_directory.joinpath(CONVERTED_DIR_NAME)
-        df_converted = read_converted_data(converted_path, patients=patients)
+        df_converted = read_converted_data(self.working_directory, patients=patients)
 
         # Send to the prepare function which will return a DataFrame of the data objects to use for
         # the dataset
