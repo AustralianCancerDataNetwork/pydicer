@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 import pandas as pd
 
@@ -7,7 +8,9 @@ import numpy as np
 from pydicer.config import PyDicerConfig
 
 from pydicer.constants import (
+    DICOM_FILE_EXTENSIONS,
     PET_IMAGE_STORAGE_UID,
+    PYDICER_DIR_NAME,
     RT_DOSE_STORAGE_UID,
     RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
@@ -25,18 +28,20 @@ class PreprocessData:
 
     Args:
         working_directory (Path): The pydicer working directory
-        input_directory (Path): The directory containing the DICOM input data
     """
 
-    def __init__(self, working_directory, input_directory):
+    def __init__(self, working_directory):
         self.working_directory = working_directory
-        self.input_directory = input_directory
-        self.pydicer_directory = working_directory.joinpath(".pydicer")
+        self.pydicer_directory = working_directory.joinpath(PYDICER_DIR_NAME)
         self.pydicer_directory.mkdir(exist_ok=True)
 
-    def preprocess(self):
+    def preprocess(self, input_directory):
         """
         Function to preprocess information regarding the data located in an Input working directory
+
+        Args:
+            input_directory (Path|list): The directory (or list of directories) containing the
+              DICOM input data
 
         Returns: res_dict (pd.DataFrame): containing a row for each DICOM file that was
            preprocessed, with the following columns:
@@ -54,6 +59,13 @@ class PreprocessData:
             - referenced_for_uid: The ReferencedFrameOfReferenceUID referenced by this DICOM file
 
         """
+
+        if isinstance(input_directory, Path):
+            input_directory = [input_directory]
+
+        if not isinstance(input_directory, list):
+            raise ValueError("input_directory must be of type pathlib.Path or list")
+
         df = pd.DataFrame(
             columns=[
                 "patient_id",
@@ -70,16 +82,15 @@ class PreprocessData:
             ]
         )
 
+        files = []
+
         config = PyDicerConfig()
-        if config.get_config("enforce_dcm_ext"):
-            files = list(self.input_directory.glob("**/*.dcm"))
-            files += list(self.input_directory.glob("**/*.DCM"))
-            files += list(self.input_directory.glob("**/*.dcim"))
-            files += list(self.input_directory.glob("**/*.DCIM"))
-            files += list(self.input_directory.glob("**/*.dicom"))
-            files += list(self.input_directory.glob("**/*.DICOM"))
-        else:
-            files += list(self.input_directory.glob("**/*"))
+        for directory in input_directory:
+            if config.get_config("enforce_dcm_ext"):
+                for ext in DICOM_FILE_EXTENSIONS:
+                    files += list(directory.glob(f"**/*.{ext}"))
+            else:
+                files += list(directory.glob("**/*"))
 
         for file in files:
             ds = pydicom.read_file(file, force=True)

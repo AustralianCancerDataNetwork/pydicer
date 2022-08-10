@@ -6,12 +6,8 @@ import numpy as np
 
 import pytest
 
+from pydicer import PyDicer
 from pydicer.input.test import TestInput
-from pydicer.preprocess.data import PreprocessData
-from pydicer.convert.data import ConvertData
-from pydicer.visualise.data import VisualiseData
-from pydicer.dataset.preparation import PrepareDataset
-from pydicer.analyse.data import AnalyseData
 
 
 @pytest.fixture
@@ -21,13 +17,13 @@ def test_data():
     directory = Path("./testdata")
     directory.mkdir(exist_ok=True, parents=True)
 
-    working_directory = directory.joinpath("dicom")
-    working_directory.mkdir(exist_ok=True, parents=True)
+    dicom_directory = directory.joinpath("dicom")
+    dicom_directory.mkdir(exist_ok=True, parents=True)
 
-    test_input = TestInput(working_directory)
+    test_input = TestInput(dicom_directory)
     test_input.fetch_data()
 
-    return working_directory
+    return directory
 
 
 def test_pipeline(test_data):
@@ -40,26 +36,24 @@ def test_pipeline(test_data):
         dicom_directory = directory.joinpath("dicom")
         dicom_directory.symlink_to(test_data.absolute(), target_is_directory=True)
 
+        pydicer = PyDicer(directory)
+        pydicer.add_input(dicom_directory)
+
         # Preprocess the data fetch to prepare it for conversion
-        preprocessed_data = PreprocessData(directory, dicom_directory)
-        preprocessed_data.preprocess()
+        pydicer.preprocess()
 
         # Convert the data into the output directory
-        convert_data = ConvertData(directory)
-        convert_data.convert(patient="HNSCC-01-0199")
+        pydicer.convert.convert(patient="HNSCC-01-0199")
 
         # Visualise the converted data
-        visualise_data = VisualiseData(directory)
-        visualise_data.visualise()
+        pydicer.visualise.visualise(patient="HNSCC-01-0199")
 
         # Dataset selection and preparation
-        prepare_dataset = PrepareDataset(directory)
-        prepare_dataset.prepare("clean", "rt_latest_dose")
+        pydicer.dataset.prepare("clean", "rt_latest_dose")
 
         # Analysis computing Radiomics and DVH
-        analyse = AnalyseData(directory, "clean")
-        analyse.compute_radiomics()
-        df_rad = analyse.get_all_computed_radiomics_for_dataset()
+        pydicer.analyse.compute_radiomics("clean")
+        df_rad = pydicer.analyse.get_all_computed_radiomics_for_dataset()
 
         # Do some spot checks on the radiomics computed for the dataset to confirm the end-to-end
         # test worked
@@ -93,8 +87,8 @@ def test_pipeline(test_data):
             -0.0053863391917069,
         )
 
-        analyse.compute_dvh()
-        df_dose_metrics = analyse.compute_dose_metrics(
+        pydicer.analyse.compute_dvh()
+        df_dose_metrics = pydicer.analyse.compute_dose_metrics(
             d_point=[50, 95, 99], v_point=[1, 10], d_cc_point=[1, 5, 10]
         )
 

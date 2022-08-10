@@ -2,48 +2,12 @@ import os
 import logging
 from pathlib import Path
 
-import pandas as pd
+from pydicer.constants import CONVERTED_DIR_NAME
 
 from pydicer.dataset import functions
+from pydicer.utils import read_converted_data
 
 logger = logging.getLogger(__name__)
-
-
-def read_converted_data_frame(data_directory, patients=None):
-    """Read the converted data frame from the supplied data directory.
-
-    Args:
-        data_directory (str): The directory in which data was stored.
-        patients (list, optional): The list of patients for which to read converted data. If None
-            is supplied then all data will be read. Defaults to None.
-
-    Returns:
-        pd.DataFrame: The DataFrame with the converted data objects.
-    """
-
-    df = pd.DataFrame()
-
-    for pat_dir in data_directory.glob("*"):
-
-        if not pat_dir.is_dir():
-            continue
-
-        pat_id = pat_dir.name
-
-        if patients is not None:
-            if pat_id not in patients:
-                continue
-
-        # Read in the DataFrame storing the converted data for this patient
-        converted_csv = data_directory.joinpath(pat_id, "converted.csv")
-        if not converted_csv.exists():
-            logger.warning("Converted CSV doesn't exist for %s", pat_id)
-            continue
-
-        df_converted = pd.read_csv(converted_csv, index_col=0)
-        df = pd.concat([df, df_converted])
-
-    return df.reset_index(drop=True)
 
 
 class PrepareDataset:
@@ -84,8 +48,7 @@ class PrepareDataset:
         logger.info("Preparing dataset %s using function: %s", dataset_name, preparation_function)
 
         # Grab the DataFrame containing all the converted data
-        converted_path = self.working_directory.joinpath("data")
-        df_converted = read_converted_data_frame(converted_path, patients=patients)
+        df_converted = read_converted_data(self.working_directory, patients=patients)
 
         # Send to the prepare function which will return a DataFrame of the data objects to use for
         # the dataset
@@ -96,12 +59,12 @@ class PrepareDataset:
 
             object_path = Path(row.path)
 
-            symlink_path = dataset_dir.joinpath(object_path.relative_to(converted_path))
+            symlink_path = dataset_dir.joinpath(object_path.relative_to(CONVERTED_DIR_NAME))
 
             rel_part = os.sep.join(
                 [".." for _ in symlink_path.parent.relative_to(self.working_directory).parts]
             )
-            src_path = Path(f"{rel_part}{os.sep}{object_path.relative_to(self.working_directory)}")
+            src_path = Path(f"{rel_part}{os.sep}{object_path.relative_to('data')}")
 
             symlink_path.parent.mkdir(parents=True, exist_ok=True)
 
