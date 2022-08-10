@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 from datetime import datetime
 from pathlib import Path
 
@@ -7,7 +8,9 @@ import pandas as pd
 import pydicom
 
 from pydicer.config import PyDicerConfig
-from pydicer.constants import PYDICER_DIR_NAME
+from pydicer.constants import CONVERTED_DIR_NAME, PYDICER_DIR_NAME
+
+logger = logging.getLogger(__name__)
 
 
 def hash_uid(uid, truncate=6):
@@ -105,6 +108,53 @@ def read_preprocessed_data(working_directory: Path):
     df_preprocess.patient_id = df_preprocess.patient_id.astype(str)
 
     return df_preprocess
+
+
+def read_converted_data(working_directory: Path, dataset_name=CONVERTED_DIR_NAME, patients=None):
+    """Read the converted data frame from the supplied data directory.
+
+    Args:
+        working_directory (Path): Working directory for project
+        dataset_name (str, optional): The name of the dataset for which to extract converted data.
+          Defaults to "data".
+        patients (list, optional): The list of patients for which to read converted data. If None
+            is supplied then all data will be read. Defaults to None.
+
+    Returns:
+        pd.DataFrame: The DataFrame with the converted data objects.
+    """
+
+    dataset_directory = working_directory.joinpath(dataset_name)
+
+    if not dataset_directory.exists():
+        raise SystemError(f"Dataset directory {dataset_directory} does not exist")
+
+    df = pd.DataFrame()
+
+    for pat_dir in dataset_directory.glob("*"):
+
+        if not pat_dir.is_dir():
+            continue
+
+        pat_id = pat_dir.name
+
+        if patients is not None:
+            if pat_id not in patients:
+                continue
+
+        # Read in the DataFrame storing the converted data for this patient
+        converted_csv = dataset_directory.joinpath(pat_id, "converted.csv")
+        if not converted_csv.exists():
+            logger.warning("Converted CSV doesn't exist for %s", pat_id)
+            continue
+
+        df_converted = pd.read_csv(converted_csv, index_col=0)
+        df = pd.concat([df, df_converted])
+
+    # Make sure patient id is a string
+    df.patient_id = df.patient_id.astype(str)
+
+    return df.reset_index(drop=True)
 
 
 def parse_patient_kwarg(patient, dataset_directory):

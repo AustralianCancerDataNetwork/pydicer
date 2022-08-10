@@ -12,7 +12,7 @@ from radiomics import firstorder, shape, glcm, glrlm, glszm, ngtdm, gldm, imageo
 from platipy.imaging.dose.dvh import calculate_dvh_for_labels, calculate_d_x, calculate_v_x
 from pydicer.constants import CONVERTED_DIR_NAME
 
-from pydicer.utils import load_object_metadata, parse_patient_kwarg
+from pydicer.utils import load_object_metadata, parse_patient_kwarg, read_converted_data
 
 logger = logging.getLogger(__name__)
 
@@ -63,24 +63,22 @@ class AnalyseData:
             pd.DataFrame: The DataFrame of all radiomics computed for dataset
         """
 
-        dataset_directory = self.working_directory.joinpath(dataset_name)
+        df_data = read_converted_data(self.working_directory, dataset_name)
 
         dfs = []
-        for converted_csv in dataset_directory.glob("*/converted.csv"):
+        for _, struct_row in df_data[df_data["modality"] == "RTSTRUCT"].iterrows():
 
-            df_converted = pd.read_csv(converted_csv)
-            for _, struct_row in df_converted[df_converted["modality"] == "RTSTRUCT"].iterrows():
-                struct_dir = self.working_directory.joinpath(struct_row.path)
+            struct_dir = self.working_directory.joinpath(struct_row.path)
 
-                for radiomics_file in struct_dir.glob("radiomics_*.csv"):
-                    col_types = {
-                        "Contour": str,
-                        "Patient": str,
-                        "ImageHashedUID": str,
-                        "StructHashedUID": str,
-                    }
-                    df_rad = pd.read_csv(radiomics_file, index_col=0, dtype=col_types)
-                    dfs.append(df_rad)
+            for radiomics_file in struct_dir.glob("radiomics_*.csv"):
+                col_types = {
+                    "Contour": str,
+                    "Patient": str,
+                    "ImageHashedUID": str,
+                    "StructHashedUID": str,
+                }
+                df_rad = pd.read_csv(radiomics_file, index_col=0, dtype=col_types)
+                dfs.append(df_rad)
 
         df = pd.concat(dfs)
         df.sort_values(["Patient", "ImageHashedUID", "StructHashedUID", "Contour"], inplace=True)
@@ -98,20 +96,17 @@ class AnalyseData:
             pd.DataFrame: The DataFrame of all DVHs computed for dataset
         """
 
-        dataset_directory = self.working_directory.joinpath(dataset_name)
+        df_data = read_converted_data(self.working_directory, dataset_name)
 
         dfs = []
-        for converted_csv in dataset_directory.glob("*/converted.csv"):
+        for _, dose_row in df_data[df_data["modality"] == "RTDOSE"].iterrows():
 
-            df_converted = pd.read_csv(converted_csv)
-            for _, dose_row in df_converted[df_converted["modality"] == "RTDOSE"].iterrows():
+            dose_dir = self.working_directory.joinpath(dose_row.path)
 
-                dose_dir = self.working_directory.joinpath(dose_row.path)
-
-                for dvh_file in dose_dir.glob("dvh_*.csv"):
-                    col_types = {"patient": str, "struct_hash": str, "label": str}
-                    df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
-                    dfs.append(df_dvh)
+            for dvh_file in dose_dir.glob("dvh_*.csv"):
+                col_types = {"patient": str, "struct_hash": str, "label": str}
+                df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
+                dfs.append(df_dvh)
 
         df = pd.concat(dfs)
         df.sort_values(["patient", "struct_hash", "label"], inplace=True)
