@@ -19,6 +19,7 @@ from pydicer.quarantine.treat import copy_file_to_quarantine
 
 from pydicer.constants import (
     CONVERTED_DIR_NAME,
+    PYDICER_DIR_NAME,
     RT_DOSE_STORAGE_UID,
     RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
