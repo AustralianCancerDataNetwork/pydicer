@@ -1,6 +1,7 @@
 from pathlib import Path
 import logging
 from pydicer.config import PyDicerConfig
+from pydicer.constants import CONVERTED_DIR_NAME, PYDICER_DIR_NAME
 
 from pydicer.input.base import InputBase
 from pydicer.preprocess.data import PreprocessData
@@ -17,7 +18,7 @@ class PyDicer:
     def __init__(self, working_directory="."):
 
         self.working_directory = Path(working_directory)
-        self.pydicer_directory = self.working_directory.joinpath(".pydicer")
+        self.pydicer_directory = self.working_directory.joinpath(PYDICER_DIR_NAME)
 
         if self.working_directory.exists():
             # If the directory already exists, make sure it's really a PyDicer directory. If not
@@ -103,8 +104,10 @@ class PyDicer:
         self.convert.convert(patient=patient, force=force)
         self.visualise.visualise(patient=patient, force=force)
 
-        self.analyse.compute_radiomics(dataset_name="data", patient=patient, force=force)
-        self.analyse.compute_dvh(dataset_name="data", patient=patient, force=force)
+        self.analyse.compute_radiomics(
+            dataset_name=CONVERTED_DIR_NAME, patient=patient, force=force
+        )
+        self.analyse.compute_dvh(dataset_name=CONVERTED_DIR_NAME, patient=patient, force=force)
 
     # Object generation (insert in dataset(s) or all data)
     def add_object_to_dataset(

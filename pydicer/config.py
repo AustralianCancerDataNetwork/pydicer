@@ -3,6 +3,8 @@ import json
 
 from pathlib import Path
 
+from pydicer.constants import PYDICER_DIR_NAME
+
 logger = logging.getLogger(__name__)
 
 PYDICER_CONFIG = {
@@ -73,7 +75,7 @@ class PyDicerConfig:
                 raise ValueError("working_dir must be set on config init")
             self.working_dir = Path(working_dir)
 
-            pydicer_dir = self.working_dir.joinpath(".pydicer")
+            pydicer_dir = self.working_dir.joinpath(PYDICER_DIR_NAME)
             self.config_path = pydicer_dir.joinpath("config.json")
 
             self.pydicer_config = {}

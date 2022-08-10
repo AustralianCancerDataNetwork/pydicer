@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 
 import pandas as pd
+from pydicer.constants import CONVERTED_DIR_NAME
 
 from pydicer.dataset import functions
 
@@ -84,7 +85,7 @@ class PrepareDataset:
         logger.info("Preparing dataset %s using function: %s", dataset_name, preparation_function)
 
         # Grab the DataFrame containing all the converted data
-        converted_path = self.working_directory.joinpath("data")
+        converted_path = self.working_directory.joinpath(CONVERTED_DIR_NAME)
         df_converted = read_converted_data_frame(converted_path, patients=patients)
 
         # Send to the prepare function which will return a DataFrame of the data objects to use for
@@ -96,7 +97,7 @@ class PrepareDataset:
 
             object_path = Path(row.path)
 
-            symlink_path = dataset_dir.joinpath(object_path.relative_to("data"))
+            symlink_path = dataset_dir.joinpath(object_path.relative_to(CONVERTED_DIR_NAME))
 
             rel_part = os.sep.join(
                 [".." for _ in symlink_path.parent.relative_to(self.working_directory).parts]

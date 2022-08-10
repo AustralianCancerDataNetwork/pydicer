@@ -18,6 +18,7 @@ from pydicer.utils import hash_uid, read_preprocessed_data
 from pydicer.quarantine.treat import copy_file_to_quarantine
 
 from pydicer.constants import (
+    CONVERTED_DIR_NAME,
     RT_DOSE_STORAGE_UID,
     RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
@@ -223,8 +224,8 @@ class ConvertData:
 
     def __init__(self, working_directory="."):
         self.working_directory = Path(working_directory)
-        self.pydicer_directory = working_directory.joinpath(".pydicer")
-        self.output_directory = working_directory.joinpath("data")
+        self.pydicer_directory = working_directory.joinpath(PYDICER_DIR_NAME)
+        self.output_directory = working_directory.joinpath(CONVERTED_DIR_NAME)
 
     def convert(self, patient=None, force=True):
         """Converts the DICOM which was preprocessed into the pydicer output directory.

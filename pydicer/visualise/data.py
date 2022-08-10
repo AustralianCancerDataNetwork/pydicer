@@ -4,6 +4,7 @@ import SimpleITK as sitk
 import pandas as pd
 import matplotlib.pyplot as plt
 from platipy.imaging import ImageVisualiser
+from pydicer.constants import CONVERTED_DIR_NAME
 
 from pydicer.utils import parse_patient_kwarg, load_object_metadata
 
@@ -21,7 +22,7 @@ class VisualiseData:
 
     def __init__(self, working_directory="."):
         self.working_directory = Path(working_directory)
-        self.output_directory = self.working_directory.joinpath("data")
+        self.output_directory = self.working_directory.joinpath(CONVERTED_DIR_NAME)
 
     def visualise(self, patient=None, force=True):
         """Visualise the data in the working directory. PNG files are generates providing a

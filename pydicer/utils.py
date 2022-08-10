@@ -7,6 +7,7 @@ import pandas as pd
 import pydicom
 
 from pydicer.config import PyDicerConfig
+from pydicer.constants import PYDICER_DIR_NAME
 
 
 def hash_uid(uid, truncate=6):
@@ -78,6 +79,7 @@ def load_object_metadata(row):
 
     return pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
 
+
 def read_preprocessed_data(working_directory: Path):
     """Reads the pydicer preprocessed data
 
@@ -91,7 +93,7 @@ def read_preprocessed_data(working_directory: Path):
         pd.DataFrame: The preprocessed data
     """
 
-    pydicer_directory = working_directory.joinpath(".pydicer")
+    pydicer_directory = working_directory.joinpath(PYDICER_DIR_NAME)
     preprocessed_file = pydicer_directory.joinpath("preprocessed.csv")
     if not preprocessed_file.exists():
         raise SystemError("Preprocessed data not found, run preprocess step first")
@@ -103,6 +105,7 @@ def read_preprocessed_data(working_directory: Path):
     df_preprocess.patient_id = df_preprocess.patient_id.astype(str)
 
     return df_preprocess
+
 
 def parse_patient_kwarg(patient, dataset_directory):
     """Helper function to prepare patient list from kwarg used in functions throughout pydicer.

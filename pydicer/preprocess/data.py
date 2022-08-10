@@ -9,6 +9,7 @@ from pydicer.config import PyDicerConfig
 
 from pydicer.constants import (
     PET_IMAGE_STORAGE_UID,
+    PYDICER_DIR_NAME,
     RT_DOSE_STORAGE_UID,
     RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
@@ -30,7 +31,7 @@ class PreprocessData:
 
     def __init__(self, working_directory):
         self.working_directory = working_directory
-        self.pydicer_directory = working_directory.joinpath(".pydicer")
+        self.pydicer_directory = working_directory.joinpath(PYDICER_DIR_NAME)
         self.pydicer_directory.mkdir(exist_ok=True)
 
     def preprocess(self, input_directory):

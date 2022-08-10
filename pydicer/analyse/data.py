@@ -10,6 +10,7 @@ import seaborn as sns
 
 from radiomics import firstorder, shape, glcm, glrlm, glszm, ngtdm, gldm, imageoperations
 from platipy.imaging.dose.dvh import calculate_dvh_for_labels, calculate_d_x, calculate_v_x
+from pydicer.constants import CONVERTED_DIR_NAME
 
 from pydicer.utils import load_object_metadata, parse_patient_kwarg
 
@@ -51,7 +52,7 @@ class AnalyseData:
     def __init__(self, working_directory="."):
         self.working_directory = Path(working_directory)
 
-    def get_all_computed_radiomics_for_dataset(self, dataset_name="data"):
+    def get_all_computed_radiomics_for_dataset(self, dataset_name=CONVERTED_DIR_NAME):
         """Return a DataFrame of radiomics computed for this dataset
 
         Args:
@@ -86,7 +87,7 @@ class AnalyseData:
 
         return df
 
-    def get_all_dvhs_for_dataset(self, dataset_name="data"):
+    def get_all_dvhs_for_dataset(self, dataset_name=CONVERTED_DIR_NAME):
         """Return a DataFrame of DVHs computed for this dataset
 
         Args:
@@ -123,7 +124,12 @@ class AnalyseData:
         return df
 
     def compute_dose_metrics(
-        self, dataset_name="data", d_point=None, v_point=None, d_cc_point=None, dvh=None
+        self,
+        dataset_name=CONVERTED_DIR_NAME,
+        d_point=None,
+        v_point=None,
+        d_cc_point=None,
+        dvh=None,
     ):
         """Compute Dose metrics from a DVH
 
@@ -207,7 +213,7 @@ class AnalyseData:
 
     def compute_radiomics(
         self,
-        dataset_name="data",
+        dataset_name=CONVERTED_DIR_NAME,
         patient=None,
         force=True,
         radiomics=None,
@@ -421,7 +427,7 @@ class AnalyseData:
 
     def compute_dvh(
         self,
-        dataset_name="data",
+        dataset_name=CONVERTED_DIR_NAME,
         patient=None,
         force=True,
         bin_width=0.1,
