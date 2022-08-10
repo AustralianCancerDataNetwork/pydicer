@@ -7,3 +7,12 @@ PET_IMAGE_STORAGE_UID = "1.2.840.10008.5.1.4.1.1.128"
 PYDICER_DIR_NAME = ".pydicer"
 CONVERTED_DIR_NAME = "data"
 QUARANTINE_DIR_NAME = "quarantine"
+
+DICOM_FILE_EXTENSIONS = [
+    "dcm",
+    "DCM",
+    "dcim",
+    "DCIM",
+    "dicom",
+    "DICOM",
+]

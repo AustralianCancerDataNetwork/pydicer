@@ -8,6 +8,7 @@ import numpy as np
 from pydicer.config import PyDicerConfig
 
 from pydicer.constants import (
+    DICOM_FILE_EXTENSIONS,
     PET_IMAGE_STORAGE_UID,
     PYDICER_DIR_NAME,
     RT_DOSE_STORAGE_UID,
@@ -86,12 +87,8 @@ class PreprocessData:
         config = PyDicerConfig()
         for directory in input_directory:
             if config.get_config("enforce_dcm_ext"):
-                files += list(directory.glob("**/*.dcm"))
-                files += list(directory.glob("**/*.DCM"))
-                files += list(directory.glob("**/*.dcim"))
-                files += list(directory.glob("**/*.DCIM"))
-                files += list(directory.glob("**/*.dicom"))
-                files += list(directory.glob("**/*.DICOM"))
+                for ext in DICOM_FILE_EXTENSIONS:
+                    files += list(directory.glob(f"**/*.{ext}"))
             else:
                 files += list(directory.glob("**/*"))
 
