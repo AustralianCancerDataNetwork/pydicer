@@ -77,6 +77,9 @@ def load_object_metadata(row):
 
     config = PyDicerConfig()
     metadata_path = Path(config.get_working_dir(), row.path).joinpath("metadata.json")
+
+    if not metadata_path.exists():
+        return pydicom.Dataset()
     with open(metadata_path, "r", encoding="utf8") as json_file:
         ds_dict = json.load(json_file)
 
