@@ -19,6 +19,27 @@ def add_object(
     referenced_sop_instance_uid=None,
     datasets=None,
 ):
+    """Add a generated object to the project.
+
+    Args:
+        working_directory (pathlib.Path): The working directory of the project.
+        object_id (str): The unique ID of the new object.
+        patient_id (str): The ID of the patient for which the object is being added.
+        object_type (str): The type of object, must be one of "image", "structure", "plan" or
+            "dose".
+        modality (str): The modality of the object (as per the DICOM standard)
+        for_uid (str, optional): The Frame of Reference UID. Defaults to None.
+        referenced_sop_instance_uid (str, optional): The SOP Instance UID of the object referenced
+            by the generated object. Defaults to None.
+        datasets (list|str, optional): The name(s) of the dataset(s) to add the object to. Defaults
+            to None.
+
+    Raises:
+        ValueError: Raised in object_type is not "image", "structure", "plan" or "dose".
+        ValueError: Raised if the patient does not exist in the project.
+        SystemError: Raised if the generated object does not yet exist on the file system.
+        SystemError: Raised if an object with this ID has already exists in the project.
+    """
 
     # Make sure the object type is one we expect
     if object_type not in ["image", "structure", "plan", "dose"]:
@@ -123,31 +144,27 @@ def add_object(
 
 
 # Add image
-def add_image_object(working_dir, image, image_id, patient_id, modality, for_uid=None):
+# def add_image_object(
+#     working_directory, image, image_id, patient_id, modality, for_uid=None, datasets=None
+# ):
 
-    # create the folder
+# create the folder
 
-    # save the image
+# save the image
 
-    # add the object to pydicer
-
-    # Visualise the image
-
-    pass
+# add the object to pydicer
 
 
 # Add structures
-def add_structure_object(working_dir, structures, structure_id, patient_id, linked_image=None):
+# def add_structure_object(
+#     working_directory, structures, structure_id, patient_id, linked_image=None, datasets=None
+# ):
 
-    # create the folder
+# create the folder
 
-    # save off the structures
+# save off the structures
 
-    # add the object to pydicer
-
-    # Visualise the structures
-
-    pass
+# add the object to pydicer
 
 
 def add_dose_object(working_directory, dose, dose_id, patient_id, linked_plan=None, datasets=None):
