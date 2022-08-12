@@ -5,7 +5,7 @@ import pytest
 import pandas as pd
 import SimpleITK as sitk
 
-from pydicer.generate.object import add_object, add_dose_object
+from pydicer.generate.object import add_object, add_dose_object, add_structure_object
 from pydicer.utils import read_converted_data
 
 
@@ -178,4 +178,39 @@ def test_generate_dose_object(test_data_path):
     )
 
     # And that the dose file exists
-    test_data_path.joinpath("data", "HNSCC-01-0019", "images", "dose_id", "RTDOSE.nii.gz").exists()
+    assert test_data_path.joinpath(
+        "data", "HNSCC-01-0019", "doses", "dose_id", "RTDOSE.nii.gz"
+    ).exists()
+
+
+def test_generate_structure_object(test_data_path):
+
+    # Confirm the data object isn't there yet
+    df_converted = read_converted_data(test_data_path, patients=["HNSCC-01-0019"])
+    assert len(df_converted[df_converted.hashed_uid == "structure_id"]) == 0
+
+    test_structure_set = {
+        "test_struct1": sitk.Image(20, 20, 20, sitk.sitkFloat32),
+        "test_struct2": sitk.Image(20, 20, 20, sitk.sitkFloat32),
+    }
+    linked_image_hash = "b281ea"
+    add_structure_object(
+        test_data_path, test_structure_set, "structure_id", "HNSCC-01-0019", linked_image_hash
+    )
+
+    # Now make sure it's there
+    df_converted = read_converted_data(test_data_path, patients=["HNSCC-01-0019"])
+    assert len(df_converted[df_converted.hashed_uid == "structure_id"]) == 1
+
+    # Also make sure the for_uid and reference sop instance uid are correct
+    linked_row = df_converted[df_converted.hashed_uid == "structure_id"].iloc[0]
+    assert linked_row.for_uid == "1.3.6.1.4.1.14519.5.2.1.1706.8040.290727775603409136366833989550"
+    assert (
+        linked_row.referenced_sop_instance_uid
+        == "1.3.6.1.4.1.14519.5.2.1.1706.8040.418136430763474248173140712714"
+    )
+
+    # And that the structure files actually exist
+    assert test_data_path.joinpath(
+        "data", "HNSCC-01-0019", "structures", "structure_id", "test_struct1.nii.gz"
+    ).exists()
