@@ -97,6 +97,9 @@ def add_object(
     if datasets is None:
         datasets = []
 
+    if isinstance(datasets, str):
+        datasets = [datasets]
+
     for dataset in datasets:
 
         # Make sure the dataset directory exists
@@ -147,9 +150,23 @@ def add_structure_object(working_dir, structures, structure_id, patient_id, link
     pass
 
 
-def add_dose_object(
-    working_directory, dose, dose_id, patient_id, linked_structure=None, datasets=None
-):
+def add_dose_object(working_directory, dose, dose_id, patient_id, linked_plan=None, datasets=None):
+    """Add a generated dose object to the project.
+
+    Args:
+        working_directory (pathlib.Path): The project working directory.
+        dose (sitk.Image): A SimpleITK.Image of the dose volume to add.
+        dose_id (str): The unique ID of the new dose object.
+        patient_id (str): The ID of the patient of this object.
+        linked_plan (str|pd.Series, optional): The hashed_uidor the Pandas DataFrame row of the
+            RTPLAN object to link to. If None the new object won't be linked. Defaults to None.
+        datasets (list|str, optional): The name(s) of the dataset(s) to add the object to. Defaults
+            to None.
+
+    Raises:
+        ValueError: Raised then the patient ID does not exist
+        SystemError: Raised when a linked_plan is provided but can't be found for this patient.
+    """
 
     # Check that the patient directory exists
     patient_directory = working_directory.joinpath(CONVERTED_DIR_NAME, patient_id)
@@ -161,29 +178,28 @@ def add_dose_object(
     # If we have linked data, use the for_uid and reference that sop_instance_uid
     for_uid = None
     ref_sop_uid = None
-    if linked_structure is not None:
+    if linked_plan is not None:
 
-        if isinstance(linked_structure, str):
+        if isinstance(linked_plan, str):
             # Find the entry
             df_converted = read_converted_data(working_directory, patients=[patient_id])
 
-            df_linked = df_converted[df_converted.hashed_uid == linked_structure]
+            df_linked = df_converted[df_converted.hashed_uid == linked_plan]
 
             if not len(df_linked) == 1:
-                raise SystemError(
-                    f"Expecting one linked_structure object but found {len(df_linked) }"
-                )
+                raise SystemError(f"Expecting one linked_plan object but found {len(df_linked) }")
 
-            linked_structure = df_linked.iloc[0]
+            linked_plan = df_linked.iloc[0]
 
-        for_uid = linked_structure.for_uid
-        ref_sop_uid = linked_structure.sop_instance_uid
+        for_uid = linked_plan.for_uid
+        ref_sop_uid = linked_plan.sop_instance_uid
 
     dose_object_path = patient_directory.joinpath(f"{object_type}s", dose_id)
     dose_object_path.mkdir(
         exist_ok=True,
     )
 
+    # Save the data object in the dose_object_path
     sitk.WriteImage(dose, str(dose_object_path.joinpath("RTDOSE.nii.gz")))
 
     # Add the object to pydicer
