@@ -77,6 +77,9 @@ def load_object_metadata(row):
 
     config = PyDicerConfig()
     metadata_path = Path(config.get_working_dir(), row.path).joinpath("metadata.json")
+
+    if not metadata_path.exists():
+        return pydicom.Dataset()
     with open(metadata_path, "r", encoding="utf8") as json_file:
         ds_dict = json.load(json_file)
 
@@ -157,30 +160,27 @@ def read_converted_data(working_directory: Path, dataset_name=CONVERTED_DIR_NAME
     return df.reset_index(drop=True)
 
 
-def parse_patient_kwarg(patient, dataset_directory):
+def parse_patient_kwarg(patient):
     """Helper function to prepare patient list from kwarg used in functions throughout pydicer.
 
     Args:
         patient (list|str): The patient ID or list of patient IDs. If None, all patients in
           dataset_directory are returned.
-        dataset_directory (pathlib.Path): The path of the output directory or dataset directory
-          (containing the patient folders)
 
     Raises:
         ValueError: All patient IDs in list aren't of type `str`
         ValueError: patient was not list, str or None.
 
     Returns:
-        list: The list of patient IDs to process
+        list: The list of patient IDs to process or None if patient is None
     """
 
     if isinstance(patient, list):
         if not all(isinstance(x, str) for x in patient):
             raise ValueError("All patient IDs must be of type 'str'")
     elif patient is None:
-        patient = [p.name for p in dataset_directory.glob("*") if p.is_dir()]
+        return None
     else:
-
         if not isinstance(patient, str) and patient is not None:
             raise ValueError(
                 "Patient ID must be list or str. None is a valid to process all patients"

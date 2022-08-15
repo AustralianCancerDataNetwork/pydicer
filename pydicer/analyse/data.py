@@ -210,6 +210,7 @@ class AnalyseData:
         self,
         dataset_name=CONVERTED_DIR_NAME,
         patient=None,
+        df_process=None,
         force=True,
         radiomics=None,
         settings=None,
@@ -226,7 +227,9 @@ class AnalyseData:
             dataset_name (str, optional): The name of the dataset to compute radiomics on. Defaults
               to "data" (runs on all data).
             patient (list|str, optional): A patient ID (or list of patient IDs) to compute
-              radiomics for. Defaults to None (all patients).
+              radiomics for. Must be None if df_process is provided. Defaults to None.
+            df_process (pd.DataFrame, optional): A DataFrame of the objects to compute radiomics
+              for. Must be None if patient is provided. Defaults to None.
             force (bool, optional): When True, radiomics will be recomputed even if the output file
               already exists. Defaults to True.
             radiomics (dict, optional): A dictionary of the pyradiomics to compute. Format should
@@ -251,9 +254,17 @@ class AnalyseData:
             ValueError: Raised if patient is not None, a list of strings or a string.
         """
 
-        dataset_directory = self.working_directory.joinpath(dataset_name)
+        if patient is not None and df_process is not None:
+            raise ValueError("Only one of patient and df_process pay be provided.")
 
-        patient = parse_patient_kwarg(patient, dataset_directory)
+        if df_process is None:
+            patient = parse_patient_kwarg(patient)
+            df_process = read_converted_data(
+                self.working_directory, dataset_name=dataset_name, patients=patient
+            )
+
+        # Read all converted data for linkage
+        df_converted = read_converted_data(self.working_directory)
 
         if radiomics is None:
             radiomics = DEFAULT_RADIOMICS
@@ -269,161 +280,151 @@ class AnalyseData:
 
         meta_data_cols = []
 
-        for pat in patient:
+        # Next compute the radiomics for each structure using their linked image
+        for _, struct_row in df_process[df_process["modality"] == "RTSTRUCT"].iterrows():
 
-            # Read in the DataFrame storing the converted data for this patient
-            converted_csv = dataset_directory.joinpath(pat, "converted.csv")
-            if not converted_csv.exists():
-                logger.warning("Converted CSV doesn't exist for %s", pat)
-                continue
+            struct_dir = self.working_directory.joinpath(struct_row.path)
 
-            df_converted = pd.read_csv(converted_csv, index_col=0)
+            # Find the linked image
+            df_linked_img = df_converted[
+                (df_converted["sop_instance_uid"] == struct_row.referenced_sop_instance_uid)
+                | (
+                    (df_converted["for_uid"] == struct_row.for_uid)
+                    & (df_converted["modality"].isin(["CT", "MR", "PT"]))
+                )
+            ]
 
-            # Next compute the radiomics for each structure using their linked image
-            for _, struct_row in df_converted[df_converted["modality"] == "RTSTRUCT"].iterrows():
+            if len(df_linked_img) == 0:
+                logger.warning(
+                    "No linked images found, structures won't be visualised: %s",
+                    struct_row.sop_instance_uid,
+                )
 
-                struct_dir = self.working_directory.joinpath(struct_row.path)
+            for _, img_row in df_linked_img.iterrows():
 
-                # Find the linked image
-                # TODO also compute radiomics on images linked by Frame of Reference
-                df_linked_img = df_converted[
-                    df_converted["sop_instance_uid"] == struct_row.referenced_sop_instance_uid
-                ]
+                struct_radiomics_path = struct_dir.joinpath(f"radiomics_{img_row.hashed_uid}.csv")
 
-                if len(df_linked_img) == 0:
-                    logger.warning(
-                        "No linked images found, structures won't be visualised: %s",
-                        struct_row.sop_instance_uid,
-                    )
+                if struct_radiomics_path.exists() and not force:
+                    logger.info("Radiomics already computed at %s", struct_radiomics_path)
+                    continue
 
-                for _, img_row in df_linked_img.iterrows():
+                img_file = self.working_directory.joinpath(
+                    img_row.path, f"{img_row.modality}.nii.gz"
+                )
+                img_meta_data = load_object_metadata(img_row)
 
-                    struct_radiomics_path = struct_dir.joinpath(
-                        f"radiomics_{img_row.hashed_uid}.csv"
-                    )
+                struct_meta_data = load_object_metadata(struct_row)
 
-                    if struct_radiomics_path.exists() and not force:
-                        logger.info("Radiomics already computed at %s", struct_radiomics_path)
-                        continue
+                output_frame = pd.DataFrame()
+                for struct_nii in struct_dir.glob("*.nii.gz"):
 
-                    img_file = self.working_directory.joinpath(
-                        img_row.path, f"{img_row.modality}.nii.gz"
-                    )
-                    img_meta_data = load_object_metadata(img_row)
+                    struct_name = struct_nii.name.replace(".nii.gz", "")
 
-                    struct_meta_data = load_object_metadata(struct_row)
+                    # If a regex is set, make sure this structure name matches it
+                    if structure_match_regex:
+                        if re.search(structure_match_regex, struct_name) is None:
+                            continue
 
-                    output_frame = pd.DataFrame()
-                    for struct_nii in struct_dir.glob("*.nii.gz"):
+                    # Reload the image for each new contour in case resampling is occuring,
+                    # should start fresh each time.
+                    image = sitk.ReadImage(str(img_file))
+                    mask = sitk.ReadImage(str(struct_nii))
 
-                        struct_name = struct_nii.name.replace(".nii.gz", "")
+                    interpolator = settings.get("interpolator")
+                    resample_pixel_spacing = settings.get("resampledPixelSpacing")
 
-                        # If a regex is set, make sure this structure name matches it
-                        if structure_match_regex:
-                            if re.search(structure_match_regex, struct_name) is None:
-                                continue
+                    resample_pixel_spacing = list(image.GetSpacing())
+                    settings["resampledPixelSpacing"] = resample_pixel_spacing
 
-                        # Reload the image for each new contour in case resampling is occuring,
-                        # should start fresh each time.
-                        image = sitk.ReadImage(str(img_file))
-                        mask = sitk.ReadImage(str(struct_nii))
-
-                        interpolator = settings.get("interpolator")
-                        resample_pixel_spacing = settings.get("resampledPixelSpacing")
-
+                    if resample_to_image:
                         resample_pixel_spacing = list(image.GetSpacing())
                         settings["resampledPixelSpacing"] = resample_pixel_spacing
 
-                        if resample_to_image:
-                            resample_pixel_spacing = list(image.GetSpacing())
-                            settings["resampledPixelSpacing"] = resample_pixel_spacing
+                    if interpolator is not None and resample_pixel_spacing is not None:
+                        image, mask = imageoperations.resampleImage(image, mask, **settings)
 
-                        if interpolator is not None and resample_pixel_spacing is not None:
-                            image, mask = imageoperations.resampleImage(image, mask, **settings)
+                    df_contour = pd.DataFrame()
 
-                        df_contour = pd.DataFrame()
+                    for rad in radiomics:
 
-                        for rad in radiomics:
+                        if rad not in AVAILABLE_RADIOMICS:
+                            logger.warning("Radiomic Class not found: %s", rad)
+                            continue
 
-                            if rad not in AVAILABLE_RADIOMICS:
-                                logger.warning("Radiomic Class not found: %s", rad)
-                                continue
+                        radiomics_obj = AVAILABLE_RADIOMICS[rad]
 
-                            radiomics_obj = AVAILABLE_RADIOMICS[rad]
+                        features = radiomics_obj(image, mask, **settings)
 
-                            features = radiomics_obj(image, mask, **settings)
+                        features.disableAllFeatures()
 
-                            features.disableAllFeatures()
+                        # All features seem to be computed if all are disabled (possible
+                        # pyradiomics bug?). Skip if all features in a class are disabled.
+                        if len(radiomics[rad]) == 0:
+                            continue
 
-                            # All features seem to be computed if all are disabled (possible
-                            # pyradiomics bug?). Skip if all features in a class are disabled.
-                            if len(radiomics[rad]) == 0:
-                                continue
+                        for feature in radiomics[rad]:
+                            try:
+                                features.enableFeatureByName(feature, True)
+                            except LookupError:
+                                # Feature not available in this set
+                                logger.warning("Feature not found: %s", feature)
 
-                            for feature in radiomics[rad]:
-                                try:
-                                    features.enableFeatureByName(feature, True)
-                                except LookupError:
-                                    # Feature not available in this set
-                                    logger.warning("Feature not found: %s", feature)
-
-                            feature_result = features.execute()
-                            feature_result = dict(
-                                (f"{rad}|{key}", value) for (key, value) in feature_result.items()
-                            )
-                            df_feature_result = pd.DataFrame(feature_result, index=[struct_name])
-
-                            # Merge the results
-                            df_contour = pd.concat([df_contour, df_feature_result], axis=1)
-
-                        output_frame = pd.concat([output_frame, df_contour])
-
-                        # Add the meta data for this contour if there is any
-                        for key in structure_meta_data:
-
-                            col_key = f"struct|{key}"
-
-                            if key in struct_meta_data:
-                                output_frame[col_key] = struct_meta_data[key].value
-                            else:
-                                output_frame[col_key] = None
-
-                            if col_key not in meta_data_cols:
-                                meta_data_cols.append(col_key)
-
-                    # Add Image Series Data Object's Meta Data to the table
-                    for key in image_meta_data:
-
-                        col_key = f"img|{key}"
-
-                        value = None
-                        if key in img_meta_data:
-                            value = img_meta_data[key].value
-
-                        output_frame[col_key] = pd.Series(
-                            [value for p in range(len(output_frame.index))],
-                            index=output_frame.index,
+                        feature_result = features.execute()
+                        feature_result = dict(
+                            (f"{rad}|{key}", value) for (key, value) in feature_result.items()
                         )
+                        df_feature_result = pd.DataFrame(feature_result, index=[struct_name])
+
+                        # Merge the results
+                        df_contour = pd.concat([df_contour, df_feature_result], axis=1)
+
+                    output_frame = pd.concat([output_frame, df_contour])
+
+                    # Add the meta data for this contour if there is any
+                    for key in structure_meta_data:
+
+                        col_key = f"struct|{key}"
+
+                        if key in struct_meta_data:
+                            output_frame[col_key] = struct_meta_data[key].value
+                        else:
+                            output_frame[col_key] = None
 
                         if col_key not in meta_data_cols:
                             meta_data_cols.append(col_key)
 
-                    output_frame.insert(
-                        loc=0, column="StructHashedUID", value=struct_row.hashed_uid
-                    )
-                    output_frame.insert(loc=0, column="ImageHashedUID", value=img_row.hashed_uid)
-                    output_frame.insert(loc=0, column="Patient", value=pat)
-                    output_frame.reset_index(inplace=True)
-                    columns = list(output_frame.columns)
-                    columns[0] = "Contour"
-                    output_frame.columns = columns
+                # Add Image Series Data Object's Meta Data to the table
+                for key in image_meta_data:
 
-                    output_frame.to_csv(struct_radiomics_path)
+                    col_key = f"img|{key}"
+
+                    value = None
+                    if key in img_meta_data:
+                        value = img_meta_data[key].value
+
+                    output_frame[col_key] = pd.Series(
+                        [value for p in range(len(output_frame.index))],
+                        index=output_frame.index,
+                    )
+
+                    if col_key not in meta_data_cols:
+                        meta_data_cols.append(col_key)
+
+                output_frame.insert(loc=0, column="StructHashedUID", value=struct_row.hashed_uid)
+                output_frame.insert(loc=0, column="ImageHashedUID", value=img_row.hashed_uid)
+                output_frame.insert(loc=0, column="Patient", value=struct_row.patient_id)
+                output_frame.reset_index(inplace=True)
+                columns = list(output_frame.columns)
+                columns[0] = "Contour"
+                output_frame.columns = columns
+
+                output_frame.to_csv(struct_radiomics_path)
 
     def compute_dvh(
         self,
         dataset_name=CONVERTED_DIR_NAME,
         patient=None,
+        df_process=None,
         force=True,
         bin_width=0.1,
         structure_meta_data_cols=None,
@@ -436,7 +437,9 @@ class AnalyseData:
             dataset_name (str, optional): The name of the dataset to compute DVHs on. Defaults to
               "data" (runs on all data).
             patient (list|str, optional): A patient ID (or list of patient IDs) to compute DVH for.
-              Defaults to None.
+             Must be None if df_process is provided. Defaults to None.
+            df_process (pd.DataFrame, optional): A DataFrame of the objects to compute radiomics
+              for. Must be None if patient is provided. Defaults to None.
             force (bool, optional): When True, DVHs will be recomputed even if the output file
               already exists. Defaults to True.
             bin_width (float, optional): The bin width of the Dose Volume Histogram.
@@ -451,9 +454,17 @@ class AnalyseData:
             ValueError: Raised if patient is not None, a list of strings or a string.
         """
 
-        dataset_directory = self.working_directory.joinpath(dataset_name)
+        if patient is not None and df_process is not None:
+            raise ValueError("Only one of patient and df_process pay be provided.")
 
-        patient = parse_patient_kwarg(patient, dataset_directory)
+        if df_process is None:
+            patient = parse_patient_kwarg(patient)
+            df_process = read_converted_data(
+                self.working_directory, dataset_name=dataset_name, patients=patient
+            )
+
+        # Read all converted data for linkage
+        df_converted = read_converted_data(self.working_directory)
 
         if structure_meta_data_cols is None:
             structure_meta_data_cols = []
@@ -463,131 +474,117 @@ class AnalyseData:
 
         meta_data_cols = []
 
-        for pat in patient:
+        # For each dose, find the structures in the same frame of reference and compute the
+        # DVH
+        for _, dose_row in df_process[df_process["modality"] == "RTDOSE"].iterrows():
 
-            # Read in the DataFrame storing the converted data for this patient
-            converted_csv = dataset_directory.joinpath(pat, "converted.csv")
-            if not converted_csv.exists():
-                logger.warning("Converted CSV doesn't exist for %s", pat)
-                continue
+            ## Currently doses are linked via: plan -> struct -> image
+            dose_meta_data = load_object_metadata(dose_row)
 
-            df_converted = pd.read_csv(converted_csv, index_col=0)
+            # Find the linked plan
+            df_linked_plan = df_converted[
+                df_converted["sop_instance_uid"] == dose_row.referenced_sop_instance_uid
+            ]
 
-            # For each dose, find the structures in the same frame of reference and compute the
-            # DVH
-            for _, dose_row in df_converted[df_converted["modality"] == "RTDOSE"].iterrows():
+            if len(df_linked_plan) == 0:
+                logger.warning("No linked plans found for dose: %s", dose_row.sop_instance_uid)
 
-                ## Currently doses are linked via: plan -> struct -> image
-                dose_meta_data = load_object_metadata(dose_row)
-
-                # Find the linked plan
-                df_linked_plan = df_converted[
-                    df_converted["sop_instance_uid"] == dose_row.referenced_sop_instance_uid
+            # Find the linked structure set
+            df_linked_struct = None
+            if len(df_linked_plan) > 0:
+                plan_row = df_linked_plan.iloc[0]
+                df_linked_struct = df_converted[
+                    df_converted["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
                 ]
 
-                if len(df_linked_plan) == 0:
-                    logger.warning("No linked plans found for dose: %s", dose_row.sop_instance_uid)
+            # Also link via Frame of Reference
+            df_for_linked = df_converted[
+                (df_converted["modality"] == "RTSTRUCT")
+                & (df_converted["for_uid"] == dose_row.for_uid)
+            ]
 
-                # Find the linked structure set
-                df_linked_struct = None
-                if len(df_linked_plan) > 0:
-                    plan_row = df_linked_plan.iloc[0]
-                    df_linked_struct = df_converted[
-                        df_converted["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
-                    ]
+            if df_linked_struct is None:
+                df_linked_struct = df_for_linked
+            else:
+                df_linked_struct = pd.concat([df_linked_struct, df_for_linked])
 
-                # Also link via Frame of Reference
-                df_for_linked = df_converted[
-                    (df_converted["modality"] == "RTSTRUCT")
-                    & (df_converted["for_uid"] == dose_row.for_uid)
-                ]
+            if len(df_linked_struct) == 0:
+                logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
 
-                if df_linked_struct is None:
-                    df_linked_struct = df_for_linked
-                else:
-                    df_linked_struct = pd.concat([df_linked_struct, df_for_linked])
+            dose_file = self.working_directory.joinpath(dose_row.path).joinpath("RTDOSE.nii.gz")
 
-                if len(df_linked_struct) == 0:
-                    logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
+            for _, struct_row in df_linked_struct.iterrows():
 
-                dose_file = self.working_directory.joinpath(dose_row.path).joinpath(
-                    "RTDOSE.nii.gz"
+                struct_hash = struct_row.hashed_uid
+                dvh_csv = dose_file.parent.joinpath(f"dvh_{struct_hash}.csv")
+
+                if dvh_csv.exists() and not force:
+                    logger.info("DVH already computed at %s", dvh_csv)
+                    continue
+
+                struct_dir = self.working_directory.joinpath(struct_row.path)
+
+                struct_meta_data = load_object_metadata(struct_row)
+
+                dose = sitk.ReadImage(str(dose_file))
+
+                structures = {
+                    struct_nii.name.replace(".nii.gz", ""): sitk.ReadImage(str(struct_nii))
+                    for struct_nii in struct_dir.glob("*.nii.gz")
+                }
+                if len(structures) == 0:
+                    continue
+
+                dvh = calculate_dvh_for_labels(dose, structures, bin_width=bin_width)
+
+                # Save the DVH plot
+                dvh_file = dose_file.parent.joinpath(f"dvh_{struct_hash}.png")
+                plt_dvh = dvh.melt(
+                    id_vars=["label", "cc", "mean"], var_name="bin", value_name="dose"
                 )
 
-                for _, struct_row in df_linked_struct.iterrows():
+                sns.set(rc={"figure.figsize": (16.7, 12.27)})
+                p = sns.lineplot(data=plt_dvh, x="bin", y="dose", hue="label", palette="Dark2")
+                p.set(xlabel="Dose (Gy)", ylabel="Frequency", title="Dose Volume Histogram (DVH)")
+                p.get_figure().savefig(dvh_file)
+                plt.close(p.get_figure())
 
-                    struct_hash = struct_row.hashed_uid
-                    dvh_csv = dose_file.parent.joinpath(f"dvh_{struct_hash}.csv")
+                # Add Dose Data Object's Meta Data to the table
+                for key in dose_meta_data_cols:
 
-                    if dvh_csv.exists() and not force:
-                        logger.info("DVH already computed at %s", dvh_csv)
-                        continue
+                    col_key = f"dose|{key}"
 
-                    struct_dir = self.working_directory.joinpath(struct_row.path)
+                    value = None
+                    if key in dose_meta_data:
+                        value = dose_meta_data[key].value
 
-                    struct_meta_data = load_object_metadata(struct_row)
-
-                    dose = sitk.ReadImage(str(dose_file))
-
-                    structures = {
-                        struct_nii.name.replace(".nii.gz", ""): sitk.ReadImage(str(struct_nii))
-                        for struct_nii in struct_dir.glob("*.nii.gz")
-                    }
-                    if len(structures) == 0:
-                        continue
-
-                    dvh = calculate_dvh_for_labels(dose, structures, bin_width=bin_width)
-
-                    # Save the DVH plot
-                    dvh_file = dose_file.parent.joinpath(f"dvh_{struct_hash}.png")
-                    plt_dvh = dvh.melt(
-                        id_vars=["label", "cc", "mean"], var_name="bin", value_name="dose"
+                    dvh[col_key] = pd.Series(
+                        [value for p in range(len(dvh.index))],
+                        index=dvh.index,
                     )
 
-                    sns.set(rc={"figure.figsize": (16.7, 12.27)})
-                    p = sns.lineplot(data=plt_dvh, x="bin", y="dose", hue="label", palette="Dark2")
-                    p.set(
-                        xlabel="Dose (Gy)", ylabel="Frequency", title="Dose Volume Histogram (DVH)"
+                    if col_key not in meta_data_cols:
+                        meta_data_cols.append(col_key)
+
+                # Add Structure Data Object's Meta Data to the table
+                for key in structure_meta_data_cols:
+
+                    col_key = f"struct|{key}"
+
+                    value = None
+                    if key in struct_meta_data:
+                        value = struct_meta_data[key].value
+
+                    dvh[col_key] = pd.Series(
+                        [value for p in range(len(dvh.index))],
+                        index=dvh.index,
                     )
-                    p.get_figure().savefig(dvh_file)
-                    plt.close(p.get_figure())
 
-                    # Add Dose Data Object's Meta Data to the table
-                    for key in dose_meta_data_cols:
+                    if col_key not in meta_data_cols:
+                        meta_data_cols.append(col_key)
 
-                        col_key = f"dose|{key}"
+                dvh.insert(loc=0, column="struct_hash", value=struct_hash)
+                dvh.insert(loc=0, column="patient", value=dose_row.patient_id)
 
-                        value = None
-                        if key in dose_meta_data:
-                            value = dose_meta_data[key].value
-
-                        dvh[col_key] = pd.Series(
-                            [value for p in range(len(dvh.index))],
-                            index=dvh.index,
-                        )
-
-                        if col_key not in meta_data_cols:
-                            meta_data_cols.append(col_key)
-
-                    # Add Structure Data Object's Meta Data to the table
-                    for key in structure_meta_data_cols:
-
-                        col_key = f"struct|{key}"
-
-                        value = None
-                        if key in struct_meta_data:
-                            value = struct_meta_data[key].value
-
-                        dvh[col_key] = pd.Series(
-                            [value for p in range(len(dvh.index))],
-                            index=dvh.index,
-                        )
-
-                        if col_key not in meta_data_cols:
-                            meta_data_cols.append(col_key)
-
-                    dvh.insert(loc=0, column="struct_hash", value=struct_hash)
-                    dvh.insert(loc=0, column="patient", value=pat)
-
-                    # Save DVH CSV
-                    dvh.to_csv(dvh_csv)
+                # Save DVH CSV
+                dvh.to_csv(dvh_csv)
