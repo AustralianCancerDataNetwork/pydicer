@@ -293,7 +293,7 @@ class ConvertData:
                     object_type = ot
             output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
 
-            # If aren't forcing this, and the object has already been created (ie the folder
+            # If we aren't forcing this, and the object has already been created (ie the folder
             # exists), then skip conversion.
             if output_dir.exists() and not force:
                 logger.info("Object already converted at %s", output_dir)
@@ -443,6 +443,14 @@ class ConvertData:
 
                         sop_instance_hash = hash_uid(rt_plan_file.sop_instance_uid)
 
+                        # Update the output directory for this plan
+                        output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
+                        if output_dir.exists() and not force:
+                            logger.info("Object already converted at %s", output_dir)
+                            continue
+
+                        output_dir.mkdir(exist_ok=True, parents=True)
+
                         json_file = output_dir.joinpath("metadata.json")
 
                         convert_dicom_headers(rt_plan_file.file_path, "", json_file)
@@ -459,6 +467,14 @@ class ConvertData:
                     for _, rt_dose_file in df_files.iterrows():
 
                         sop_instance_hash = hash_uid(rt_dose_file.sop_instance_uid)
+
+                        # Update the output directory for this dose
+                        output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
+                        if output_dir.exists() and not force:
+                            logger.info("Object already converted at %s", output_dir)
+                            continue
+
+                        output_dir.mkdir(exist_ok=True, parents=True)
 
                         nifti_file = output_dir.joinpath("RTDOSE.nii.gz")
                         nifti_file.parent.mkdir(exist_ok=True, parents=True)
