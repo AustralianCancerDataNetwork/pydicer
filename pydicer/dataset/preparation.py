@@ -64,7 +64,7 @@ class PrepareDataset:
             rel_part = os.sep.join(
                 [".." for _ in symlink_path.parent.relative_to(self.working_directory).parts]
             )
-            src_path = Path(f"{rel_part}{os.sep}{object_path.relative_to('data')}")
+            src_path = Path(f"{rel_part}{os.sep}{object_path}")
 
             symlink_path.parent.mkdir(parents=True, exist_ok=True)
 
