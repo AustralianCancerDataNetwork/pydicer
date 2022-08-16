@@ -192,7 +192,13 @@ def get_linked_for_and_ref_uid(working_directory, patient_id, linked_obj):
 
 
 def add_structure_object(
-    working_directory, structures, structure_id, patient_id, linked_image=None, datasets=None
+    working_directory,
+    structures,
+    structure_id,
+    patient_id,
+    linked_image=None,
+    for_uid=None,
+    datasets=None,
 ):
     """Add a generated structure object to the project.
 
@@ -204,6 +210,8 @@ def add_structure_object(
         patient_id (str): The ID of the patient of this object.
         linked_image (str|pd.Series, optional): The hashed_uid or the Pandas DataFrame row of the
             image object to link to. If None the new object won't be linked. Defaults to None.
+        for_uid (str, optional): Frame Of Reference UID for new data object. If not provided it
+            will be extracted from the linked image (if available). Defaults to None.
         datasets (list|str, optional): The name(s) of the dataset(s) to add the object to. Defaults
             to None.
 
@@ -220,7 +228,12 @@ def add_structure_object(
     object_type = "structure"
 
     # Grab the UIDs of the frame of reference and the linked SOP instance
-    for_uid, ref_sop_uid = get_linked_for_and_ref_uid(working_directory, patient_id, linked_image)
+    linked_for_uid, ref_sop_uid = get_linked_for_and_ref_uid(
+        working_directory, patient_id, linked_image
+    )
+
+    if for_uid is None:
+        for_uid = linked_for_uid
 
     structure_object_path = patient_directory.joinpath(f"{object_type}s", structure_id)
     structure_object_path.mkdir(
@@ -244,7 +257,9 @@ def add_structure_object(
     )
 
 
-def add_dose_object(working_directory, dose, dose_id, patient_id, linked_plan=None, datasets=None):
+def add_dose_object(
+    working_directory, dose, dose_id, patient_id, linked_plan=None, for_uid=None, datasets=None
+):
     """Add a generated dose object to the project.
 
     Args:
@@ -254,6 +269,8 @@ def add_dose_object(working_directory, dose, dose_id, patient_id, linked_plan=No
         patient_id (str): The ID of the patient of this object.
         linked_plan (str|pd.Series, optional): The hashed_uid or the Pandas DataFrame row of the
             RTPLAN object to link to. If None the new object won't be linked. Defaults to None.
+        for_uid (str, optional): Frame Of Reference UID for new data object. If not provided it
+            will be extracted from the linked plan (if available). Defaults to None.
         datasets (list|str, optional): The name(s) of the dataset(s) to add the object to. Defaults
             to None.
 
@@ -270,7 +287,12 @@ def add_dose_object(working_directory, dose, dose_id, patient_id, linked_plan=No
     object_type = "dose"
 
     # Grab the UIDs of the frame of reference and the linked SOP instance
-    for_uid, ref_sop_uid = get_linked_for_and_ref_uid(working_directory, patient_id, linked_plan)
+    linked_for_uid, ref_sop_uid = get_linked_for_and_ref_uid(
+        working_directory, patient_id, linked_plan
+    )
+
+    if for_uid is None:
+        for_uid = linked_for_uid
 
     dose_object_path = patient_directory.joinpath(f"{object_type}s", dose_id)
     dose_object_path.mkdir(
