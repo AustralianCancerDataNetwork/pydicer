@@ -338,9 +338,9 @@ class ConvertData:
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
 
-                    # Should only be one file per RTSTRUCT series
-                    if not len(df_files) == 1:
-                        ValueError("More than one RTSTRUCT with the same SeriesInstanceUID")
+                    # If we have multiple structure sets with the same sop_instance_uid we'll just
+                    # drop them
+                    df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
 
                     rt_struct_file = df_files.iloc[0]
 
@@ -444,6 +444,9 @@ class ConvertData:
 
                 elif sop_class_uid == RT_PLAN_STORAGE_UID:
 
+                    # If we have multiple plans with the same sop_instance_uid we'll just drop them
+                    df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
+
                     # No Nifti to create here, just save the JSON
 
                     # If there are multiple RTPLANs in the same series then just save them all
@@ -470,6 +473,9 @@ class ConvertData:
                         df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
 
                 elif sop_class_uid == RT_DOSE_STORAGE_UID:
+
+                    # If we have multiple doses with the same sop_instance_uid we'll just drop them
+                    df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
 
                     # If there are multiple RTDOSEs in the same series then just save them all
                     for _, rt_dose_file in df_files.iterrows():
