@@ -1,6 +1,7 @@
 import logging
 import tempfile
 import copy
+import shutil
 from pathlib import Path
 import pandas as pd
 import numpy as np
@@ -308,7 +309,6 @@ class ConvertData:
                     if not output_dir.exists() or force:
 
                         # Only convert if it doesn't already exist or if force is True
-                        output_dir.mkdir(exist_ok=True, parents=True)
 
                         if config.get_config("interp_missing_slices"):
                             series_files = handle_missing_slice(df_files)
@@ -318,6 +318,8 @@ class ConvertData:
                                 "Slice Locations are not evenly spaced. Set "
                                 "interp_missing_slices to True to interpolate slices."
                             )
+
+                        output_dir.mkdir(exist_ok=True, parents=True)
 
                         series_files = [str(f) for f in series_files]
                         series = sitk.ReadImage(series_files)
@@ -419,11 +421,11 @@ class ConvertData:
                     if not output_dir.exists() or force:
 
                         # Only convert if it doesn't already exist or if force is True
-                        output_dir.mkdir(exist_ok=True, parents=True)
 
                         series_files = df_files.file_path.tolist()
                         series_files = [str(f) for f in series_files]
 
+                        output_dir.mkdir(exist_ok=True, parents=True)
                         nifti_file = output_dir.joinpath("PT.nii.gz")
 
                         convert_dicom_to_nifti_pt(
@@ -528,6 +530,10 @@ class ConvertData:
                     "Unable to convert series for patient: %s with UID: %s", patient_id, series_uid
                 )
                 logger.exception(e)
+
+                # Remove the output_dir if it had already been created
+                if output_dir.exists():
+                    shutil.rmtree(output_dir)
 
                 for f in df_files.file_path.tolist():
                     logger.error(
