@@ -16,7 +16,7 @@ from pydicer.convert.pt import convert_dicom_to_nifti_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.convert.headers import convert_dicom_headers
 from pydicer.utils import hash_uid, read_preprocessed_data
-from pydicer.quarantine.treat import copy_file_to_quarantine
+from pydicer.quarantine.treat import TreatImages, copy_file_to_quarantine
 
 from pydicer.constants import (
     CONVERTED_DIR_NAME,
@@ -252,6 +252,7 @@ class ConvertData:
         converted_df_path = patient_directory.joinpath("converted.csv")
         if converted_df_path.exists():
             df_pat_data = pd.read_csv(converted_df_path, index_col=0)
+            df_pat_data = df_pat_data.reset_index(drop=True)
         else:
             df_pat_data = pd.DataFrame(columns=DATA_OBJECT_COLUMNS)
 
