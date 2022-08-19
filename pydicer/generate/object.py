@@ -111,6 +111,7 @@ def add_object(
     }
 
     df_converted = pd.concat([df_converted, pd.DataFrame([entry])])
+    df_converted = df_converted.reset_index(drop=True)
     df_converted.to_csv(patient_directory.joinpath("converted.csv"))
 
     # Now loop through each dataset and add in there. If the dataset doesn't exist or the patient
@@ -140,6 +141,7 @@ def add_object(
         )
 
         df_converted = pd.concat([df_converted, pd.DataFrame([entry])])
+        df_converted = df_converted.reset_index(drop=True)
         df_converted.to_csv(patient_directory.joinpath("converted.csv"))
 
 

@@ -256,7 +256,7 @@ class ConvertData:
         else:
             df_pat_data = pd.DataFrame(columns=DATA_OBJECT_COLUMNS)
 
-        # If this entry alread existed, replace that row in the dataframe. Otherwise append.
+        # If this entry already existed, replace that row in the dataframe. Otherwise append.
         df_this_object = pd.DataFrame([entry])
         if len(df_pat_data[df_pat_data.hashed_uid == hashed_uid]) > 0:
             df_pat_data.loc[df_pat_data.hashed_uid == hashed_uid, :] = df_this_object
@@ -264,6 +264,7 @@ class ConvertData:
             df_pat_data = pd.concat([df_pat_data, df_this_object])
 
         # Save the patient converted dataframe
+        df_pat_data = df_pat_data.reset_index(drop=True)
         df_pat_data.to_csv(converted_df_path)
 
     def convert(self, patient=None, force=True):
