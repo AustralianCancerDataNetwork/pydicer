@@ -38,20 +38,21 @@ class VisualiseData:
 
         patient = parse_patient_kwarg(patient)
         df_process = read_converted_data(
-            self.working_directory, dataset_name=dataset_name, patients=patient
+            self.working_directory,
+            dataset_name=dataset_name,
+            patients=patient,
+            join_working_directory=True,
         )
 
         for _, row in df_process[df_process["modality"] == "CT"].iterrows():
             img_path = Path(row.path)
-            vis_filename = self.working_directory.joinpath(img_path, "CT.png")
+            vis_filename = img_path.joinpath("CT.png")
 
             if vis_filename.exists() and not force:
                 logger.info("Visualisation already exists at %s", vis_filename)
                 continue
 
-            img = sitk.ReadImage(
-                str(self.working_directory.joinpath(img_path, f"{row.modality}.nii.gz"))
-            )
+            img = sitk.ReadImage(str(img_path.joinpath(f"{row.modality}.nii.gz")))
 
             vis = ImageVisualiser(img)
             fig = vis.show()
@@ -115,22 +116,18 @@ class VisualiseData:
                 img_path = Path(img_row.path)
 
                 # save image inside structure directory
-                vis_filename = self.working_directory.joinpath(
-                    struct_dir, f"vis_{img_row.hashed_uid}.png"
-                )
+                vis_filename = struct_dir.joinpath(f"vis_{img_row.hashed_uid}.png")
 
                 if vis_filename.exists() and not force:
                     logger.info("Visualisation already exists at %s", vis_filename)
                     continue
 
-                img = sitk.ReadImage(
-                    str(self.working_directory.joinpath(img_path, f"{img_row.modality}.nii.gz"))
-                )
+                img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
 
                 vis = ImageVisualiser(img)
                 masks = {
                     f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
-                    for f in self.working_directory.joinpath(struct_dir).glob("*.nii.gz")
+                    for f in struct_dir.glob("*.nii.gz")
                 }
 
                 if len(masks) == 0:
@@ -199,20 +196,14 @@ class VisualiseData:
                 img_path = Path(img_row.path)
 
                 # save image inside dose directory
-                vis_filename = self.working_directory.joinpath(
-                    dose_path, f"vis_{struct_row.hashed_uid}.png"
-                )
+                vis_filename = dose_path.joinpath(f"vis_{struct_row.hashed_uid}.png")
 
                 if vis_filename.exists() and not force:
                     logger.info("Visualisation already exists at %s", vis_filename)
                     continue
 
-                img = sitk.ReadImage(
-                    str(self.working_directory.joinpath(img_path, f"{img_row.modality}.nii.gz"))
-                )
-                dose_img = sitk.ReadImage(
-                    str(self.working_directory.joinpath(dose_path, "RTDOSE.nii.gz"))
-                )
+                img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
+                dose_img = sitk.ReadImage(str(dose_path.joinpath("RTDOSE.nii.gz")))
                 dose_img = sitk.Resample(dose_img, img)
 
                 vis = ImageVisualiser(img)
@@ -223,7 +214,7 @@ class VisualiseData:
 
                 masks = {
                     f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
-                    for f in self.working_directory.joinpath(struct_dir).glob("*.nii.gz")
+                    for f in struct_dir.glob("*.nii.gz")
                 }
 
                 if len(masks) == 0:

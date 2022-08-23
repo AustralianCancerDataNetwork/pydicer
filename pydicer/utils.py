@@ -1,3 +1,4 @@
+import os
 import hashlib
 import json
 import logging
@@ -5,9 +6,9 @@ from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
+import SimpleITK as sitk
 import pydicom
 
-from pydicer.config import PyDicerConfig
 from pydicer.constants import CONVERTED_DIR_NAME, PYDICER_DIR_NAME
 
 logger = logging.getLogger(__name__)
@@ -75,8 +76,7 @@ def load_object_metadata(row):
         pydicom.Dataset: The dataset object containing the original DICOM metadata
     """
 
-    config = PyDicerConfig()
-    metadata_path = Path(config.get_working_dir(), row.path).joinpath("metadata.json")
+    metadata_path = Path(row.path).joinpath("metadata.json")
 
     if not metadata_path.exists():
         return pydicom.Dataset()
@@ -113,7 +113,12 @@ def read_preprocessed_data(working_directory: Path):
     return df_preprocess
 
 
-def read_converted_data(working_directory: Path, dataset_name=CONVERTED_DIR_NAME, patients=None):
+def read_converted_data(
+    working_directory: Path,
+    dataset_name=CONVERTED_DIR_NAME,
+    patients=None,
+    join_working_directory=True,
+):
     """Read the converted data frame from the supplied data directory.
 
     Args:
@@ -122,6 +127,9 @@ def read_converted_data(working_directory: Path, dataset_name=CONVERTED_DIR_NAME
           Defaults to "data".
         patients (list, optional): The list of patients for which to read converted data. If None
             is supplied then all data will be read. Defaults to None.
+        join_working_directory (bool, optional): If True, the path in the data frame returned will
+            be adjusted to the location of the working_directory. If False the path will be
+            relative to the working_directory.
 
     Returns:
         pd.DataFrame: The DataFrame with the converted data objects.
@@ -157,6 +165,10 @@ def read_converted_data(working_directory: Path, dataset_name=CONVERTED_DIR_NAME
     # Make sure patient id is a string
     df.patient_id = df.patient_id.astype(str)
 
+    # Join the working directory to each object's path
+    if join_working_directory:
+        df.path = df.path.apply(lambda p: os.path.join(working_directory, p))
+
     return df.reset_index(drop=True)
 
 
@@ -188,3 +200,16 @@ def parse_patient_kwarg(patient):
         patient = [patient]
 
     return patient
+
+
+def read_simple_itk_image(row):
+
+    object_path = Path(row.path)
+
+    nifti_path = object_path.joinpath(f"{row.modality}.nii.gz")
+
+    if not nifti_path.exists():
+        logger.warning("Unable to load Nifti at %s", nifti_path)
+        return None
+
+    return sitk.ReadImage(str(nifti_path))

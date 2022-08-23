@@ -68,7 +68,7 @@ class AnalyseData:
         dfs = []
         for _, struct_row in df_data[df_data["modality"] == "RTSTRUCT"].iterrows():
 
-            struct_dir = self.working_directory.joinpath(struct_row.path)
+            struct_dir = Path(struct_row.path)
 
             for radiomics_file in struct_dir.glob("radiomics_*.csv"):
                 col_types = {
@@ -101,7 +101,7 @@ class AnalyseData:
         dfs = []
         for _, dose_row in df_data[df_data["modality"] == "RTDOSE"].iterrows():
 
-            dose_dir = self.working_directory.joinpath(dose_row.path)
+            dose_dir = Path(dose_row.path)
 
             for dvh_file in dose_dir.glob("dvh_*.csv"):
                 col_types = {"patient": str, "struct_hash": str, "label": str}
@@ -283,7 +283,7 @@ class AnalyseData:
         # Next compute the radiomics for each structure using their linked image
         for _, struct_row in df_process[df_process["modality"] == "RTSTRUCT"].iterrows():
 
-            struct_dir = self.working_directory.joinpath(struct_row.path)
+            struct_dir = Path(struct_row.path)
 
             # Find the linked image
             df_linked_img = df_converted[
@@ -308,9 +308,7 @@ class AnalyseData:
                     logger.info("Radiomics already computed at %s", struct_radiomics_path)
                     continue
 
-                img_file = self.working_directory.joinpath(
-                    img_row.path, f"{img_row.modality}.nii.gz"
-                )
+                img_file = Path(img_row.path).joinpath(f"{img_row.modality}.nii.gz")
                 img_meta_data = load_object_metadata(img_row)
 
                 struct_meta_data = load_object_metadata(struct_row)
@@ -511,7 +509,7 @@ class AnalyseData:
             if len(df_linked_struct) == 0:
                 logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
 
-            dose_file = self.working_directory.joinpath(dose_row.path).joinpath("RTDOSE.nii.gz")
+            dose_file = Path(dose_row.path).joinpath("RTDOSE.nii.gz")
 
             for _, struct_row in df_linked_struct.iterrows():
 
@@ -522,7 +520,7 @@ class AnalyseData:
                     logger.info("DVH already computed at %s", dvh_csv)
                     continue
 
-                struct_dir = self.working_directory.joinpath(struct_row.path)
+                struct_dir = Path(struct_row.path).joinpath(struct_row.path)
 
                 struct_meta_data = load_object_metadata(struct_row)
 
