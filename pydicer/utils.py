@@ -203,6 +203,14 @@ def parse_patient_kwarg(patient):
 
 
 def read_simple_itk_image(row):
+    """Reads the SimpleITK Image object given a converted dataframe row.
+
+    Args:
+        row (pd.Series): The row of the data frame for which to load the SimpleITK Image.
+
+    Returns:
+        SimpleITK.Image: The loaded image. Returns None if the image was not found.
+    """
 
     object_path = Path(row.path)
 
