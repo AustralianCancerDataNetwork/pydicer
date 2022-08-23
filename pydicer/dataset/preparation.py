@@ -77,5 +77,5 @@ class PrepareDataset:
         for pat_id, df in df_clean_data.groupby("patient_id"):
 
             pat_dir = dataset_dir.joinpath(pat_id)
-            df = df_converted.reset_index(drop=True)
+            df = df.reset_index(drop=True)
             df.to_csv(pat_dir.joinpath("converted.csv"))
