@@ -63,7 +63,9 @@ def add_object(
         )
 
     # Check that an object with this ID hasn't already been added to the dataset
-    df_converted = read_converted_data(working_directory, patients=[patient_id])
+    df_converted = read_converted_data(
+        working_directory, patients=[patient_id], join_working_directory=False
+    )
     if len(df_converted[df_converted.hashed_uid == object_id]) > 0:
         raise SystemError(f"An object with ID {object_id} already exists for this patient!")
 
@@ -111,6 +113,7 @@ def add_object(
     }
 
     df_converted = pd.concat([df_converted, pd.DataFrame([entry])])
+    df_converted = df_converted.reset_index(drop=True)
     df_converted.to_csv(patient_directory.joinpath("converted.csv"))
 
     # Now loop through each dataset and add in there. If the dataset doesn't exist or the patient
@@ -136,10 +139,14 @@ def add_object(
             continue
 
         df_converted = read_converted_data(
-            working_directory, dataset_name=dataset, patients=[patient_id]
+            working_directory,
+            dataset_name=dataset,
+            patients=[patient_id],
+            join_working_directory=False,
         )
 
         df_converted = pd.concat([df_converted, pd.DataFrame([entry])])
+        df_converted = df_converted.reset_index(drop=True)
         df_converted.to_csv(patient_directory.joinpath("converted.csv"))
 
 
@@ -177,7 +184,9 @@ def get_linked_for_and_ref_uid(working_directory, patient_id, linked_obj):
 
         if isinstance(linked_obj, str):
 
-            df_converted = read_converted_data(working_directory, patients=[patient_id])
+            df_converted = read_converted_data(
+                working_directory, patients=[patient_id], join_working_directory=False
+            )
             df_linked = df_converted[df_converted.hashed_uid == linked_obj]
 
             if not len(df_linked) == 1:
@@ -236,9 +245,7 @@ def add_structure_object(
         for_uid = linked_for_uid
 
     structure_object_path = patient_directory.joinpath(f"{object_type}s", structure_id)
-    structure_object_path.mkdir(
-        exist_ok=True,
-    )
+    structure_object_path.mkdir(exist_ok=True, parents=True)
 
     # Save the data object in the dose_object_path
     for struct_name, struct_mask in structures.items():
@@ -295,9 +302,7 @@ def add_dose_object(
         for_uid = linked_for_uid
 
     dose_object_path = patient_directory.joinpath(f"{object_type}s", dose_id)
-    dose_object_path.mkdir(
-        exist_ok=True,
-    )
+    dose_object_path.mkdir(exist_ok=True, parents=True)
 
     # Save the data object in the dose_object_path
     sitk.WriteImage(dose, str(dose_object_path.joinpath("RTDOSE.nii.gz")))

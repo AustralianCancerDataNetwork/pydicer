@@ -48,7 +48,9 @@ class PrepareDataset:
         logger.info("Preparing dataset %s using function: %s", dataset_name, preparation_function)
 
         # Grab the DataFrame containing all the converted data
-        df_converted = read_converted_data(self.working_directory, patients=patients)
+        df_converted = read_converted_data(
+            self.working_directory, patients=patients, join_working_directory=False
+        )
 
         # Send to the prepare function which will return a DataFrame of the data objects to use for
         # the dataset
@@ -77,5 +79,5 @@ class PrepareDataset:
         for pat_id, df in df_clean_data.groupby("patient_id"):
 
             pat_dir = dataset_dir.joinpath(pat_id)
-
+            df = df.reset_index(drop=True)
             df.to_csv(pat_dir.joinpath("converted.csv"))

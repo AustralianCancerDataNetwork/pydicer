@@ -1,6 +1,7 @@
 import logging
 import tempfile
 import copy
+import shutil
 from pathlib import Path
 import pandas as pd
 import numpy as np
@@ -29,15 +30,23 @@ from pydicer.constants import (
 
 logger = logging.getLogger(__name__)
 
-# TODO make this user-selected
-INTERPOLATE_MISSING_DATA = True
-
 OBJECT_TYPES = {
     "images": [CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID],
     "structures": [RT_STRUCTURE_STORAGE_UID],
     "plans": [RT_PLAN_STORAGE_UID],
     "doses": [RT_DOSE_STORAGE_UID],
 }
+
+DATA_OBJECT_COLUMNS = [
+    "sop_instance_uid",
+    "hashed_uid",
+    "modality",
+    "patient_id",
+    "series_uid",
+    "for_uid",
+    "referenced_sop_instance_uid",
+    "path",
+]
 
 
 def handle_missing_slice(files):
@@ -228,6 +237,36 @@ class ConvertData:
         self.pydicer_directory = working_directory.joinpath(PYDICER_DIR_NAME)
         self.output_directory = working_directory.joinpath(CONVERTED_DIR_NAME)
 
+    def add_entry(self, entry):
+        """Add an entry of a converted data object to the patient's converted dataframe.
+
+        Args:
+            entry (dict): A dictionary object describing the object converted.
+        """
+
+        patient_id = entry["patient_id"]
+        hashed_uid = entry["hashed_uid"]
+
+        # Load the converted dataframe for this patient if it exists, otherwise create a new one
+        patient_directory = self.output_directory.joinpath(patient_id)
+        converted_df_path = patient_directory.joinpath("converted.csv")
+        if converted_df_path.exists():
+            df_pat_data = pd.read_csv(converted_df_path, index_col=0)
+            df_pat_data = df_pat_data.reset_index(drop=True)
+        else:
+            df_pat_data = pd.DataFrame(columns=DATA_OBJECT_COLUMNS)
+
+        # If this entry already existed, replace that row in the dataframe. Otherwise append.
+        df_this_object = pd.DataFrame([entry])
+        if len(df_pat_data[df_pat_data.hashed_uid == hashed_uid]) > 0:
+            df_pat_data.loc[df_pat_data.hashed_uid == hashed_uid, :] = df_this_object
+        else:
+            df_pat_data = pd.concat([df_pat_data, df_this_object])
+
+        # Save the patient converted dataframe
+        df_pat_data = df_pat_data.reset_index(drop=True)
+        df_pat_data.to_csv(converted_df_path)
+
     def convert(self, patient=None, force=True):
         """Converts the DICOM which was preprocessed into the pydicer output directory.
 
@@ -236,9 +275,6 @@ class ConvertData:
               None.
             force (bool, optional): When True objects will be converted even if the output files
               already exist. Defaults to True.
-
-        Returns:
-            pd.DataFrame: DataFrame describing the objects converted
         """
 
         # Create the output directory if it hasn't already been created
@@ -248,19 +284,6 @@ class ConvertData:
         df_preprocess = read_preprocessed_data(self.working_directory)
 
         config = PyDicerConfig()
-
-        df_data_objects = pd.DataFrame(
-            columns=[
-                "sop_instance_uid",
-                "hashed_uid",
-                "modality",
-                "patient_id",
-                "series_uid",
-                "for_uid",
-                "referenced_sop_instance_uid",
-                "path",
-            ]
-        )
 
         if patient is not None and not isinstance(patient, list):
             patient = [patient]
@@ -308,7 +331,6 @@ class ConvertData:
                     if not output_dir.exists() or force:
 
                         # Only convert if it doesn't already exist or if force is True
-                        output_dir.mkdir(exist_ok=True, parents=True)
 
                         if config.get_config("interp_missing_slices"):
                             series_files = handle_missing_slice(df_files)
@@ -318,6 +340,8 @@ class ConvertData:
                                 "Slice Locations are not evenly spaced. Set "
                                 "interp_missing_slices to True to interpolate slices."
                             )
+
+                        output_dir.mkdir(exist_ok=True, parents=True)
 
                         series_files = [str(f) for f in series_files]
                         series = sitk.ReadImage(series_files)
@@ -334,13 +358,14 @@ class ConvertData:
                         )
 
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
-                    df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
+
+                    self.add_entry(entry)
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
 
-                    # Should only be one file per RTSTRUCT series
-                    if not len(df_files) == 1:
-                        ValueError("More than one RTSTRUCT with the same SeriesInstanceUID")
+                    # If we have multiple structure sets with the same sop_instance_uid we'll just
+                    # drop them
+                    df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
 
                     rt_struct_file = df_files.iloc[0]
 
@@ -412,18 +437,18 @@ class ConvertData:
                         "referenced_sop_instance_uid"
                     ] = df_linked_series.sop_instance_uid.unique()[0]
 
-                    df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
+                    self.add_entry(entry)
 
                 elif sop_class_uid == PET_IMAGE_STORAGE_UID:
 
                     if not output_dir.exists() or force:
 
                         # Only convert if it doesn't already exist or if force is True
-                        output_dir.mkdir(exist_ok=True, parents=True)
 
                         series_files = df_files.file_path.tolist()
                         series_files = [str(f) for f in series_files]
 
+                        output_dir.mkdir(exist_ok=True, parents=True)
                         nifti_file = output_dir.joinpath("PT.nii.gz")
 
                         convert_dicom_to_nifti_pt(
@@ -440,9 +465,13 @@ class ConvertData:
                         )
 
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
-                    df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
+
+                    self.add_entry(entry)
 
                 elif sop_class_uid == RT_PLAN_STORAGE_UID:
+
+                    # If we have multiple plans with the same sop_instance_uid we'll just drop them
+                    df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
 
                     # No Nifti to create here, just save the JSON
 
@@ -467,9 +496,13 @@ class ConvertData:
                         entry["hashed_uid"] = sop_instance_hash
                         entry["referenced_sop_instance_uid"] = rt_plan_file.referenced_uid
                         entry["path"] = str(output_dir.relative_to(self.working_directory))
-                        df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
+
+                        self.add_entry(entry)
 
                 elif sop_class_uid == RT_DOSE_STORAGE_UID:
+
+                    # If we have multiple doses with the same sop_instance_uid we'll just drop them
+                    df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
 
                     # If there are multiple RTDOSEs in the same series then just save them all
                     for _, rt_dose_file in df_files.iterrows():
@@ -502,18 +535,13 @@ class ConvertData:
                         entry["hashed_uid"] = sop_instance_hash
                         entry["referenced_sop_instance_uid"] = rt_dose_file.referenced_uid
                         entry["path"] = str(output_dir.relative_to(self.working_directory))
-                        df_data_objects = pd.concat([df_data_objects, pd.DataFrame([entry])])
+
+                        self.add_entry(entry)
                 else:
                     raise NotImplementedError(
                         "Unable to convert Series with SOP Class UID: {sop_class_uid} / "
                         f"Modality: {modality}"
                     )
-
-                # Save off the converted data frame for this patient
-                converted_df_path = patient_directory.joinpath("converted.csv")
-                df_data_objects[df_data_objects["patient_id"] == patient_id].to_csv(
-                    converted_df_path
-                )
 
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
@@ -523,10 +551,12 @@ class ConvertData:
                 )
                 logger.exception(e)
 
+                # Remove the output_dir if it had already been created
+                if output_dir.exists():
+                    shutil.rmtree(output_dir)
+
                 for f in df_files.file_path.tolist():
                     logger.error(
                         "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
                     )
                     copy_file_to_quarantine(Path(f), self.working_directory, e)
-
-        return df_data_objects
