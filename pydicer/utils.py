@@ -9,6 +9,7 @@ import pandas as pd
 import SimpleITK as sitk
 import pydicom
 
+from pydicer.config import PyDicerConfig
 from pydicer.constants import CONVERTED_DIR_NAME, PYDICER_DIR_NAME
 
 logger = logging.getLogger(__name__)
@@ -76,7 +77,16 @@ def load_object_metadata(row):
         pydicom.Dataset: The dataset object containing the original DICOM metadata
     """
 
-    metadata_path = Path(row.path).joinpath("metadata.json")
+    row_path = Path(row.path)
+
+    config = PyDicerConfig()
+
+    # If the working directory is configured and the row_path isn't relative to it, join it.
+    if config is not None:
+        if not row_path.is_relative_to(config.get_working_dir()):
+            row_path = config.get_working_dir().joinpath(row_path)
+
+    metadata_path = row_path.joinpath("metadata.json")
 
     if not metadata_path.exists():
         return pydicom.Dataset()
