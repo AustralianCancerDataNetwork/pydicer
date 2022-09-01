@@ -53,7 +53,7 @@ class AnalyseData:
         self.working_directory = Path(working_directory)
 
     def get_all_computed_radiomics_for_dataset(
-        self, dataset_name=CONVERTED_DIR_NAME, patients=None
+        self, dataset_name=CONVERTED_DIR_NAME, patient=None
     ):
         """Return a DataFrame of radiomics computed for this dataset
 
@@ -67,9 +67,9 @@ class AnalyseData:
             pd.DataFrame: The DataFrame of all radiomics computed for dataset
         """
 
-        patients = parse_patient_kwarg(patients)
+        patient = parse_patient_kwarg(patient)
 
-        df_data = read_converted_data(self.working_directory, dataset_name, patients=patients)
+        df_data = read_converted_data(self.working_directory, dataset_name, patients=patient)
 
         dfs = []
         for _, struct_row in df_data[df_data["modality"] == "RTSTRUCT"].iterrows():
@@ -96,22 +96,22 @@ class AnalyseData:
 
         return df
 
-    def get_all_dvhs_for_dataset(self, dataset_name=CONVERTED_DIR_NAME, patients=None):
+    def get_all_dvhs_for_dataset(self, dataset_name=CONVERTED_DIR_NAME, patient=None):
         """Return a DataFrame of DVHs computed for this dataset
 
         Args:
             dataset_name (str, optional): The name of the dataset on which to run analysis.
               Defaults to "data".
-            patients (list|str, optional): A patient ID (or list of patient IDs) to fetch DVHs for.
+            patient (list|str, optional): A patient ID (or list of patient IDs) to fetch DVHs for.
               Defaults to None.
 
         Returns:
             pd.DataFrame: The DataFrame of all DVHs computed for dataset
         """
 
-        patients = parse_patient_kwarg(patients)
+        patient = parse_patient_kwarg(patient)
 
-        df_data = read_converted_data(self.working_directory, dataset_name, patients=patients)
+        df_data = read_converted_data(self.working_directory, dataset_name, patients=patient)
 
         dfs = []
         for _, dose_row in df_data[df_data["modality"] == "RTDOSE"].iterrows():
@@ -223,7 +223,7 @@ class AnalyseData:
     def compute_radiomics(
         self,
         dataset_name=CONVERTED_DIR_NAME,
-        patients=None,
+        patient=None,
         df_process=None,
         force=True,
         radiomics=None,
@@ -240,7 +240,7 @@ class AnalyseData:
         Args:
             dataset_name (str, optional): The name of the dataset to compute radiomics on. Defaults
               to "data" (runs on all data).
-            patients (list|str, optional): A patient ID (or list of patient IDs) to compute
+            patient (list|str, optional): A patient ID (or list of patient IDs) to compute
               radiomics for. Must be None if df_process is provided. Defaults to None.
             df_process (pd.DataFrame, optional): A DataFrame of the objects to compute radiomics
               for. Must be None if patient is provided. Defaults to None.
@@ -268,13 +268,13 @@ class AnalyseData:
             ValueError: Raised if patient is not None, a list of strings or a string.
         """
 
-        if patients is not None and df_process is not None:
+        if patient is not None and df_process is not None:
             raise ValueError("Only one of patient and df_process pay be provided.")
 
         if df_process is None:
-            patients = parse_patient_kwarg(patients)
+            patient = parse_patient_kwarg(patient)
             df_process = read_converted_data(
-                self.working_directory, dataset_name=dataset_name, patients=patients
+                self.working_directory, dataset_name=dataset_name, patients=patient
             )
 
         # Read all converted data for linkage
@@ -435,7 +435,7 @@ class AnalyseData:
     def compute_dvh(
         self,
         dataset_name=CONVERTED_DIR_NAME,
-        patients=None,
+        patient=None,
         df_process=None,
         force=True,
         bin_width=0.1,
@@ -448,7 +448,7 @@ class AnalyseData:
         Args:
             dataset_name (str, optional): The name of the dataset to compute DVHs on. Defaults to
               "data" (runs on all data).
-            patients (list|str, optional): A patient ID (or list of patient IDs) to compute DVH
+            patient (list|str, optional): A patient ID (or list of patient IDs) to compute DVH
               for. Must be None if df_process is provided. Defaults to None.
             df_process (pd.DataFrame, optional): A DataFrame of the objects to compute radiomics
               for. Must be None if patient is provided. Defaults to None.
@@ -466,13 +466,13 @@ class AnalyseData:
             ValueError: Raised if patient is not None, a list of strings or a string.
         """
 
-        if patients is not None and df_process is not None:
+        if patient is not None and df_process is not None:
             raise ValueError("Only one of patients and df_process pay be provided.")
 
         if df_process is None:
-            patients = parse_patient_kwarg(patients)
+            patient = parse_patient_kwarg(patient)
             df_process = read_converted_data(
-                self.working_directory, dataset_name=dataset_name, patients=patients
+                self.working_directory, dataset_name=dataset_name, patients=patient
             )
 
         # Read all converted data for linkage
