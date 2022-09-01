@@ -83,7 +83,10 @@ def load_object_metadata(row):
 
     # If the working directory is configured and the row_path isn't relative to it, join it.
     if config is not None:
-        if not row_path.is_relative_to(config.get_working_dir()):
+
+        try:
+            row_path.relative_to(config.get_working_dir())
+        except ValueError:
             row_path = config.get_working_dir().joinpath(row_path)
 
     metadata_path = row_path.joinpath("metadata.json")
