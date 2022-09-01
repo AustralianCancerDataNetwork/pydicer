@@ -467,7 +467,7 @@ class AnalyseData:
         """
 
         if patient is not None and df_process is not None:
-            raise ValueError("Only one of patients and df_process pay be provided.")
+            raise ValueError("Only one of patient and df_process pay be provided.")
 
         if df_process is None:
             patient = parse_patient_kwarg(patient)
