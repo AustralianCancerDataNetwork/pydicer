@@ -4,6 +4,7 @@ from pydicer.utils import load_object_metadata, determine_dcm_datetime
 
 logger = logging.getLogger(__name__)
 
+
 def rt_latest_struct(df, **kwargs):
     """Select the latest Structure set and the image which it is linked to. You can specify keyword
     arguments to for a match on any top level DICOM attributes. You may also supply lists of values
@@ -76,7 +77,7 @@ def rt_latest_struct(df, **kwargs):
 
             struct_indicies.append(idx)
 
-        df_patient[df_patient["modality"] == "RTSTRUCT" :, "datetime"] = struct_dates
+        df_patient[df_patient["modality"] == "RTSTRUCT", "datetime"] = struct_dates
         df_structures = df_patient.loc[struct_indicies]
         df_structures.sort_values("datetime", ascending=False, inplace=True)
 

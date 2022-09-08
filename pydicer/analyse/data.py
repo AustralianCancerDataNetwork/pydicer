@@ -132,7 +132,6 @@ class AnalyseData:
         d_point=None,
         v_point=None,
         d_cc_point=None,
-        dvh=None,
     ):
         """Compute Dose metrics from a DVH
 
@@ -148,10 +147,8 @@ class AnalyseData:
             v_point (float|int|list, optional): The point or list of points at which to compute the
               V metric. E.g. to compute V5, V10 and V50, supply [5, 10, 50]. Defaults to None.
             d_cc_point (float|int|list, optional): The point or list of points at which to compute
-              the Dcc metric. E.g. to compute Dcc5, Dcc10 and Dcc50, supply [5, 10, 50]. Defaults \
+              the Dcc metric. E.g. to compute Dcc5, Dcc10 and Dcc50, supply [5, 10, 50]. Defaults
               to None.
-            dvh (pd.DataFrame, optional): The DataFrame containing the DVH. If None is supplied the
-              DVH will be fetched using the `get_all_dvhs_for_dataset` function. Defaults to None.
 
         Raises:
             ValueError: One of d_point, v_point or d_cc_point should be set
@@ -226,6 +223,8 @@ class AnalyseData:
                     cc_col.append(cc_val)
 
                 df.insert(loc=len(df.columns), column=f"D{cc_point}cc", value=cc_col)
+
+            df_result = pd.concat([df_result, df])
 
         return df_result
 

@@ -48,13 +48,16 @@ class PrepareDataset:
         logger.info("Preparing dataset %s using function: %s", dataset_name, preparation_function)
 
         # Grab the DataFrame containing all the converted data
-        df_converted = read_converted_data(
-            self.working_directory, patients=patients, join_working_directory=False
-        )
+        df_converted = read_converted_data(self.working_directory, patients=patients)
 
         # Send to the prepare function which will return a DataFrame of the data objects to use for
         # the dataset
         df_clean_data = preparation_function(df_converted, **kwargs)
+
+        # Remove the working directory part for when we re-save off the filtered converted csv
+        df_clean_data.path = df_clean_data.path.apply(
+            lambda p: Path(p).relative_to(self.working_directory)
+        )
 
         # For each data object prepare the data in the clean directory (using symbolic links)
         for _, row in df_clean_data.iterrows():
