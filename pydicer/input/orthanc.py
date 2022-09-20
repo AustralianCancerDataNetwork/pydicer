@@ -2,8 +2,7 @@ import logging
 from io import BytesIO
 
 import pydicom
-
-from pyorthanc import Orthanc
+from pyorthanc.deprecated.client import Orthanc
 
 from pydicer.input.base import InputBase
 
@@ -52,7 +51,7 @@ class OrthancInput(InputBase):
 
         # Do a dummy lookup to check that we can reach the Orthanc host, this will throw a
         # connection error if we can't connect to the Orthanc
-        self.orthanc.c_find({"Level": "Patient", "Query": {"PatientID": "XXX"}})
+        # self.orthanc.c_find({"Level": "Patient", "Query": {"PatientID": "XXX"}})
 
     def fetch_data(self, patients, modalities=None):
         """Download the DICOM data from Orthanc
