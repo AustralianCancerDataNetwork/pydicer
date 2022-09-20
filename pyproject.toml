@@ -6,7 +6,7 @@ authors = ["Ingham Medical Physics"]
 license = "Apache License 2.0"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 pylint = "^2.12.2"
 black = "^22.1.0"
 Sphinx = "^4.4.0"
@@ -16,7 +16,7 @@ sphinx-rtd-theme = "^1.0.0"
 pydicom = ">=2.1.2"
 SimpleITK = ">=2.0.2"
 platipy = ">=0.2.1"
-pyorthanc = ">=0.2.14"
+pyorthanc = ">=1.11.2"
 argparse = ">=1.4.0"
 pyradiomics = ">=3.0.1"
 scikit-image = ">=0.19.2"
