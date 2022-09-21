@@ -1,5 +1,7 @@
 import logging
 
+import pandas as pd
+
 from pydicer.utils import load_object_metadata, determine_dcm_datetime
 
 logger = logging.getLogger(__name__)
@@ -28,25 +30,20 @@ def rt_latest_struct(df, **kwargs):
         pd.DataFrame: The filtered DataFrame containing only the objects to select
     """
 
-    patients = df.patient_id.unique()
-
     keep_rows = []
 
-    for pat_id in patients:
+    for pat_id, df_patient in df.groupby("patient_id"):
 
         logger.debug("Selecting data for patient: %s", pat_id)
 
-        df_patient = df[df["patient_id"] == pat_id]
-
-        df_structures = df_patient[df_patient["modality"] == "RTSTRUCT"]
+        df_patient["datetime"] = pd.NaT
 
         struct_indicies = []
-        struct_dates = []
-        for idx, row in df_structures.iterrows():
+        for idx, row in df_patient[df_patient["modality"] == "RTSTRUCT"].iterrows():
 
             struct_ds = load_object_metadata(row)
             ds_date = determine_dcm_datetime(struct_ds)
-            struct_dates.append(ds_date)
+            df_patient.loc[idx, "datetime"] = ds_date
 
             skip_series = False
             for k, item in kwargs.items():
@@ -79,8 +76,7 @@ def rt_latest_struct(df, **kwargs):
 
             struct_indicies.append(idx)
 
-        df_structures.loc[:, "datetime"] = struct_dates
-        df_structures = df_structures.loc[struct_indicies]
+        df_structures = df_patient.loc[struct_indicies]
         df_structures.sort_values("datetime", ascending=False, inplace=True)
 
         if len(df_structures) == 0:
@@ -97,7 +93,6 @@ def rt_latest_struct(df, **kwargs):
         keep_rows.append(struct_row.name)  # Track index of row to keep
 
         # Find the linked image
-
         df_linked_img = df[df["sop_instance_uid"] == struct_row.referenced_sop_instance_uid]
 
         if len(df_linked_img) == 0:

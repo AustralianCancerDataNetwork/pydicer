@@ -90,7 +90,7 @@ class PreprocessData:
                 for ext in DICOM_FILE_EXTENSIONS:
                     files += list(directory.glob(f"**/*.{ext}"))
             else:
-                files += list(directory.glob("**/*"))
+                files += list(f for f in directory.glob("**/*") if not f.is_dir())
 
         for file in files:
             ds = pydicom.read_file(file, force=True)

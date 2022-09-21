@@ -9,6 +9,7 @@ import pandas as pd
 import SimpleITK as sitk
 import pydicom
 
+from pydicer.config import PyDicerConfig
 from pydicer.constants import CONVERTED_DIR_NAME, PYDICER_DIR_NAME
 
 logger = logging.getLogger(__name__)
@@ -76,7 +77,19 @@ def load_object_metadata(row):
         pydicom.Dataset: The dataset object containing the original DICOM metadata
     """
 
-    metadata_path = Path(row.path).joinpath("metadata.json")
+    row_path = Path(row.path)
+
+    config = PyDicerConfig()
+
+    # If the working directory is configured and the row_path isn't relative to it, join it.
+    if config is not None:
+
+        try:
+            row_path.relative_to(config.get_working_dir())
+        except ValueError:
+            row_path = config.get_working_dir().joinpath(row_path)
+
+    metadata_path = row_path.joinpath("metadata.json")
 
     if not metadata_path.exists():
         return pydicom.Dataset()
@@ -84,6 +97,50 @@ def load_object_metadata(row):
         ds_dict = json.load(json_file)
 
     return pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
+
+
+def load_dvh(row):
+    """Loads an object's Dose Volume Histogram (DVH)
+
+    Args:
+        row (pd.Series): The row of the converted DataFrame for an RTDOSE
+
+    Raises:
+        ValueError: Raised the the object described in the row is not an RTDOSE
+
+    Returns:
+        pd.DataFrame: The DataFrame containing the DVH for the row
+    """
+
+    if not row.modality == "RTDOSE":
+        raise ValueError("Row is not an RTDOSE")
+
+    row_path = Path(row.path)
+
+    config = PyDicerConfig()
+
+    # If the working directory is configured and the row_path isn't relative to it, join it.
+    if config is not None:
+
+        try:
+            row_path.relative_to(config.get_working_dir())
+        except ValueError:
+            row_path = config.get_working_dir().joinpath(row_path)
+
+    df_result = pd.DataFrame(columns=["patient", "struct_hash", "label", "cc", "mean"])
+    for dvh_file in row_path.glob("dvh_*.csv"):
+        col_types = {"patient": str, "struct_hash": str, "label": str}
+        df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
+        df_result = pd.concat([df_result, df_dvh])
+
+    df_result.sort_values(["patient", "struct_hash", "label"], inplace=True)
+    df_result.reset_index(drop=True, inplace=True)
+
+    # Change the type of the columns which indicate the dose bins, useful for dose metric
+    # computation later
+    df_result.columns = [float(c) if "." in c else c for c in df_result.columns]
+
+    return df_result
 
 
 def read_preprocessed_data(working_directory: Path):
