@@ -12,7 +12,7 @@ from radiomics import firstorder, shape, glcm, glrlm, glszm, ngtdm, gldm, imageo
 from platipy.imaging.dose.dvh import calculate_dvh_for_labels, calculate_d_x, calculate_v_x
 from pydicer.constants import CONVERTED_DIR_NAME
 
-from pydicer.utils import load_object_metadata, parse_patient_kwarg, read_converted_data
+from pydicer.utils import load_object_metadata, load_dvh, parse_patient_kwarg, read_converted_data
 
 logger = logging.getLogger(__name__)
 
@@ -52,18 +52,24 @@ class AnalyseData:
     def __init__(self, working_directory="."):
         self.working_directory = Path(working_directory)
 
-    def get_all_computed_radiomics_for_dataset(self, dataset_name=CONVERTED_DIR_NAME):
+    def get_all_computed_radiomics_for_dataset(
+        self, dataset_name=CONVERTED_DIR_NAME, patient=None
+    ):
         """Return a DataFrame of radiomics computed for this dataset
 
         Args:
             dataset_name (str, optional): The name of the dataset on which to run analysis.
               Defaults to "data".
+            patient (list|str, optional): A patient ID (or list of patient IDs) to fetch radiomics
+              for. Defaults to None.
 
         Returns:
             pd.DataFrame: The DataFrame of all radiomics computed for dataset
         """
 
-        df_data = read_converted_data(self.working_directory, dataset_name)
+        patient = parse_patient_kwarg(patient)
+
+        df_data = read_converted_data(self.working_directory, dataset_name, patients=patient)
 
         dfs = []
         for _, struct_row in df_data[df_data["modality"] == "RTSTRUCT"].iterrows():
@@ -80,66 +86,69 @@ class AnalyseData:
                 df_rad = pd.read_csv(radiomics_file, index_col=0, dtype=col_types)
                 dfs.append(df_rad)
 
+        if len(dfs) == 0:
+            return pd.DataFrame(
+                columns=["Patient", "ImageHashedUID", "StructHashedUID", "Contour"]
+            )
+
         df = pd.concat(dfs)
         df.sort_values(["Patient", "ImageHashedUID", "StructHashedUID", "Contour"], inplace=True)
 
         return df
 
-    def get_all_dvhs_for_dataset(self, dataset_name=CONVERTED_DIR_NAME):
+    def get_all_dvhs_for_dataset(self, dataset_name=CONVERTED_DIR_NAME, patient=None):
         """Return a DataFrame of DVHs computed for this dataset
 
         Args:
             dataset_name (str, optional): The name of the dataset on which to run analysis.
               Defaults to "data".
+            patient (list|str, optional): A patient ID (or list of patient IDs) to fetch DVHs for.
+              Defaults to None.
 
         Returns:
             pd.DataFrame: The DataFrame of all DVHs computed for dataset
         """
 
-        df_data = read_converted_data(self.working_directory, dataset_name)
+        patient = parse_patient_kwarg(patient)
 
-        dfs = []
+        df_data = read_converted_data(self.working_directory, dataset_name, patients=patient)
+
+        df_result = pd.DataFrame(columns=["patient", "struct_hash", "dose_hash", "label"])
         for _, dose_row in df_data[df_data["modality"] == "RTDOSE"].iterrows():
 
-            dose_dir = Path(dose_row.path)
-
-            for dvh_file in dose_dir.glob("dvh_*.csv"):
-                col_types = {"patient": str, "struct_hash": str, "label": str}
-                df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
-                dfs.append(df_dvh)
-
-        df = pd.concat(dfs)
-        df.sort_values(["patient", "struct_hash", "label"], inplace=True)
-        df.reset_index(drop=True, inplace=True)
+            df_result = pd.concat([df_result, load_dvh(dose_row)])
 
         # Change the type of the columns which indicate the dose bins, useful for dose metric
         # computation later
-        df.columns = [float(c) if "." in c else c for c in df.columns]
+        df_result.columns = [float(c) if "." in c else c for c in df_result.columns]
 
-        return df
+        return df_result
 
     def compute_dose_metrics(
         self,
         dataset_name=CONVERTED_DIR_NAME,
+        patient=None,
+        df_process=None,
         d_point=None,
         v_point=None,
         d_cc_point=None,
-        dvh=None,
     ):
         """Compute Dose metrics from a DVH
 
         Args:
             dataset_name (str, optional): The name of the dataset from which to extract dose
                metrics. Defaults to "data".
+            patient (list|str, optional): A patient ID (or list of patient IDs) to compute
+              dose metrics for. Must be None if df_process is provided. Defaults to None.
+            df_process (pd.DataFrame, optional): A DataFrame of the objects to compute dose metrics
+              for. Must be None if patient is provided. Defaults to None.
             d_point (float|int|list, optional): The point or list of points at which to compute the
               D metric. E.g. to compute D50, D95 and D99, supply [50, 95, 99]. Defaults to None.
             v_point (float|int|list, optional): The point or list of points at which to compute the
               V metric. E.g. to compute V5, V10 and V50, supply [5, 10, 50]. Defaults to None.
             d_cc_point (float|int|list, optional): The point or list of points at which to compute
-              the Dcc metric. E.g. to compute Dcc5, Dcc10 and Dcc50, supply [5, 10, 50]. Defaults \
+              the Dcc metric. E.g. to compute Dcc5, Dcc10 and Dcc50, supply [5, 10, 50]. Defaults
               to None.
-            dvh (pd.DataFrame, optional): The DataFrame containing the DVH. If None is supplied the
-              DVH will be fetched using the `get_all_dvhs_for_dataset` function. Defaults to None.
 
         Raises:
             ValueError: One of d_point, v_point or d_cc_point should be set
@@ -149,11 +158,17 @@ class AnalyseData:
             pd.DataFrame: The DataFrame containing the requested metrics.
         """
 
+        if patient is not None and df_process is not None:
+            raise ValueError("Only one of patient and df_process pay be provided.")
+
+        if df_process is None:
+            patient = parse_patient_kwarg(patient)
+            df_process = read_converted_data(
+                self.working_directory, dataset_name=dataset_name, patients=patient
+            )
+
         if d_point is None and v_point is None and d_cc_point is None:
             raise ValueError("One of d_point, v_point or d_cc_point should be set")
-
-        if dvh is None:
-            dvh = self.get_all_dvhs_for_dataset(dataset_name=dataset_name)
 
         if not isinstance(d_point, list):
             if d_point is None:
@@ -182,29 +197,36 @@ class AnalyseData:
         if not all(isinstance(x, (int, float)) for x in d_cc_point):
             raise ValueError("D_cc point must be of type int or float")
 
-        df = dvh[["patient", "struct_hash", "label", "cc", "mean"]]
+        df_result = pd.DataFrame()
 
-        for d in d_point:
-            df.insert(
-                loc=len(df.columns), column=f"D{d:0.0f}", value=calculate_d_x(dvh, d)["value"]
-            )
+        for _, row in df_process[df_process.modality == "RTDOSE"].iterrows():
 
-        for v in v_point:
-            df.insert(
-                loc=len(df.columns), column=f"V{v:0.0f}", value=calculate_v_x(dvh, v)["value"]
-            )
+            dvh = load_dvh(row)
+            df = dvh[["patient", "struct_hash", "dose_hash", "label", "cc", "mean"]]
 
-        for cc_point in d_cc_point:
-            cc_col = []
-            for label in dvh.label:
-                cc_at = (cc_point / dvh[dvh.label == label].cc.iloc[0]) * 100
-                cc_at = min(cc_at, 100)
-                cc_val = calculate_d_x(dvh[dvh.label == label], cc_at).value.iloc[0]
-                cc_col.append(cc_val)
+            for d in d_point:
+                df.insert(
+                    loc=len(df.columns), column=f"D{d}", value=calculate_d_x(dvh, d)["value"]
+                )
 
-            df.insert(loc=len(df.columns), column=f"D{cc_point}cc", value=cc_col)
+            for v in v_point:
+                df.insert(
+                    loc=len(df.columns), column=f"V{v}", value=calculate_v_x(dvh, v)["value"]
+                )
 
-        return df
+            for cc_point in d_cc_point:
+                cc_col = []
+                for label in dvh.label:
+                    cc_at = (cc_point / dvh[dvh.label == label].cc.iloc[0]) * 100
+                    cc_at = min(cc_at, 100)
+                    cc_val = calculate_d_x(dvh[dvh.label == label], cc_at).value.iloc[0]
+                    cc_col.append(cc_val)
+
+                df.insert(loc=len(df.columns), column=f"D{cc_point}cc", value=cc_col)
+
+            df_result = pd.concat([df_result, df])
+
+        return df_result
 
     def compute_radiomics(
         self,
@@ -434,8 +456,8 @@ class AnalyseData:
         Args:
             dataset_name (str, optional): The name of the dataset to compute DVHs on. Defaults to
               "data" (runs on all data).
-            patient (list|str, optional): A patient ID (or list of patient IDs) to compute DVH for.
-             Must be None if df_process is provided. Defaults to None.
+            patient (list|str, optional): A patient ID (or list of patient IDs) to compute DVH
+              for. Must be None if df_process is provided. Defaults to None.
             df_process (pd.DataFrame, optional): A DataFrame of the objects to compute radiomics
               for. Must be None if patient is provided. Defaults to None.
             force (bool, optional): When True, DVHs will be recomputed even if the output file
@@ -506,6 +528,9 @@ class AnalyseData:
             else:
                 df_linked_struct = pd.concat([df_linked_struct, df_for_linked])
 
+            # Drop in case a structure was linked twice
+            df_linked_struct.drop_duplicates(inplace=True)
+
             if len(df_linked_struct) == 0:
                 logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
 
@@ -519,6 +544,13 @@ class AnalyseData:
                 if dvh_csv.exists() and not force:
                     logger.info("DVH already computed at %s", dvh_csv)
                     continue
+
+                logger.info(
+                    "Computing DVH for dose %s on structures %s for patient %s",
+                    dose_row.hashed_uid,
+                    struct_row.hashed_uid,
+                    struct_row.patient_id,
+                )
 
                 struct_dir = Path(struct_row.path).joinpath(struct_row.path)
 
@@ -581,6 +613,7 @@ class AnalyseData:
                     if col_key not in meta_data_cols:
                         meta_data_cols.append(col_key)
 
+                dvh.insert(loc=0, column="dose_hash", value=dose_row.hashed_uid)
                 dvh.insert(loc=0, column="struct_hash", value=struct_hash)
                 dvh.insert(loc=0, column="patient", value=dose_row.patient_id)
 

@@ -257,11 +257,11 @@ class ConvertData:
             df_pat_data = pd.DataFrame(columns=DATA_OBJECT_COLUMNS)
 
         # If this entry already existed, replace that row in the dataframe. Otherwise append.
-        df_this_object = pd.DataFrame([entry])
         if len(df_pat_data[df_pat_data.hashed_uid == hashed_uid]) > 0:
-            df_pat_data.loc[df_pat_data.hashed_uid == hashed_uid, :] = df_this_object
+            for c in entry:
+                df_pat_data.loc[df_pat_data.hashed_uid == hashed_uid, c] = entry[c]
         else:
-            df_pat_data = pd.concat([df_pat_data, df_this_object])
+            df_pat_data = pd.concat([df_pat_data, pd.DataFrame([entry])])
 
         # Save the patient converted dataframe
         df_pat_data = df_pat_data.reset_index(drop=True)
