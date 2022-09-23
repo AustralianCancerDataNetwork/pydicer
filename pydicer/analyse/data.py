@@ -118,10 +118,6 @@ class AnalyseData:
 
             df_result = pd.concat([df_result, load_dvh(dose_row)])
 
-        # Change the type of the columns which indicate the dose bins, useful for dose metric
-        # computation later
-        df_result.columns = [float(c) if "." in c else c for c in df_result.columns]
-
         return df_result
 
     def compute_dose_metrics(
