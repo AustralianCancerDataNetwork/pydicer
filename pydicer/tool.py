@@ -78,13 +78,8 @@ class PyDicer:
         if len(self.dicom_directories) == 0:
             raise ValueError("No DICOM input locations set. Add one using the add_input function.")
 
-        if self.pydicer_directory.joinpath("preprocessed.csv").exists() and not force:
-            logger.debug("Data already preprocessed")
-            self.preprocessed_data = read_preprocessed_data(self.working_directory)
-            return
-
         pd = PreprocessData(self.working_directory)
-        pd.preprocess(self.dicom_directories)
+        pd.preprocess(self.dicom_directories, force=force)
 
         self.preprocessed_data = read_preprocessed_data(self.working_directory)
 
