@@ -17,6 +17,7 @@ from pydicer.constants import (
     CT_IMAGE_STORAGE_UID,
 )
 from pydicer.quarantine.treat import copy_file_to_quarantine
+from pydicer.utils import read_preprocessed_data
 
 logger = logging.getLogger(__name__)
 
@@ -35,13 +36,15 @@ class PreprocessData:
         self.pydicer_directory = working_directory.joinpath(PYDICER_DIR_NAME)
         self.pydicer_directory.mkdir(exist_ok=True)
 
-    def preprocess(self, input_directory):
+    def preprocess(self, input_directory, force=True):
         """
         Function to preprocess information regarding the data located in an Input working directory
 
         Args:
             input_directory (Path|list): The directory (or list of directories) containing the
               DICOM input data
+            force (bool, optional): When True, all files will be preprocessed. Otherwise only files
+              not already scanned previously will be preprocessed. Defaults to True.
 
         Returns: res_dict (pd.DataFrame): containing a row for each DICOM file that was
            preprocessed, with the following columns:
@@ -65,6 +68,8 @@ class PreprocessData:
 
         if not isinstance(input_directory, list):
             raise ValueError("input_directory must be of type pathlib.Path or list")
+
+        preprocessed_csv_path = self.pydicer_directory.joinpath("preprocessed.csv")
 
         df = pd.DataFrame(
             columns=[
@@ -91,6 +96,14 @@ class PreprocessData:
                     files += list(directory.glob(f"**/*.{ext}"))
             else:
                 files += list(f for f in directory.glob("**/*") if not f.is_dir())
+
+        # If we don't want to force preprocess and preprocesses files already exists, filter these
+        # out
+        if not force and preprocessed_csv_path.exists():
+            df = read_preprocessed_data(self.working_directory)
+            files_already_scanned = df.file_path.tolist()
+
+            files = [f for f in files if str(f) not in files_already_scanned]
 
         for file in files:
             ds = pydicom.read_file(file, force=True)
@@ -187,6 +200,6 @@ class PreprocessData:
         df = df.sort_values(["patient_id", "modality", "series_uid", "slice_location"])
 
         # Save the Preprocessed DataFrame
-        df.to_csv(self.pydicer_directory.joinpath("preprocessed.csv"))
+        df.to_csv(preprocessed_csv_path)
 
         return df
