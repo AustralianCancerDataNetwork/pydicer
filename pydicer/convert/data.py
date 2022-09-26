@@ -50,6 +50,14 @@ DATA_OBJECT_COLUMNS = [
 
 
 def get_object_type(sop_class_uid):
+    """Get the type of the object (used for the output path)
+
+    Args:
+        sop_class_uid (str): The SOP Class UID of the object
+
+    Returns:
+        str: The object type
+    """
     object_type = "other"
     for ot, sops in OBJECT_TYPES.items():
         if sop_class_uid in sops:
