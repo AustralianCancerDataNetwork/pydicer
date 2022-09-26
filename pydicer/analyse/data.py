@@ -12,7 +12,13 @@ from radiomics import firstorder, shape, glcm, glrlm, glszm, ngtdm, gldm, imageo
 from platipy.imaging.dose.dvh import calculate_dvh_for_labels, calculate_d_x, calculate_v_x
 from pydicer.constants import CONVERTED_DIR_NAME
 
-from pydicer.utils import load_object_metadata, load_dvh, parse_patient_kwarg, read_converted_data
+from pydicer.utils import (
+    load_object_metadata,
+    load_dvh,
+    parse_patient_kwarg,
+    read_converted_data,
+    get_iterator,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -195,7 +201,12 @@ class AnalyseData:
 
         df_result = pd.DataFrame()
 
-        for _, row in df_process[df_process.modality == "RTDOSE"].iterrows():
+        # For each dose, find the structures in the same frame of reference and compute the
+        # DVH
+        df_doses = df_process[df_process["modality"] == "RTDOSE"]
+        for _, row in get_iterator(
+            df_doses.iterrows(), length=len(df_doses), unit="objects", name="Compute Dose Metrics"
+        ):
 
             dvh = load_dvh(row)
             df = dvh[["patient", "struct_hash", "dose_hash", "label", "cc", "mean"]]
@@ -299,8 +310,11 @@ class AnalyseData:
         meta_data_cols = []
 
         # Next compute the radiomics for each structure using their linked image
-        for _, struct_row in df_process[df_process["modality"] == "RTSTRUCT"].iterrows():
+        df_structs = df_process[df_process["modality"] == "RTSTRUCT"]
 
+        for _, struct_row in get_iterator(
+            df_structs.iterrows(), length=len(df_structs), unit="objects", name="Compute Radiomics"
+        ):
             struct_dir = Path(struct_row.path)
 
             # Find the linked image
@@ -492,8 +506,10 @@ class AnalyseData:
 
         # For each dose, find the structures in the same frame of reference and compute the
         # DVH
-        for _, dose_row in df_process[df_process["modality"] == "RTDOSE"].iterrows():
-
+        df_doses = df_process[df_process["modality"] == "RTDOSE"]
+        for _, dose_row in get_iterator(
+            df_doses.iterrows(), length=len(df_doses), unit="objects", name="Compute DVH"
+        ):
             ## Currently doses are linked via: plan -> struct -> image
             dose_meta_data = load_object_metadata(dose_row)
 
@@ -548,7 +564,7 @@ class AnalyseData:
                     struct_row.patient_id,
                 )
 
-                struct_dir = Path(struct_row.path).joinpath(struct_row.path)
+                struct_dir = Path(struct_row.path)
 
                 struct_meta_data = load_object_metadata(struct_row)
 
@@ -559,6 +575,7 @@ class AnalyseData:
                     for struct_nii in struct_dir.glob("*.nii.gz")
                 }
                 if len(structures) == 0:
+                    logger.debug("No structures found in: %s", struct_dir)
                     continue
 
                 dvh = calculate_dvh_for_labels(dose, structures, bin_width=bin_width)

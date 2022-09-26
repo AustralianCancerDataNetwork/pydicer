@@ -15,7 +15,7 @@ from pydicer.config import PyDicerConfig
 from pydicer.convert.pt import convert_dicom_to_nifti_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.convert.headers import convert_dicom_headers
-from pydicer.utils import hash_uid, read_preprocessed_data
+from pydicer.utils import hash_uid, read_preprocessed_data, get_iterator
 from pydicer.quarantine.treat import copy_file_to_quarantine
 
 from pydicer.constants import (
@@ -47,6 +47,15 @@ DATA_OBJECT_COLUMNS = [
     "referenced_sop_instance_uid",
     "path",
 ]
+
+
+def get_object_type(sop_class_uid):
+    object_type = "other"
+    for ot, sops in OBJECT_TYPES.items():
+        if sop_class_uid in sops:
+            object_type = ot
+
+    return object_type
 
 
 def handle_missing_slice(files):
@@ -196,6 +205,7 @@ def handle_missing_slice(files):
 
                 df_files = pd.concat([df_files, pd.DataFrame([interp_df_row])])
                 df_files.sort_values(by="slice_location", inplace=True)
+
     return df_files.file_path.tolist()
 
 
@@ -263,6 +273,12 @@ class ConvertData:
         else:
             df_pat_data = pd.concat([df_pat_data, pd.DataFrame([entry])])
 
+        logger.info(
+            "Successfully converted %s object with hashed UID: %s",
+            entry["modality"],
+            entry["hashed_uid"],
+        )
+
         # Save the patient converted dataframe
         df_pat_data = df_pat_data.reset_index(drop=True)
         df_pat_data.to_csv(converted_df_path)
@@ -285,15 +301,21 @@ class ConvertData:
 
         config = PyDicerConfig()
 
-        if patient is not None and not isinstance(patient, list):
-            patient = [patient]
+        if patient is not None:
+            if not isinstance(patient, list):
+                patient = [patient]
 
-        for key, df_files in df_preprocess.groupby(["patient_id", "modality", "series_uid"]):
+            df_preprocess = df_preprocess[df_preprocess["patient_id"].str.isin(patient)]
+
+        for key, df_files in get_iterator(
+            df_preprocess.groupby(["patient_id", "modality", "series_uid"]),
+            unit="objects",
+            name="convert",
+        ):
 
             patient_id, _, series_uid = key
 
-            if patient is not None and patient_id not in patient:
-                continue
+            logger.info("Converting data for patient: %s", patient_id)
 
             patient_directory = self.output_directory.joinpath(patient_id)
 
@@ -310,10 +332,8 @@ class ConvertData:
             sop_instance_hash = hash_uid(sop_instance_uid)
 
             # Determine the output type to decide in which directory the object should be placed
-            object_type = "other"
-            for ot, sops in OBJECT_TYPES.items():
-                if sop_class_uid in sops:
-                    object_type = ot
+            object_type = get_object_type(sop_class_uid)
+
             output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
 
             entry = {
