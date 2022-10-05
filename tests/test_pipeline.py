@@ -104,15 +104,15 @@ def test_pipeline(test_data):
 
         assert np.isclose(
             (df_dose_metrics.loc[df_dose_metrics.label == "Lt_Parotid", "D95"].iloc[0]),
-            8.3,
+            8.310638297872341,
         )
 
         assert np.isclose(
             (df_dose_metrics.loc[df_dose_metrics.label == "GTV", "D99"].iloc[0]),
-            70.2,
+            70.23906832298137,
         )
 
         assert np.isclose(
             (df_dose_metrics.loc[df_dose_metrics.label == "Rt_Parotid", "D5cc"].iloc[0]),
-            70.4,
+            70.45179733333333,
         )
