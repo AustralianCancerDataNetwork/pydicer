@@ -2,8 +2,7 @@ import logging
 from io import BytesIO
 
 import pydicom
-
-from pyorthanc import Orthanc
+from pyorthanc.deprecated.client import Orthanc
 
 from pydicer.input.base import InputBase
 
