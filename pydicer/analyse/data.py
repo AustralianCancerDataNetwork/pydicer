@@ -9,7 +9,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from radiomics import firstorder, shape, glcm, glrlm, glszm, ngtdm, gldm, imageoperations
-from platipy.imaging.dose.dvh import calculate_dvh_for_labels, calculate_d_x, calculate_v_x, calculate_d_cc_x
+from platipy.imaging.dose.dvh import (
+    calculate_dvh_for_labels,
+    calculate_d_x,
+    calculate_v_x,
+    calculate_d_cc_x,
+)
 from pydicer.constants import CONVERTED_DIR_NAME
 
 from pydicer.utils import load_object_metadata, load_dvh, parse_patient_kwarg, read_converted_data
@@ -203,7 +208,7 @@ class AnalyseData:
             df_v = calculate_v_x(dvh, v_point)
             df_dcc = calculate_d_cc_x(dvh, d_cc_point)
             df = pd.concat([df, df_d, df_v, df_dcc], axis=1)
-            df = df.loc[:,~df.columns.duplicated()]
+            df = df.loc[:, ~df.columns.duplicated()]
 
             df_result = pd.concat([df_result, df])
 
