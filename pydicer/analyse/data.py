@@ -9,7 +9,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from radiomics import firstorder, shape, glcm, glrlm, glszm, ngtdm, gldm, imageoperations
-from platipy.imaging.dose.dvh import calculate_dvh_for_labels, calculate_d_x, calculate_v_x
+from platipy.imaging.dose.dvh import (
+    calculate_dvh_for_labels,
+    calculate_d_x,
+    calculate_v_x,
+    calculate_d_cc_x,
+)
 from pydicer.constants import CONVERTED_DIR_NAME
 
 from pydicer.utils import load_object_metadata, load_dvh, parse_patient_kwarg, read_converted_data
@@ -118,10 +123,6 @@ class AnalyseData:
 
             df_result = pd.concat([df_result, load_dvh(dose_row)])
 
-        # Change the type of the columns which indicate the dose bins, useful for dose metric
-        # computation later
-        df_result.columns = [float(c) if "." in c else c for c in df_result.columns]
-
         return df_result
 
     def compute_dose_metrics(
@@ -203,26 +204,11 @@ class AnalyseData:
 
             dvh = load_dvh(row)
             df = dvh[["patient", "struct_hash", "dose_hash", "label", "cc", "mean"]]
-
-            for d in d_point:
-                df.insert(
-                    loc=len(df.columns), column=f"D{d}", value=calculate_d_x(dvh, d)["value"]
-                )
-
-            for v in v_point:
-                df.insert(
-                    loc=len(df.columns), column=f"V{v}", value=calculate_v_x(dvh, v)["value"]
-                )
-
-            for cc_point in d_cc_point:
-                cc_col = []
-                for label in dvh.label:
-                    cc_at = (cc_point / dvh[dvh.label == label].cc.iloc[0]) * 100
-                    cc_at = min(cc_at, 100)
-                    cc_val = calculate_d_x(dvh[dvh.label == label], cc_at).value.iloc[0]
-                    cc_col.append(cc_val)
-
-                df.insert(loc=len(df.columns), column=f"D{cc_point}cc", value=cc_col)
+            df_d = calculate_d_x(dvh, d_point)
+            df_v = calculate_v_x(dvh, v_point)
+            df_dcc = calculate_d_cc_x(dvh, d_cc_point)
+            df = pd.concat([df, df_d, df_v, df_dcc], axis=1)
+            df = df.loc[:, ~df.columns.duplicated()]
 
             df_result = pd.concat([df_result, df])
 
@@ -266,7 +252,7 @@ class AnalyseData:
             structure_meta_data (list, optional): A list of DICOM tags which will be extracted from
                 the structure DICOM headers and included in the resulting table of radiomics.
                 Defaults to None.
-            image_meta_data ([type], optional): A list of DICOM tags which will be extracted from
+            image_meta_data (list, optional): A list of DICOM tags which will be extracted from
                 the image DICOM headers and included in the resulting table of radiomics.
                 Defaults to None.
             resample_to_image (bool, optional): Define if mask should be resampled to image. If not
