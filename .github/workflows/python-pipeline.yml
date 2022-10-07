@@ -33,10 +33,10 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install Python modules with poetry
         # Install numpy first so that pyradiomics can compile
-        # TODO remove this once https://github.com/AIM-Harvard/pyradiomics/pull/761 landsry
+        # TODO remove this once https://github.com/AIM-Harvard/pyradiomics/pull/761 lands
         run: |
           poetry run pip install --upgrade pip
-          poetry run pip install numpy
+          pip install numpy
           poetry install
       - name: Lint with Pylint
         run: |
