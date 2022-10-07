@@ -36,7 +36,7 @@ jobs:
         # TODO remove this once https://github.com/AIM-Harvard/pyradiomics/pull/761 lands
         run: |
           poetry run pip install --upgrade pip
-          pip install numpy
+          poetry run pip install numpy
           poetry install
       - name: Lint with Pylint
         run: |
