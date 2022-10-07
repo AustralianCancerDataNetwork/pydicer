@@ -130,7 +130,7 @@ def load_dvh(row):
 
     df_result = pd.DataFrame(columns=["patient", "struct_hash", "label", "cc", "mean"])
     for dvh_file in row_path.glob("dvh_*.csv"):
-        col_types = {"patient": str, "struct_hash": str, "label": str}
+        col_types = {"patient": str, "struct_hash": str, "label": str, "dose_hash": str}
         df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
         df_result = pd.concat([df_result, df_dvh])
 
