@@ -531,7 +531,7 @@ class AnalyseData:
                 df_linked_struct = pd.concat([df_linked_struct, df_for_linked])
 
             # Drop in case a structure was linked twice
-            df_linked_struct.drop_duplicates(inplace=True)
+            df_linked_struct = df_linked_struct.drop_duplicates()
 
             if len(df_linked_struct) == 0:
                 logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
