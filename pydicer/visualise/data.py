@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 import SimpleITK as sitk
+import pandas as pd
 import matplotlib.pyplot as plt
 from platipy.imaging import ImageVisualiser
 from pydicer.constants import CONVERTED_DIR_NAME
@@ -51,6 +52,9 @@ class VisualiseData:
 
         visualise_modalities = ["CT", "RTSTRUCT", "RTDOSE"]
         df_process = df_process[df_process.modality.isin(visualise_modalities)]
+
+        # Read all converted data for linkage
+        df_converted = read_converted_data(self.working_directory)
 
         for _, row in get_iterator(
             df_process.iterrows(), length=len(df_process), unit="objects", name="visualise"
@@ -178,7 +182,7 @@ class VisualiseData:
                 # Also link via Frame of Reference
                 df_for_linked = df_converted[
                     (df_converted["modality"] == "RTSTRUCT")
-                    & (df_converted["for_uid"] == dose_row.for_uid)
+                    & (df_converted["for_uid"] == row.for_uid)
                 ]
 
                 if df_linked_struct is None:
@@ -192,7 +196,8 @@ class VisualiseData:
                 if len(df_linked_struct) == 0:
                     logger.warning("No linked structures found for dose: %s", row.sop_instance_uid)
 
-                dose_file = Path(dose_row.path).joinpath("RTDOSE.nii.gz")
+                dose_path = Path(row.path)
+                dose_file = dose_path.joinpath("RTDOSE.nii.gz")
 
                 for _, struct_row in df_linked_struct.iterrows():
 
@@ -207,7 +212,6 @@ class VisualiseData:
                             row.sop_instance_uid,
                         )
 
-                    dose_path = Path(row.path)
                     struct_dir = Path(struct_row.path)
 
                     for _, img_row in df_linked_img.iterrows():
@@ -222,7 +226,7 @@ class VisualiseData:
                             continue
 
                         img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
-                        dose_img = sitk.ReadImage(str(dose_path.joinpath("RTDOSE.nii.gz")))
+                        dose_img = sitk.ReadImage(str(dose_file))
                         dose_img = sitk.Resample(dose_img, img)
 
                         vis = ImageVisualiser(img)
