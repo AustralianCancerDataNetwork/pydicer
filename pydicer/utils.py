@@ -8,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 import SimpleITK as sitk
 import pydicom
+import tqdm
 
 from pydicer.config import PyDicerConfig
 from pydicer.constants import CONVERTED_DIR_NAME, PYDICER_DIR_NAME
@@ -278,3 +279,35 @@ def read_simple_itk_image(row):
         return None
 
     return sitk.ReadImage(str(nifti_path))
+
+
+def get_iterator(iterable, length=None, unit="it", name=None):
+    """Get the appropriate iterator based on the level of verbosity configured.
+
+    Args:
+        iterable (iterable): The list or iterable to iterate over.
+        length (int, optional): The length of the iterator. If None, the len() functio will be used
+          to determine the length (only works for list/tuple). Defaults to None.
+        unit (str, optional): The unit string to display in the progress bar. Defaults to "it".
+        name (str, optional): The name to display in the progress bar. Defaults to None.
+
+    Returns:
+        iterable: The appropriate iterable object.
+    """
+
+    config = PyDicerConfig()
+
+    iterator = iterable
+    if config.get_config("verbosity") == 0:
+
+        if length is None:
+            length = len(iterable)
+
+        iterator = tqdm.tqdm(
+            iterable,
+            total=length,
+            unit=unit,
+            postfix=name,
+        )
+
+    return iterator

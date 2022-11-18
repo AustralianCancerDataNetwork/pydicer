@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.8", "3.9", "3.10"]
         poetry-version: [1.1.12]
         # os: [ubuntu-20.04, macos-latest, windows-latest]
     steps:
@@ -33,7 +33,7 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install Python modules with poetry
         # Install numpy first so that pyradiomics can compile
-        # TODO remove this once https://github.com/AIM-Harvard/pyradiomics/pull/761 landsry
+        # TODO remove this once https://github.com/AIM-Harvard/pyradiomics/pull/761 lands
         run: |
           poetry run pip install --upgrade pip
           poetry run pip install numpy

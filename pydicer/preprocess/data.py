@@ -2,11 +2,10 @@ import logging
 from pathlib import Path
 
 import pandas as pd
-
 import pydicom
 import numpy as np
-from pydicer.config import PyDicerConfig
 
+from pydicer.config import PyDicerConfig
 from pydicer.constants import (
     DICOM_FILE_EXTENSIONS,
     PET_IMAGE_STORAGE_UID,
@@ -17,7 +16,7 @@ from pydicer.constants import (
     CT_IMAGE_STORAGE_UID,
 )
 from pydicer.quarantine.treat import copy_file_to_quarantine
-from pydicer.utils import read_preprocessed_data
+from pydicer.utils import read_preprocessed_data, get_iterator
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +34,112 @@ class PreprocessData:
         self.working_directory = working_directory
         self.pydicer_directory = working_directory.joinpath(PYDICER_DIR_NAME)
         self.pydicer_directory.mkdir(exist_ok=True)
+
+    def scan_file(self, file):
+        """Scan a DICOM file.
+
+        Args:
+            file (pathlib.Path|str): The path to the file to scan.
+
+        Returns:
+            dict: Returns the dict object containing the scanned information. None if the file
+              couldn't be scanned.
+        """
+
+        logger.debug("Scanning file %s", file)
+
+        ds = pydicom.read_file(file, force=True)
+
+        try:
+
+            dicom_type_uid = ds.SOPClassUID
+
+            res_dict = {
+                "patient_id": ds.PatientID,
+                "study_uid": ds.StudyInstanceUID,
+                "series_uid": ds.SeriesInstanceUID,
+                "modality": ds.Modality,
+                "sop_class_uid": dicom_type_uid,
+                "sop_instance_uid": ds.SOPInstanceUID,
+                "file_path": str(file),
+            }
+
+            if "FrameOfReferenceUID" in ds:
+                res_dict["for_uid"] = ds.FrameOfReferenceUID
+
+            if dicom_type_uid == RT_STRUCTURE_STORAGE_UID:
+
+                try:
+                    referenced_series_uid = (
+                        ds.ReferencedFrameOfReferenceSequence[0]
+                        .RTReferencedStudySequence[0]
+                        .RTReferencedSeriesSequence[0]
+                        .SeriesInstanceUID
+                    )
+                    res_dict["referenced_uid"] = referenced_series_uid
+                except AttributeError:
+                    logger.warning("Unable to determine Reference Series UID")
+
+                try:
+                    # Check other tags for a linked DICOM
+                    # e.g. ds.ReferencedFrameOfReferenceSequence[0].FrameOfReferenceUID
+                    # Potentially, we should check each referenced
+                    referenced_frame_of_reference_uid = ds.ReferencedFrameOfReferenceSequence[
+                        0
+                    ].FrameOfReferenceUID
+                    res_dict["referenced_for_uid"] = referenced_frame_of_reference_uid
+                except AttributeError:
+                    logger.warning("Unable to determine Referenced Frame of Reference UID")
+
+            elif dicom_type_uid == RT_PLAN_STORAGE_UID:
+
+                try:
+                    referenced_sop_instance_uid = ds.ReferencedStructureSetSequence[
+                        0
+                    ].ReferencedSOPInstanceUID
+                    res_dict["referenced_uid"] = referenced_sop_instance_uid
+                except AttributeError:
+                    logger.warning("Unable to determine Reference Series UID")
+
+            elif dicom_type_uid == RT_DOSE_STORAGE_UID:
+
+                try:
+                    referenced_sop_instance_uid = ds.ReferencedRTPlanSequence[
+                        0
+                    ].ReferencedSOPInstanceUID
+                    res_dict["referenced_uid"] = referenced_sop_instance_uid
+                except AttributeError:
+                    logger.warning("Unable to determine Reference Series UID")
+
+            elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID):
+
+                image_position = np.array(ds.ImagePositionPatient, dtype=float)
+                image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
+
+                image_plane_normal = np.cross(image_orientation[:3], image_orientation[3:])
+
+                slice_location = (image_position * image_plane_normal)[2]
+
+                res_dict["slice_location"] = slice_location
+
+            else:
+                raise ValueError(f"Could not determine DICOM type {ds.Modality} {dicom_type_uid}.")
+
+            logger.debug(
+                "Successfully scanned DICOM file with SOP Instance UID: %s",
+                res_dict["sop_instance_uid"],
+            )
+
+            return res_dict
+
+        except Exception as e:  # pylint: disable=broad-except
+            # Broad except ok here, since we will put these file into a
+            # quarantine location for further inspection.
+            logger.error("Unable to preprocess file: %s", file)
+            logger.exception(e)
+            copy_file_to_quarantine(file, self.working_directory, e)
+
+        return None
 
     def preprocess(self, input_directory, force=True):
         """
@@ -100,104 +205,30 @@ class PreprocessData:
         # If we don't want to force preprocess and preprocesses files already exists, filter these
         # out
         if not force and preprocessed_csv_path.exists():
+
+            logger.info("Not forcing preprocessing, will only scan unindexed files")
+
             df = read_preprocessed_data(self.working_directory)
             files_already_scanned = df.file_path.tolist()
 
             files = [f for f in files if str(f) not in files_already_scanned]
 
-        for file in files:
-            ds = pydicom.read_file(file, force=True)
+        logger.info("Found %d files to scan", len(files))
 
-            try:
+        result_list = []
 
-                dicom_type_uid = ds.SOPClassUID
+        for f in get_iterator(files, unit="files", name="preprocess"):
+            result = self.scan_file(f)
+            if result is not None:
+                result_list.append(result)
 
-                res_dict = {
-                    "patient_id": ds.PatientID,
-                    "study_uid": ds.StudyInstanceUID,
-                    "series_uid": ds.SeriesInstanceUID,
-                    "modality": ds.Modality,
-                    "sop_class_uid": dicom_type_uid,
-                    "sop_instance_uid": ds.SOPInstanceUID,
-                    "file_path": str(file),
-                }
-
-                if "FrameOfReferenceUID" in ds:
-                    res_dict["for_uid"] = ds.FrameOfReferenceUID
-
-                if dicom_type_uid == RT_STRUCTURE_STORAGE_UID:
-
-                    try:
-                        referenced_series_uid = (
-                            ds.ReferencedFrameOfReferenceSequence[0]
-                            .RTReferencedStudySequence[0]
-                            .RTReferencedSeriesSequence[0]
-                            .SeriesInstanceUID
-                        )
-                        res_dict["referenced_uid"] = referenced_series_uid
-                    except AttributeError:
-                        logger.warning("Unable to determine Reference Series UID")
-
-                    try:
-                        # Check other tags for a linked DICOM
-                        # e.g. ds.ReferencedFrameOfReferenceSequence[0].FrameOfReferenceUID
-                        # Potentially, we should check each referenced
-                        referenced_frame_of_reference_uid = ds.ReferencedFrameOfReferenceSequence[
-                            0
-                        ].FrameOfReferenceUID
-                        res_dict["referenced_for_uid"] = referenced_frame_of_reference_uid
-                    except AttributeError:
-                        logger.warning("Unable to determine Referenced Frame of Reference UID")
-
-                elif dicom_type_uid == RT_PLAN_STORAGE_UID:
-
-                    try:
-                        referenced_sop_instance_uid = ds.ReferencedStructureSetSequence[
-                            0
-                        ].ReferencedSOPInstanceUID
-                        res_dict["referenced_uid"] = referenced_sop_instance_uid
-                    except AttributeError:
-                        logger.warning("Unable to determine Reference Series UID")
-
-                elif dicom_type_uid == RT_DOSE_STORAGE_UID:
-
-                    try:
-                        referenced_sop_instance_uid = ds.ReferencedRTPlanSequence[
-                            0
-                        ].ReferencedSOPInstanceUID
-                        res_dict["referenced_uid"] = referenced_sop_instance_uid
-                    except AttributeError:
-                        logger.warning("Unable to determine Reference Series UID")
-
-                elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID):
-
-                    image_position = np.array(ds.ImagePositionPatient, dtype=float)
-                    image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
-
-                    image_plane_normal = np.cross(image_orientation[:3], image_orientation[3:])
-
-                    slice_location = (image_position * image_plane_normal)[2]
-
-                    res_dict["slice_location"] = slice_location
-
-                else:
-                    raise ValueError(
-                        f"Could not determine DICOM type {ds.Modality} {dicom_type_uid}."
-                    )
-
-                # Add as a row to the DataFrame
-                df = pd.concat([df, pd.DataFrame([res_dict])])
-
-            except Exception as e:  # pylint: disable=broad-except
-                # Broad except ok here, since we will put these file into a
-                # quarantine location for further inspection.
-                logger.error("Unable to preprocess file: %s", file)
-                logger.exception(e)
-                copy_file_to_quarantine(file, self.working_directory, e)
+        df = pd.concat([df, pd.DataFrame(result_list)])
 
         # Sort the the DataFrame by the patient then series uid and the slice location, ensuring
         # that the slices are ordered correctly
         df = df.sort_values(["patient_id", "modality", "series_uid", "slice_location"])
+
+        logger.info("Total of %d preprocessed DICOM files", len(df))
 
         # Save the Preprocessed DataFrame
         df.to_csv(preprocessed_csv_path)
