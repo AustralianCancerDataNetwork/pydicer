@@ -159,89 +159,96 @@ class VisualiseData:
             # Next visualise the doses on top of their linked image
             if row.modality == "RTDOSE":
 
-                ## Currently doses are linked via: plan -> struct -> image
-
                 # Find the linked plan
-                df_linked_plan = df_process[
-                    df_process["sop_instance_uid"] == row.referenced_sop_instance_uid
+                df_linked_plan = df_converted[
+                    df_converted["sop_instance_uid"] == row.referenced_sop_instance_uid
                 ]
 
                 if len(df_linked_plan) == 0:
-                    logger.warning(
-                        "No linked plans found, dose won't be visualised: %s", row.sop_instance_uid
-                    )
-                    continue
+                    logger.warning("No linked plans found for dose: %s", row.sop_instance_uid)
 
                 # Find the linked structure set
-                plan_row = df_linked_plan.iloc[0]
-                df_linked_struct = df_process[
-                    df_process["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
-                ]
-
-                if len(df_linked_struct) == 0:
-                    # Try to link via Frame of Reference instead
-                    df_linked_struct = df_process[
-                        (df_process["modality"] == "RTSTRUCT")
-                        & (df_process["for_uid"] == row.for_uid)
+                df_linked_struct = None
+                if len(df_linked_plan) > 0:
+                    plan_row = df_linked_plan.iloc[0]
+                    df_linked_struct = df_converted[
+                        df_converted["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
                     ]
 
-                if len(df_linked_struct) == 0:
-                    logger.warning(
-                        "No structures found, dose won't be visualised: %s", row.sop_instance_uid
-                    )
-                    continue
-
-                # Find the linked image
-                struct_row = df_linked_struct.iloc[0]
-                df_linked_img = df_process[
-                    df_process["sop_instance_uid"] == struct_row.referenced_sop_instance_uid
+                # Also link via Frame of Reference
+                df_for_linked = df_converted[
+                    (df_converted["modality"] == "RTSTRUCT")
+                    & (df_converted["for_uid"] == dose_row.for_uid)
                 ]
 
-                if len(df_linked_img) == 0:
-                    logger.warning(
-                        "No linked images found, dose won't be visualised: %s",
-                        row.sop_instance_uid,
-                    )
+                if df_linked_struct is None:
+                    df_linked_struct = df_for_linked
+                else:
+                    df_linked_struct = pd.concat([df_linked_struct, df_for_linked])
 
-                dose_path = Path(row.path)
-                struct_dir = Path(struct_row.path)
+                # Drop in case a structure was linked twice
+                df_linked_struct = df_linked_struct.drop_duplicates()
 
-                for _, img_row in df_linked_img.iterrows():
+                if len(df_linked_struct) == 0:
+                    logger.warning("No linked structures found for dose: %s", row.sop_instance_uid)
 
-                    img_path = Path(img_row.path)
+                dose_file = Path(dose_row.path).joinpath("RTDOSE.nii.gz")
 
-                    # save image inside dose directory
-                    vis_filename = dose_path.joinpath(f"vis_{struct_row.hashed_uid}.png")
+                for _, struct_row in df_linked_struct.iterrows():
 
-                    if vis_filename.exists() and not force:
-                        logger.info("Visualisation already exists at %s", vis_filename)
-                        continue
+                    # Find the linked image
+                    df_linked_img = df_process[
+                        df_process["sop_instance_uid"] == struct_row.referenced_sop_instance_uid
+                    ]
 
-                    img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
-                    dose_img = sitk.ReadImage(str(dose_path.joinpath("RTDOSE.nii.gz")))
-                    dose_img = sitk.Resample(dose_img, img)
-
-                    vis = ImageVisualiser(img)
-
-                    vis.add_scalar_overlay(
-                        dose_img, "Dose", discrete_levels=20, colormap=plt.cm.get_cmap("inferno")
-                    )
-
-                    masks = {
-                        f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
-                        for f in struct_dir.glob("*.nii.gz")
-                    }
-
-                    if len(masks) == 0:
+                    if len(df_linked_img) == 0:
                         logger.warning(
-                            "No contours found in structure directory: %s", {struct_dir}
+                            "No linked images found, dose won't be visualised: %s",
+                            row.sop_instance_uid,
                         )
-                        continue
 
-                    vis.add_contour(masks)
-                    fig = vis.show()
+                    dose_path = Path(row.path)
+                    struct_dir = Path(struct_row.path)
 
-                    fig.savefig(vis_filename, dpi=fig.dpi)
-                    plt.close(fig)
+                    for _, img_row in df_linked_img.iterrows():
 
-                    logger.info("Created dose visualisation: %s", vis_filename)
+                        img_path = Path(img_row.path)
+
+                        # save image inside dose directory
+                        vis_filename = dose_path.joinpath(f"vis_{struct_row.hashed_uid}.png")
+
+                        if vis_filename.exists() and not force:
+                            logger.info("Visualisation already exists at %s", vis_filename)
+                            continue
+
+                        img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
+                        dose_img = sitk.ReadImage(str(dose_path.joinpath("RTDOSE.nii.gz")))
+                        dose_img = sitk.Resample(dose_img, img)
+
+                        vis = ImageVisualiser(img)
+
+                        vis.add_scalar_overlay(
+                            dose_img,
+                            "Dose",
+                            discrete_levels=20,
+                            colormap=plt.cm.get_cmap("inferno"),
+                        )
+
+                        masks = {
+                            f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
+                            for f in struct_dir.glob("*.nii.gz")
+                        }
+
+                        if len(masks) == 0:
+                            logger.warning(
+                                "No contours found in structure directory: %s", {struct_dir}
+                            )
+                            continue
+
+                        vis.add_contour(masks)
+                        fig = vis.show()
+
+                        fig.savefig(vis_filename, dpi=fig.dpi)
+                        plt.close(fig)
+
+                        logger.info("Created dose visualisation: %s", vis_filename)
