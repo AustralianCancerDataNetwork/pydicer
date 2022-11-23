@@ -26,7 +26,13 @@ class PrepareDataset:
 
         dataset_dir = self.working_directory.joinpath(dataset_name)
 
-        data_object_row.path = str(Path(data_object_row.path).relative_to(self.working_directory))
+        # Create a copy so that we aren't manuipulating the original entry
+        data_object_row = data_object_row.copy()
+
+        if data_object_row.path.str.startswith(str(self.working_directory)):
+            data_object_row.path = str(
+                Path(data_object_row.path).relative_to(self.working_directory)
+            )
 
         object_path = Path(data_object_row.path)
         symlink_path = dataset_dir.joinpath(object_path.relative_to(CONVERTED_DIR_NAME))
@@ -51,7 +57,14 @@ class PrepareDataset:
 
             col_types = {"patient_id": str, "hashed_uid": str}
             df_converted = pd.read_csv(pat_converted_csv, index_col=0, dtype=col_types)
-            df_pat = pd.concat([df_pat, df_converted])
+
+            # Check if this object already exists in the converted dataframe
+            if len(df_converted[df_converted.hashed_uid == data_object_row.hashed_uid]) == 0:
+                # If not add it
+                df_pat = pd.concat([df_pat, df_converted])
+            else:
+                # Otherwise just leave the converted data as is
+                df_pat = df_converted
 
         df_pat = df_pat.reset_index(drop=True)
         df_pat.to_csv(pat_dir.joinpath("converted.csv"))
