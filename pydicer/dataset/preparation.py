@@ -61,7 +61,7 @@ class PrepareDataset:
             # Check if this object already exists in the converted dataframe
             if len(df_converted[df_converted.hashed_uid == data_object_row.hashed_uid]) == 0:
                 # If not add it
-                df_pat = pd.concat([df_pat, df_converted])
+                df_pat = pd.concat([df_converted, df_pat])
             else:
                 # Otherwise just leave the converted data as is
                 df_pat = df_converted
