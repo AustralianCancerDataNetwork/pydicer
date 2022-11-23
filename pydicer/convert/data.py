@@ -269,7 +269,8 @@ class ConvertData:
         patient_directory = self.output_directory.joinpath(patient_id)
         converted_df_path = patient_directory.joinpath("converted.csv")
         if converted_df_path.exists():
-            df_pat_data = pd.read_csv(converted_df_path, index_col=0)
+            col_types = {"patient_id": str, "hashed_uid": str}
+            df_pat_data = pd.read_csv(converted_df_path, index_col=0, dtype=col_types)
             df_pat_data = df_pat_data.reset_index(drop=True)
         else:
             df_pat_data = pd.DataFrame(columns=DATA_OBJECT_COLUMNS)
