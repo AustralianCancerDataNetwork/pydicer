@@ -29,7 +29,7 @@ class PrepareDataset:
         # Create a copy so that we aren't manuipulating the original entry
         data_object_row = data_object_row.copy()
 
-        if data_object_row.path.str.startswith(str(self.working_directory)):
+        if data_object_row.path.startswith(str(self.working_directory)):
             data_object_row.path = str(
                 Path(data_object_row.path).relative_to(self.working_directory)
             )
