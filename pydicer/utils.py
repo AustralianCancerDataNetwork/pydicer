@@ -149,11 +149,13 @@ def load_object_metadata(row, keep_tags=None, remove_tags=None):
     return pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
 
 
-def load_dvh(row):
+def load_dvh(row, struct_hash=None):
     """Loads an object's Dose Volume Histogram (DVH)
 
     Args:
         row (pd.Series): The row of the converted DataFrame for an RTDOSE
+        struct_hash (list|str, optional): The struct_hash (or list of struct_hashes) to load DVHs
+            for. When None all DVHs for RTDOSE will be loaded. Defaults to None.
 
     Raises:
         ValueError: Raised the the object described in the row is not an RTDOSE
@@ -164,6 +166,9 @@ def load_dvh(row):
 
     if not row.modality == "RTDOSE":
         raise ValueError("Row is not an RTDOSE")
+
+    if isinstance(struct_hash, str):
+        struct_hash = [struct_hash]
 
     row_path = Path(row.path)
 
@@ -179,6 +184,13 @@ def load_dvh(row):
 
     df_result = pd.DataFrame(columns=["patient", "struct_hash", "label", "cc", "mean"])
     for dvh_file in row_path.glob("dvh_*.csv"):
+
+        if struct_hash is not None:
+            file_struct_hash = dvh_file.name.replace("dvh_", "").replace(".csv", "")
+
+            if file_struct_hash not in struct_hash:
+                continue
+
         col_types = {"patient": str, "struct_hash": str, "label": str, "dose_hash": str}
         df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
         df_result = pd.concat([df_result, df_dvh])
