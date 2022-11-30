@@ -86,7 +86,7 @@ class PrepareDataset:
 
         # Remove the working directory part for when we re-save off the filtered converted csv
         df_prepare.path = df_prepare.path.apply(
-            lambda p: Path(p).relative_to(self.working_directory)
+            lambda p: str(Path(p).relative_to(self.working_directory))
         )
 
         # For each data object prepare the data in the dataset directory
