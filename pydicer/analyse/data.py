@@ -217,6 +217,10 @@ class AnalyseData:
             ].hashed_uid.tolist()
 
             dvh = load_dvh(row, struct_hash=struct_hashes)
+
+            if len(dvh) == 0:
+                logger.warning("No DVHs found for %s", struct_hashes)
+
             df = dvh[["patient", "struct_hash", "dose_hash", "label", "cc", "mean"]]
             df_d = calculate_d_x(dvh, d_point)
             df_v = calculate_v_x(dvh, v_point)
