@@ -212,8 +212,11 @@ class AnalyseData:
         for _, row in get_iterator(
             df_doses.iterrows(), length=len(df_doses), unit="objects", name="Compute Dose Metrics"
         ):
+            struct_hashes = df_process[
+                (df_process.for_uid == row.for_uid) & (df_process.modality == "RTSTRUCT")
+            ].hashed_uid.tolist()
 
-            dvh = load_dvh(row)
+            dvh = load_dvh(row, struct_hash=struct_hashes)
             df = dvh[["patient", "struct_hash", "dose_hash", "label", "cc", "mean"]]
             df_d = calculate_d_x(dvh, d_point)
             df_v = calculate_v_x(dvh, v_point)

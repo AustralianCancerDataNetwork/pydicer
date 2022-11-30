@@ -68,11 +68,13 @@ def determine_dcm_datetime(ds, require_time=False):
     return None
 
 
-def load_object_metadata(row):
+def load_object_metadata(row, keep_tags=None, remove_tags=None):
     """Loads the object's metadata
 
     Args:
         row (pd.Series): The row of the converted DataFrame for which to load the metadata
+        keep_tags TODO
+        remove_tag TODO
 
     Returns:
         pydicom.Dataset: The dataset object containing the original DICOM metadata
@@ -97,14 +99,63 @@ def load_object_metadata(row):
     with open(metadata_path, "r", encoding="utf8") as json_file:
         ds_dict = json.load(json_file)
 
+    if keep_tags is not None:
+
+        clean_keep_tags = []
+
+        if not isinstance(keep_tags, list):
+            keep_tags = [keep_tags]
+
+        for tag in keep_tags:
+            tag_key = pydicom.datadict.tag_for_keyword(tag)
+            if tag_key is not None:
+                t = pydicom.tag.Tag(tag_key)
+                group_str = hex(t.group).replace("0x", "").zfill(4)
+                element_str = hex(t.element).replace("0x", "").zfill(4)
+                tag = f"{group_str}{element_str}"
+
+            clean_keep_tags.append(tag)
+
+        keep_tags = clean_keep_tags
+
+    # If
+    if keep_tags is not None:
+
+        if remove_tags is None:
+            remove_tags = []
+
+        for tag in ds_dict.keys():
+
+            if tag not in keep_tags:
+                remove_tags.append(tag)
+
+    if remove_tags is not None:
+
+        if not isinstance(remove_tags, list):
+            remove_tags = [remove_tags]
+
+        for tag in remove_tags:
+
+            tag_key = pydicom.datadict.tag_for_keyword(tag)
+            if tag_key is not None:
+                t = pydicom.tag.Tag(tag_key)
+                group_str = hex(t.group).replace("0x", "").zfill(4)
+                element_str = hex(t.element).replace("0x", "").zfill(4)
+                tag = f"{group_str}{element_str}"
+
+            if tag in ds_dict:
+                del ds_dict[tag]
+
     return pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
 
 
-def load_dvh(row):
+def load_dvh(row, struct_hash=None):
     """Loads an object's Dose Volume Histogram (DVH)
 
     Args:
         row (pd.Series): The row of the converted DataFrame for an RTDOSE
+        struct_hash (list|str, optional): The struct_hash (or list of struct_hashes) to load DVHs
+            for. When None all DVHs for RTDOSE will be loaded. Defaults to None.
 
     Raises:
         ValueError: Raised the the object described in the row is not an RTDOSE
@@ -115,6 +166,9 @@ def load_dvh(row):
 
     if not row.modality == "RTDOSE":
         raise ValueError("Row is not an RTDOSE")
+
+    if isinstance(struct_hash, str):
+        struct_hash = [struct_hash]
 
     row_path = Path(row.path)
 
@@ -130,6 +184,13 @@ def load_dvh(row):
 
     df_result = pd.DataFrame(columns=["patient", "struct_hash", "label", "cc", "mean"])
     for dvh_file in row_path.glob("dvh_*.csv"):
+
+        if struct_hash is not None:
+            file_struct_hash = dvh_file.name.replace("dvh_", "").replace(".csv", "")
+
+            if file_struct_hash not in struct_hash:
+                continue
+
         col_types = {"patient": str, "struct_hash": str, "label": str, "dose_hash": str}
         df_dvh = pd.read_csv(dvh_file, index_col=0, dtype=col_types)
         df_result = pd.concat([df_result, df_dvh])
@@ -217,7 +278,8 @@ def read_converted_data(
             logger.warning("Converted CSV doesn't exist for %s", pat_id)
             continue
 
-        df_converted = pd.read_csv(converted_csv, index_col=0)
+        col_types = {"patient_id": str, "hashed_uid": str}
+        df_converted = pd.read_csv(converted_csv, index_col=0, dtype=col_types)
         df = pd.concat([df, df_converted])
 
     # Make sure patient id is a string
