@@ -220,6 +220,7 @@ class AnalyseData:
 
             if len(dvh) == 0:
                 logger.warning("No DVHs found for %s", struct_hashes)
+                continue
 
             df = dvh[["patient", "struct_hash", "dose_hash", "label", "cc", "mean"]]
             df_d = calculate_d_x(dvh, d_point)
