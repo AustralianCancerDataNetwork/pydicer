@@ -27,6 +27,7 @@ from pydicer.constants import (
     CT_IMAGE_STORAGE_UID,
     PET_IMAGE_STORAGE_UID,
 )
+from pydicer.logger import PatientLogger
 
 logger = logging.getLogger(__name__)
 
@@ -328,6 +329,8 @@ class ConvertData:
 
             patient_directory = self.output_directory.joinpath(patient_id)
 
+            patient_logger = PatientLogger(patient_id, self.output_directory)
+
             # Grab the sop_class_uid, modality and for_uid (should be the same for all files in
             # series)
             sop_class_uid = df_files.sop_class_uid.unique()[0]
@@ -365,10 +368,9 @@ class ConvertData:
                             series_files = handle_missing_slice(df_files)
                         else:
                             # TODO Handle inconsistent slice spacing
-                            raise ValueError(
-                                "Slice Locations are not evenly spaced. Set "
-                                "interp_missing_slices to True to interpolate slices."
-                            )
+                            error = """Slice Locations are not evenly spaced. Set
+                                interp_missing_slices to True to interpolate slices."""
+                            patient_logger.log_module_error("convert", error)
 
                         output_dir.mkdir(exist_ok=True, parents=True)
 
@@ -415,7 +417,8 @@ class ConvertData:
                     # TODO handle rendering the masks even if we don't have an image series it's
                     # linked to
                     if len(df_linked_series) == 0:
-                        raise ValueError("Series Referenced by RTSTRUCT not found")
+                        error = "Series Referenced by RTSTRUCT not found"
+                        patient_logger.log_module_error("convert", error)
 
                     if not output_dir.exists() or force:
 
@@ -589,3 +592,5 @@ class ConvertData:
                         "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
                     )
                     copy_file_to_quarantine(Path(f), self.working_directory, e)
+                patient_logger.log_module_error("convert", e)
+        patient_logger.eval_module_process("convert", df_preprocess.patient_id.unique().tolist())
