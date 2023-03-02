@@ -1,3 +1,4 @@
+from datetime import datetime as dt
 import logging
 from pathlib import Path
 import SimpleITK as sitk
@@ -12,6 +13,7 @@ from pydicer.utils import (
     read_converted_data,
     get_iterator,
 )
+from pydicer.logger import PatientLogger
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +61,8 @@ class VisualiseData:
         for _, row in get_iterator(
             df_process.iterrows(), length=len(df_process), unit="objects", name="visualise"
         ):
+            convert_start_time = dt.now()
+            patient_logger = PatientLogger(row.patient_id, self.output_directory, force=False)
 
             if row.modality == "CT":
                 img_path = Path(row.path)
@@ -108,6 +112,13 @@ class VisualiseData:
                 )
                 plt.close(fig)
 
+                convert_end_time = dt.now()
+                patient_logger.eval_module_process(
+                    "visualise",
+                    row.hashed_uid,
+                    convert_start_time,
+                    convert_end_time,
+                )
                 logger.debug("Created CT visualisation: %s", vis_filename)
 
             # Visualise the structures on top of their linked image
@@ -158,6 +169,13 @@ class VisualiseData:
                     fig.savefig(vis_filename, dpi=fig.dpi)
                     plt.close(fig)
 
+                    convert_end_time = dt.now()
+                    patient_logger.eval_module_process(
+                        "visualise",
+                        row.hashed_uid,
+                        convert_start_time,
+                        convert_end_time,
+                    )
                     logger.info("Created structure visualisation: %s", vis_filename)
 
             # Next visualise the doses on top of their linked image
@@ -255,4 +273,11 @@ class VisualiseData:
                         fig.savefig(vis_filename, dpi=fig.dpi)
                         plt.close(fig)
 
+                        convert_end_time = dt.now()
+                        patient_logger.eval_module_process(
+                            "visualise",
+                            row.hashed_uid,
+                            convert_start_time,
+                            convert_end_time,
+                        )
                         logger.info("Created dose visualisation: %s", vis_filename)

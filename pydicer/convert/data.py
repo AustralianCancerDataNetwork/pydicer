@@ -1,3 +1,4 @@
+from datetime import datetime as dt
 import logging
 import tempfile
 import copy
@@ -323,13 +324,14 @@ class ConvertData:
             name="convert",
         ):
 
+            convert_start_time = dt.now()
             patient_id, _, series_uid = key
 
             logger.info("Converting data for patient: %s", patient_id)
 
             patient_directory = self.output_directory.joinpath(patient_id)
 
-            patient_logger = PatientLogger(patient_id, self.output_directory)
+            patient_logger = PatientLogger(patient_id, self.output_directory, force=False)
 
             # Grab the sop_class_uid, modality and for_uid (should be the same for all files in
             # series)
@@ -367,10 +369,17 @@ class ConvertData:
                         if config.get_config("interp_missing_slices"):
                             series_files = handle_missing_slice(df_files)
                         else:
+                            convert_end_time = dt.now()
                             # TODO Handle inconsistent slice spacing
-                            error = """Slice Locations are not evenly spaced. Set
+                            error_log = """Slice Locations are not evenly spaced. Set
                                 interp_missing_slices to True to interpolate slices."""
-                            patient_logger.log_module_error("convert", error)
+                            patient_logger.log_module_error(
+                                "convert",
+                                sop_instance_hash,
+                                error_log,
+                                convert_start_time,
+                                convert_end_time,
+                            )
 
                         output_dir.mkdir(exist_ok=True, parents=True)
 
@@ -391,6 +400,13 @@ class ConvertData:
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                     self.add_entry(entry)
+                    convert_end_time = dt.now()
+                    patient_logger.eval_module_process(
+                        "convert",
+                        sop_instance_hash,
+                        convert_start_time,
+                        convert_end_time,
+                    )
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
 
@@ -417,8 +433,15 @@ class ConvertData:
                     # TODO handle rendering the masks even if we don't have an image series it's
                     # linked to
                     if len(df_linked_series) == 0:
-                        error = "Series Referenced by RTSTRUCT not found"
-                        patient_logger.log_module_error("convert", error)
+                        convert_end_time = dt.now()
+                        error_log = "Series Referenced by RTSTRUCT not found"
+                        patient_logger.log_module_error(
+                            "convert",
+                            sop_instance_hash,
+                            error_log,
+                            convert_start_time,
+                            convert_end_time,
+                        )
 
                     if not output_dir.exists() or force:
 
@@ -470,6 +493,13 @@ class ConvertData:
                     ] = df_linked_series.sop_instance_uid.unique()[0]
 
                     self.add_entry(entry)
+                    convert_end_time = dt.now()
+                    patient_logger.eval_module_process(
+                        "convert",
+                        sop_instance_hash,
+                        convert_start_time,
+                        convert_end_time,
+                    )
 
                 elif sop_class_uid == PET_IMAGE_STORAGE_UID:
 
@@ -499,6 +529,13 @@ class ConvertData:
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                     self.add_entry(entry)
+                    convert_end_time = dt.now()
+                    patient_logger.eval_module_process(
+                        "convert",
+                        sop_instance_hash,
+                        convert_start_time,
+                        convert_end_time,
+                    )
 
                 elif sop_class_uid == RT_PLAN_STORAGE_UID:
 
@@ -530,6 +567,13 @@ class ConvertData:
                         entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                         self.add_entry(entry)
+                        convert_end_time = dt.now()
+                        patient_logger.eval_module_process(
+                            "convert",
+                            sop_instance_hash,
+                            convert_start_time,
+                            convert_end_time,
+                        )
 
                 elif sop_class_uid == RT_DOSE_STORAGE_UID:
 
@@ -569,6 +613,14 @@ class ConvertData:
                         entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                         self.add_entry(entry)
+
+                        convert_end_time = dt.now()
+                        patient_logger.eval_module_process(
+                            "convert",
+                            sop_instance_hash,
+                            convert_start_time,
+                            convert_end_time,
+                        )
                 else:
                     raise NotImplementedError(
                         "Unable to convert Series with SOP Class UID: {sop_class_uid} / "
@@ -578,6 +630,7 @@ class ConvertData:
             except Exception as e:  # pylint: disable=broad-except
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
+                convert_end_time = dt.now()
                 logger.error(
                     "Unable to convert series for patient: %s with UID: %s", patient_id, series_uid
                 )
@@ -592,5 +645,10 @@ class ConvertData:
                         "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
                     )
                     copy_file_to_quarantine(Path(f), self.working_directory, e)
-                patient_logger.log_module_error("convert", e)
-        patient_logger.eval_module_process("convert", df_preprocess.patient_id.unique().tolist())
+                patient_logger.log_module_error(
+                    "convert",
+                    sop_instance_hash,
+                    e,
+                    convert_start_time,
+                    convert_end_time,
+                )
