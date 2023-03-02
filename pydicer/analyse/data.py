@@ -1,4 +1,3 @@
-from datetime import datetime as dt
 import logging
 from pathlib import Path
 import re
@@ -215,7 +214,6 @@ class AnalyseData:
         for _, row in get_iterator(
             df_doses.iterrows(), length=len(df_doses), unit="objects", name="Compute Dose Metrics"
         ):
-            analyse_start_time = dt.now()
             patient_logger = PatientLogger(row.patient_id, self.output_directory, force=False)
 
             struct_hashes = df_process[
@@ -237,13 +235,7 @@ class AnalyseData:
 
             df_result = pd.concat([df_result, df])
 
-            analyse_end_time = dt.now()
-            patient_logger.eval_module_process(
-                "analyse_compute_dose_metrics",
-                row.hashed_uid,
-                analyse_start_time,
-                analyse_end_time,
-            )
+            patient_logger.eval_module_process("analyse_compute_dose_metrics", row.hashed_uid)
 
         return df_result
 
@@ -327,7 +319,6 @@ class AnalyseData:
         for _, struct_row in get_iterator(
             df_structs.iterrows(), length=len(df_structs), unit="objects", name="Compute Radiomics"
         ):
-            analyse_start_time = dt.now()
             patient_logger = PatientLogger(
                 struct_row.patient_id, self.output_directory, force=False
             )
@@ -466,12 +457,8 @@ class AnalyseData:
                 output_frame.columns = columns
 
                 output_frame.to_csv(struct_radiomics_path)
-                analyse_end_time = dt.now()
                 patient_logger.eval_module_process(
-                    "analyse_compute_radiomics",
-                    struct_row.hashed_uid,
-                    analyse_start_time,
-                    analyse_end_time,
+                    "analyse_compute_radiomics", struct_row.hashed_uid
                 )
 
     def compute_dvh(
