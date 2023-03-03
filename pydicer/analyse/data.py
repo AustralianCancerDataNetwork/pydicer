@@ -24,6 +24,7 @@ from pydicer.utils import (
     read_converted_data,
     get_iterator,
 )
+from pydicer.logger import PatientLogger
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,7 @@ class AnalyseData:
 
     def __init__(self, working_directory="."):
         self.working_directory = Path(working_directory)
+        self.output_directory = self.working_directory.joinpath(CONVERTED_DIR_NAME)
 
     def get_all_computed_radiomics_for_dataset(
         self, dataset_name=CONVERTED_DIR_NAME, patient=None
@@ -212,6 +214,8 @@ class AnalyseData:
         for _, row in get_iterator(
             df_doses.iterrows(), length=len(df_doses), unit="objects", name="Compute Dose Metrics"
         ):
+            patient_logger = PatientLogger(row.patient_id, self.output_directory, force=False)
+
             struct_hashes = df_process[
                 (df_process.for_uid == row.for_uid) & (df_process.modality == "RTSTRUCT")
             ].hashed_uid.tolist()
@@ -230,6 +234,8 @@ class AnalyseData:
             df = df.loc[:, ~df.columns.duplicated()]
 
             df_result = pd.concat([df_result, df])
+
+            patient_logger.eval_module_process("analyse_compute_dose_metrics", row.hashed_uid)
 
         return df_result
 
@@ -313,6 +319,10 @@ class AnalyseData:
         for _, struct_row in get_iterator(
             df_structs.iterrows(), length=len(df_structs), unit="objects", name="Compute Radiomics"
         ):
+            patient_logger = PatientLogger(
+                struct_row.patient_id, self.output_directory, force=False
+            )
+
             struct_dir = Path(struct_row.path)
 
             # Find the linked image
@@ -447,6 +457,9 @@ class AnalyseData:
                 output_frame.columns = columns
 
                 output_frame.to_csv(struct_radiomics_path)
+                patient_logger.eval_module_process(
+                    "analyse_compute_radiomics", struct_row.hashed_uid
+                )
 
     def compute_dvh(
         self,

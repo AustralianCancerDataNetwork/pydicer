@@ -27,6 +27,7 @@ from pydicer.constants import (
     CT_IMAGE_STORAGE_UID,
     PET_IMAGE_STORAGE_UID,
 )
+from pydicer.logger import PatientLogger
 
 logger = logging.getLogger(__name__)
 
@@ -328,6 +329,8 @@ class ConvertData:
 
             patient_directory = self.output_directory.joinpath(patient_id)
 
+            patient_logger = PatientLogger(patient_id, self.output_directory, force=False)
+
             # Grab the sop_class_uid, modality and for_uid (should be the same for all files in
             # series)
             sop_class_uid = df_files.sop_class_uid.unique()[0]
@@ -365,9 +368,10 @@ class ConvertData:
                             series_files = handle_missing_slice(df_files)
                         else:
                             # TODO Handle inconsistent slice spacing
-                            raise ValueError(
-                                "Slice Locations are not evenly spaced. Set "
-                                "interp_missing_slices to True to interpolate slices."
+                            error_log = """Slice Locations are not evenly spaced. Set
+                                interp_missing_slices to True to interpolate slices."""
+                            patient_logger.log_module_error(
+                                "convert", sop_instance_hash, error_log
                             )
 
                         output_dir.mkdir(exist_ok=True, parents=True)
@@ -389,6 +393,7 @@ class ConvertData:
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                     self.add_entry(entry)
+                    patient_logger.eval_module_process("convert", sop_instance_hash)
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
 
@@ -415,7 +420,8 @@ class ConvertData:
                     # TODO handle rendering the masks even if we don't have an image series it's
                     # linked to
                     if len(df_linked_series) == 0:
-                        raise ValueError("Series Referenced by RTSTRUCT not found")
+                        error_log = "Series Referenced by RTSTRUCT not found"
+                        patient_logger.log_module_error("convert", sop_instance_hash, error_log)
 
                     if not output_dir.exists() or force:
 
@@ -467,6 +473,10 @@ class ConvertData:
                     ] = df_linked_series.sop_instance_uid.unique()[0]
 
                     self.add_entry(entry)
+                    patient_logger.eval_module_process(
+                        "convert",
+                        sop_instance_hash,
+                    )
 
                 elif sop_class_uid == PET_IMAGE_STORAGE_UID:
 
@@ -496,6 +506,7 @@ class ConvertData:
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                     self.add_entry(entry)
+                    patient_logger.eval_module_process("convert", sop_instance_hash)
 
                 elif sop_class_uid == RT_PLAN_STORAGE_UID:
 
@@ -527,6 +538,7 @@ class ConvertData:
                         entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                         self.add_entry(entry)
+                        patient_logger.eval_module_process("convert", sop_instance_hash)
 
                 elif sop_class_uid == RT_DOSE_STORAGE_UID:
 
@@ -566,6 +578,8 @@ class ConvertData:
                         entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                         self.add_entry(entry)
+
+                        patient_logger.eval_module_process("convert", sop_instance_hash)
                 else:
                     raise NotImplementedError(
                         "Unable to convert Series with SOP Class UID: {sop_class_uid} / "
@@ -589,3 +603,4 @@ class ConvertData:
                         "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
                     )
                     copy_file_to_quarantine(Path(f), self.working_directory, e)
+                patient_logger.log_module_error("convert", sop_instance_hash, e)
