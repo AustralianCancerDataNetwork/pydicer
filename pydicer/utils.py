@@ -141,9 +141,9 @@ def load_object_metadata(row, keep_tags=None, remove_tags=None):
                 t = pydicom.tag.Tag(tag_key)
                 group_str = hex(t.group).replace("0x", "").zfill(4)
                 element_str = hex(t.element).replace("0x", "").zfill(4)
-                tag = f"{group_str}{element_str}"
+                tag = f"{group_str}{element_str}".upper()
 
-            if tag.upper() in ds_dict:
+            if tag in ds_dict:
                 del ds_dict[tag]
 
     return pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
