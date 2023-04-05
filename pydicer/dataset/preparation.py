@@ -1,5 +1,6 @@
-import os
+import json
 import logging
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -7,7 +8,7 @@ import pandas as pd
 from pydicer.constants import CONVERTED_DIR_NAME
 
 from pydicer.dataset import functions
-from pydicer.utils import read_converted_data
+from pydicer.utils import read_converted_data, map_contour_name
 
 logger = logging.getLogger(__name__)
 
@@ -127,3 +128,109 @@ class PrepareDataset:
         df_clean_data = preparation_function(df_converted, **kwargs)
 
         self.prepare_from_dataframe(dataset_name, df_clean_data)
+
+
+class MapStructureSetNomenclature:
+    """Class to handle the mapping of structure set nomenclature"""
+
+    def __init__(self, working_directory: Path):
+        self.working_directory = Path(working_directory)
+        self.project_structs_map_path = self.working_directory.joinpath(".pydicer").joinpath(
+            "structures_map.json"
+        )
+
+    def map_project_structure_set_names(
+        self,
+    ):
+        """Function to perform the mapping of all structures in the converted "data" folder using
+        a project-wide mapping file
+        """
+        try:
+            with open(self.project_structs_map_path, "r", encoding="utf8") as structs_map_file:
+                struct_map_dict = json.load(structs_map_file)["structures"]
+                pat_ids = read_converted_data(self.working_directory).patient_id.unique()
+                # Get all patients
+                for pat_id in pat_ids:
+                    pat_struct_sets_path = (
+                        self.working_directory.joinpath("data")
+                        .joinpath(pat_id)
+                        .joinpath("structures")
+                    )
+                    # Get all structure sets for this patient
+                    for p in pat_struct_sets_path.rglob("*"):
+                        if p.is_dir():
+                            df = pd.DataFrame(columns=["old_structure_name", "path_to_structure"])
+                            # Grab the names of the structures for this set, as well as the paths
+                            # to these NifTi files
+                            df.old_structure_name, df.path_to_structure = (
+                                [
+                                    str(x.name.strip(".nii.gz"))
+                                    for x in p.glob("*nii.gz")
+                                    if x.is_file()
+                                ],
+                                [str(x) for x in p.glob("*nii.gz") if x.is_file()],
+                            )
+                            logger.debug("Mapping names for structure set: %s", p.name)
+                            df.apply(
+                                lambda x: map_contour_name(
+                                    x.old_structure_name,
+                                    x.path_to_structure,
+                                    struct_map_dict,
+                                    "Project",
+                                ),
+                                axis=1,
+                            )
+        except FileNotFoundError:
+            logger.error(
+                """'%s' structures mapping file not
+                found for the project!""",
+                self.project_structs_map_path,
+            )
+
+    def map_specific_structure_set_names(
+        self, struct_set_id, mapping_file_name="structures_map.json"
+    ):
+        """Function to map a specific structure set structures' names according to its own mapping
+        file.
+
+        Args:
+            struct_set_id (str): the hashed id of the structure set to be mapped
+            mapping_file_name (str, optional): name of the mapping file that must sit under the
+            "struct_set_id" directory. Defaults to "structures_map.json".
+        """
+        try:
+            df_converted = read_converted_data(self.working_directory)
+            patient_structs_map_path = Path(
+                df_converted[df_converted.hashed_uid == struct_set_id].path.iloc[0]
+            )
+            with open(
+                patient_structs_map_path.joinpath(mapping_file_name), "r", encoding="utf8"
+            ) as structs_map_file:
+                struct_map_dict = json.load(structs_map_file)["structures"]
+                if patient_structs_map_path.is_dir():
+                    df = pd.DataFrame(columns=["old_structure_name", "path_to_structure"])
+                    # Grab the names of the structures for this set, as well as the paths
+                    # to these NifTi files
+                    df.old_structure_name, df.path_to_structure = (
+                        [
+                            str(x.name.strip(".nii.gz"))
+                            for x in patient_structs_map_path.glob("*nii.gz")
+                            if x.is_file()
+                        ],
+                        [str(x) for x in patient_structs_map_path.glob("*nii.gz") if x.is_file()],
+                    )
+                    logger.debug(
+                        "Mapping names for structure set: %s", patient_structs_map_path.name
+                    )
+                    df.apply(
+                        lambda x: map_contour_name(
+                            x.old_structure_name, x.path_to_structure, struct_map_dict, "Patient"
+                        ),
+                        axis=1,
+                    )
+        except FileNotFoundError:
+            logger.error(
+                """ '%s' structures mapping file not
+                found for patient ({pat_id}) structure set ({struct_set_id})!""",
+                mapping_file_name,
+            )

@@ -373,3 +373,29 @@ def get_iterator(iterable, length=None, unit="it", name=None):
         )
 
     return iterator
+
+
+def map_contour_name(struct_name, path_to_struct, struct_map_dict, level):
+    """Function to map a structure's name according to a mapping dictionary
+
+    Args:
+        struct_name (str): the structure name to be mapped. If the name is remapped according to the
+        mapping file, then the structure NifTi file is renamed with the mapped name
+        path_to_struct (str): path to the structure to be mapped
+        struct_map_dict (dict): the mapping dictionary
+        level (str): the mapping level, either project-wide (all structures under "data") or defined
+        by a structure set id
+    """
+    # Check if the structure name needs to be mapped
+    mapped_struct_name_set = {i for i in struct_map_dict if struct_name in struct_map_dict[i]}
+
+    # If not true, then either the structure name is already in mapped form, or the structure name
+    # is not being captured in the specific mapping dictionary
+    if len(mapped_struct_name_set) > 0:
+        mapped_struct_name = mapped_struct_name_set.pop()
+        path_to_struct = Path(path_to_struct)
+        path_to_struct.rename(path_to_struct.parent.joinpath(f"{mapped_struct_name}.nii.gz"))
+        print(
+            f"""{level}-level mapping found for structure:
+            {struct_name} -> {mapped_struct_name}"""
+        )
