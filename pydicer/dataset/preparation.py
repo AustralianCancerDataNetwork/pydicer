@@ -8,7 +8,7 @@ import pandas as pd
 from pydicer.constants import CONVERTED_DIR_NAME
 
 from pydicer.dataset import functions
-from pydicer.utils import read_converted_data, map_contour_name
+from pydicer.utils import read_converted_data, map_all_structures_in_set
 
 logger = logging.getLogger(__name__)
 
@@ -158,28 +158,7 @@ class MapStructureSetNomenclature:
                     )
                     # Get all structure sets for this patient
                     for p in pat_struct_sets_path.rglob("*"):
-                        if p.is_dir():
-                            df = pd.DataFrame(columns=["old_structure_name", "path_to_structure"])
-                            # Grab the names of the structures for this set, as well as the paths
-                            # to these NifTi files
-                            df.old_structure_name, df.path_to_structure = (
-                                [
-                                    str(x.name.strip(".nii.gz"))
-                                    for x in p.glob("*nii.gz")
-                                    if x.is_file()
-                                ],
-                                [str(x) for x in p.glob("*nii.gz") if x.is_file()],
-                            )
-                            logger.debug("Mapping names for structure set: %s", p.name)
-                            df.apply(
-                                lambda x: map_contour_name(
-                                    x.old_structure_name,
-                                    x.path_to_structure,
-                                    struct_map_dict,
-                                    "Project",
-                                ),
-                                axis=1,
-                            )
+                        map_all_structures_in_set(p, struct_map_dict, "Project")
         except FileNotFoundError:
             logger.error(
                 """'%s' structures mapping file not
@@ -200,34 +179,14 @@ class MapStructureSetNomenclature:
         """
         try:
             df_converted = read_converted_data(self.working_directory)
-            patient_structs_map_path = Path(
+            patient_structs_set_path = Path(
                 df_converted[df_converted.hashed_uid == struct_set_id].path.iloc[0]
             )
             with open(
-                patient_structs_map_path.joinpath(mapping_file_name), "r", encoding="utf8"
+                patient_structs_set_path.joinpath(mapping_file_name), "r", encoding="utf8"
             ) as structs_map_file:
                 struct_map_dict = json.load(structs_map_file)["structures"]
-                if patient_structs_map_path.is_dir():
-                    df = pd.DataFrame(columns=["old_structure_name", "path_to_structure"])
-                    # Grab the names of the structures for this set, as well as the paths
-                    # to these NifTi files
-                    df.old_structure_name, df.path_to_structure = (
-                        [
-                            str(x.name.strip(".nii.gz"))
-                            for x in patient_structs_map_path.glob("*nii.gz")
-                            if x.is_file()
-                        ],
-                        [str(x) for x in patient_structs_map_path.glob("*nii.gz") if x.is_file()],
-                    )
-                    logger.debug(
-                        "Mapping names for structure set: %s", patient_structs_map_path.name
-                    )
-                    df.apply(
-                        lambda x: map_contour_name(
-                            x.old_structure_name, x.path_to_structure, struct_map_dict, "Patient"
-                        ),
-                        axis=1,
-                    )
+                map_all_structures_in_set(patient_structs_set_path, struct_map_dict, "Patient")
         except FileNotFoundError:
             logger.error(
                 """ '%s' structures mapping file not
