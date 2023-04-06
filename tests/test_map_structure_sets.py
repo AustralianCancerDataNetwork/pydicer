@@ -52,5 +52,77 @@ def test_map_single_structure_set(test_data):
     assert mapped_structure_name.is_file()
     assert not structure_name.is_file()
 
-    # Remove mapping file for this structure set
-    mapping_file.unlink()
+
+def test_map_project_structure_set(test_data):
+
+    # Create mapping file for the project and write to ".pydicer" directory
+    mapping_dict = {"structures": {"BRAINSTEM": ["brainstem", "Brainstem"]}}
+
+    pat_0019_struct_set = (
+        test_data.joinpath("data")
+        .joinpath("HNSCC-01-0019")
+        .joinpath("structures")
+        .joinpath("7cdcd9")
+    )
+
+    pat_0176_struct_set = (
+        test_data.joinpath("data")
+        .joinpath("HNSCC-01-0176")
+        .joinpath("structures")
+        .joinpath("cbbf5b")
+    )
+
+    pat_0199_struct_set = (
+        test_data.joinpath("data")
+        .joinpath("HNSCC-01-0199")
+        .joinpath("structures")
+        .joinpath("06e49c")
+    )
+
+    correct_mappings = {
+        "patients": [
+            {
+                "patient_id": "HNSCC-01-0019",
+                "mappings": {
+                    "filepaths": {
+                        pat_0019_struct_set.joinpath(
+                            "Brainstem.nii.gz"
+                        ): pat_0019_struct_set.joinpath("BRAINSTEM.nii.gz")
+                    }
+                },
+            },
+            {
+                "patient_id": "HNSCC-01-0176",
+                "mappings": {
+                    "filepaths": {
+                        pat_0176_struct_set.joinpath(
+                            "brainstem.nii.gz"
+                        ): pat_0176_struct_set.joinpath("BRAINSTEM.nii.gz")
+                    },
+                },
+            },
+            {
+                "patient_id": "HNSCC-01-0199",
+                "mappings": {
+                    "filepaths": {
+                        pat_0199_struct_set.joinpath(
+                            "Brainstem.nii.gz"
+                        ): pat_0199_struct_set.joinpath("BRAINSTEM.nii.gz")
+                    }
+                },
+            },
+        ]
+    }
+
+    mapping_file = test_data.joinpath(".pydicer").joinpath("structures_map.json")
+
+    with mapping_file.open("w", encoding="utf-8") as f:
+        json.dump(mapping_dict, f)
+
+    stan = MapStructureSetNomenclature(test_data)
+    stan.map_project_structure_set_names()
+
+    # Assert new brainstem niftis are now there
+    assert list(correct_mappings["patients"][0]["mappings"]["filepaths"].values())[0].is_file()
+    assert list(correct_mappings["patients"][1]["mappings"]["filepaths"].values())[0].is_file()
+    assert list(correct_mappings["patients"][2]["mappings"]["filepaths"].values())[0].is_file()
