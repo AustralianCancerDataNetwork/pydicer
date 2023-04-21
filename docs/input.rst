@@ -16,6 +16,13 @@ Input
 ----
 
 
+.. automodule:: pydicer.input.orthanc
+    :members:
+
+
+----
+
+
 .. automodule:: pydicer.input.tcia
     :members:
 
