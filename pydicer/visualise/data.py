@@ -98,7 +98,7 @@ class VisualiseData:
                     va="top",
                     size=fs,
                     wrap=True,
-                    bbox=dict(boxstyle="square", fc="w", ec="r"),
+                    bbox={"boxstyle": "square", "fc": "w", "ec": "r"},
                 )
 
                 fig.savefig(
