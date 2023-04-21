@@ -23,6 +23,7 @@ from pydicer.utils import (
     parse_patient_kwarg,
     read_converted_data,
     get_iterator,
+    get_structures_linked_to_dose,
 )
 from pydicer.logger import PatientLogger
 
@@ -129,7 +130,11 @@ class AnalyseData:
         df_result = pd.DataFrame(columns=["patient", "struct_hash", "dose_hash", "label"])
         for _, dose_row in df_data[df_data["modality"] == "RTDOSE"].iterrows():
 
-            df_result = pd.concat([df_result, load_dvh(dose_row)])
+            struct_hashes = df_data[
+                (df_data.for_uid == dose_row.for_uid) & (df_data.modality == "RTSTRUCT")
+            ].hashed_uid.tolist()
+
+            df_result = pd.concat([df_result, load_dvh(dose_row, struct_hash=struct_hashes)])
 
         return df_result
 
@@ -216,9 +221,32 @@ class AnalyseData:
         ):
             patient_logger = PatientLogger(row.patient_id, self.output_directory, force=False)
 
-            struct_hashes = df_process[
-                (df_process.for_uid == row.for_uid) & (df_process.modality == "RTSTRUCT")
-            ].hashed_uid.tolist()
+            ## Currently doses are linked via: plan -> struct -> image
+
+            # Find the linked plan
+            df_linked_plan = df_process[
+                df_process["sop_instance_uid"] == row.referenced_sop_instance_uid
+            ]
+
+            if len(df_linked_plan) == 0:
+                logger.warning("No linked plans found for dose: %s", row.sop_instance_uid)
+
+            # Find the linked structure set
+            df_linked_struct = None
+            if len(df_linked_plan) > 0:
+                plan_row = df_linked_plan.iloc[0]
+                df_linked_struct = df_process[
+                    df_process["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
+                ]
+
+            # Also link via Frame of Reference
+            df_for_linked = df_process[
+                (df_process["modality"] == "RTSTRUCT") & (df_process["for_uid"] == row.for_uid)
+            ]
+
+            struct_hashes = (
+                df_linked_struct.hashed_uid.tolist() + df_for_linked.hashed_uid.tolist()
+            )
 
             dvh = load_dvh(row, struct_hash=struct_hashes)
 
@@ -504,9 +532,6 @@ class AnalyseData:
                 self.working_directory, dataset_name=dataset_name, patients=patient
             )
 
-        # Read all converted data for linkage
-        df_converted = read_converted_data(self.working_directory)
-
         if structure_meta_data_cols is None:
             structure_meta_data_cols = []
 
@@ -521,41 +546,14 @@ class AnalyseData:
         for _, dose_row in get_iterator(
             df_doses.iterrows(), length=len(df_doses), unit="objects", name="Compute DVH"
         ):
-            ## Currently doses are linked via: plan -> struct -> image
             dose_meta_data = load_object_metadata(dose_row)
 
-            # Find the linked plan
-            df_linked_plan = df_converted[
-                df_converted["sop_instance_uid"] == dose_row.referenced_sop_instance_uid
-            ]
-
-            if len(df_linked_plan) == 0:
-                logger.warning("No linked plans found for dose: %s", dose_row.sop_instance_uid)
-
-            # Find the linked structure set
-            df_linked_struct = None
-            if len(df_linked_plan) > 0:
-                plan_row = df_linked_plan.iloc[0]
-                df_linked_struct = df_converted[
-                    df_converted["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
-                ]
-
-            # Also link via Frame of Reference
-            df_for_linked = df_converted[
-                (df_converted["modality"] == "RTSTRUCT")
-                & (df_converted["for_uid"] == dose_row.for_uid)
-            ]
-
-            if df_linked_struct is None:
-                df_linked_struct = df_for_linked
-            else:
-                df_linked_struct = pd.concat([df_linked_struct, df_for_linked])
-
-            # Drop in case a structure was linked twice
-            df_linked_struct = df_linked_struct.drop_duplicates()
+            df_linked_struct = get_structures_linked_to_dose(self.working_directory, dose_row)
 
             if len(df_linked_struct) == 0:
-                logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
+                logger.warning(
+                    "No linked structures found for dose: %s", dose_row.sop_instance_uid
+                )
 
             dose_file = Path(dose_row.path).joinpath("RTDOSE.nii.gz")
 

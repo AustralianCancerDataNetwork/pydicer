@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
 import SimpleITK as sitk
-import pandas as pd
 import matplotlib.pyplot as plt
 from platipy.imaging import ImageVisualiser
 from pydicer.constants import CONVERTED_DIR_NAME
@@ -11,6 +10,7 @@ from pydicer.utils import (
     load_object_metadata,
     read_converted_data,
     get_iterator,
+    get_structures_linked_to_dose,
 )
 from pydicer.logger import PatientLogger
 
@@ -53,9 +53,6 @@ class VisualiseData:
 
         visualise_modalities = ["CT", "RTSTRUCT", "RTDOSE"]
         df_process = df_process[df_process.modality.isin(visualise_modalities)]
-
-        # Read all converted data for linkage
-        df_converted = read_converted_data(self.working_directory)
 
         for _, row in get_iterator(
             df_process.iterrows(), length=len(df_process), unit="objects", name="visualise"
@@ -167,35 +164,7 @@ class VisualiseData:
             # Next visualise the doses on top of their linked image
             if row.modality == "RTDOSE":
 
-                # Find the linked plan
-                df_linked_plan = df_converted[
-                    df_converted["sop_instance_uid"] == row.referenced_sop_instance_uid
-                ]
-
-                if len(df_linked_plan) == 0:
-                    logger.warning("No linked plans found for dose: %s", row.sop_instance_uid)
-
-                # Find the linked structure set
-                df_linked_struct = None
-                if len(df_linked_plan) > 0:
-                    plan_row = df_linked_plan.iloc[0]
-                    df_linked_struct = df_converted[
-                        df_converted["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
-                    ]
-
-                # Also link via Frame of Reference
-                df_for_linked = df_converted[
-                    (df_converted["modality"] == "RTSTRUCT")
-                    & (df_converted["for_uid"] == row.for_uid)
-                ]
-
-                if df_linked_struct is None:
-                    df_linked_struct = df_for_linked
-                else:
-                    df_linked_struct = pd.concat([df_linked_struct, df_for_linked])
-
-                # Drop in case a structure was linked twice
-                df_linked_struct = df_linked_struct.drop_duplicates()
+                df_linked_struct = get_structures_linked_to_dose(self.working_directory, row)
 
                 if len(df_linked_struct) == 0:
                     logger.warning("No linked structures found for dose: %s", row.sop_instance_uid)
