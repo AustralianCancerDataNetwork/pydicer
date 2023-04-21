@@ -37,7 +37,7 @@ jobs:
         run: |
           poetry run pip install --upgrade pip
           poetry install
-          pip install "pyradiomics>=3.0.1"
+          poetry run pip install "pyradiomics>=3.0.1"
       - name: Lint with Pylint
         run: |
           poetry run pylint pydicer
