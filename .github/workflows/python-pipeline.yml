@@ -36,8 +36,8 @@ jobs:
         # TODO remove this once https://github.com/AIM-Harvard/pyradiomics/pull/761 lands
         run: |
           poetry run pip install --upgrade pip
-          poetry run pip install numpy
           poetry install
+          pip install "pyradiomics>=3.0.1"
       - name: Lint with Pylint
         run: |
           poetry run pylint pydicer
