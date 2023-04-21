@@ -21,6 +21,7 @@ argparse = ">=1.4.0"
 pyradiomics = ">=3.0.1"
 seaborn = "^0.12.0"
 tqdm = "^4.55.1"
+scikit-learn = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.13.5"
