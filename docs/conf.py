@@ -52,7 +52,7 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "site"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -70,31 +70,8 @@ html_static_path = ["_static"]
 
 html_show_sphinx = False
 
-# Define the file extensions we want to copy
-extensions_to_copy = ["md"]
-
-# Remove any leftover files from the docs directory first
-files = []
-for ext in extensions_to_copy:
-    files += Path(".").glob(f"**/*.{ext}")
-for file in files:
-    os.remove(file)
-
 # Copy in the files from the other repository directories to have them
 # be rendered by Sphinx
-files = []
-for ext in extensions_to_copy:
-    files += Path("..").glob(f"**/*.{ext}")
-for file in files:
-
-    # Only do this for files not in the docs directory
-    if file.parts[1] == "docs":
-        continue
-
-    target_file = file.relative_to("..")
-    target_file.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(file, target_file)
-
 shutil.rmtree("_examples", ignore_errors=True)
 os.mkdir("_examples")
 shutil.copy("../examples/Pipeline.ipynb", "_examples/Pipeline.ipynb")

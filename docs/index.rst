@@ -18,3 +18,4 @@
    convert
    visualise
    dataset
+   analyse
