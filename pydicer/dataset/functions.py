@@ -14,6 +14,7 @@ def rt_latest_struct(df, **kwargs):
 
     Example of matching the latest structure set with Series Description being "FINAL" or
     "APPROVED"
+
     .. code-block:: python
 
         prepare_dataset = PrepareDataset(working_directory)
@@ -110,6 +111,7 @@ def rt_latest_dose(df, **kwargs):
     lists of values to these, one of which should match to select that series.
 
     Example of matching the latest dose with Series Description being "FINAL" or "APPROVED"
+
     .. code-block:: python
 
         prepare_dataset = PrepareDataset(working_directory)

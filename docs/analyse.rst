@@ -1,6 +1,6 @@
 #####################
-Visualisation
+Analyse
 #####################
 
-.. automodule:: pydicer.visualise.data
+.. automodule:: pydicer.analyse.data
     :members:

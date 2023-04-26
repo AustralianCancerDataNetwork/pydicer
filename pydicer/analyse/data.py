@@ -8,7 +8,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from radiomics import firstorder, shape, glcm, glrlm, glszm, ngtdm, gldm, imageoperations
 from platipy.imaging.dose.dvh import (
     calculate_dvh_for_labels,
     calculate_d_x,
@@ -29,27 +28,13 @@ from pydicer.logger import PatientLogger
 
 logger = logging.getLogger(__name__)
 
+
 PYRAD_DEFAULT_SETTINGS = {
     "binWidth": 25,
     "resampledPixelSpacing": None,
     "interpolator": "sitkNearestNeighbor",
     "verbose": True,
     "removeOutliers": 10000,
-}
-
-AVAILABLE_RADIOMICS = {
-    "firstorder": firstorder.RadiomicsFirstOrder,
-    "shape": shape.RadiomicsShape,
-    "glcm": glcm.RadiomicsGLCM,
-    "glrlm": glrlm.RadiomicsGLRLM,
-    "glszm": glszm.RadiomicsGLSZM,
-    "ngtdm": ngtdm.RadiomicsNGTDM,
-    "gldm": gldm.RadiomicsGLDM,
-}
-
-FIRST_ORDER_FEATURES = firstorder.RadiomicsFirstOrder.getFeatureNames()
-DEFAULT_RADIOMICS = {
-    "firstorder": [f for f in FIRST_ORDER_FEATURES if not FIRST_ORDER_FEATURES[f]]
 }
 
 
@@ -314,6 +299,48 @@ class AnalyseData:
         Raises:
             ValueError: Raised if patient is not None, a list of strings or a string.
         """
+
+        # Begin pyradiomics workaround
+        # This code should be moved back to the top of this file once pyradiomics integration into
+        # poetry issue is resolved: https://github.com/AIM-Harvard/pyradiomics/issues/787
+
+        try:
+            # pylint: disable=import-outside-toplevel
+            from radiomics import (
+                firstorder,
+                shape,
+                glcm,
+                glrlm,
+                glszm,
+                ngtdm,
+                gldm,
+                imageoperations,
+            )
+        except ImportError:
+            print(
+                "Due to some limitations in the current version of pyradiomics, pyradiomics "
+                "must be installed separately. Please run `pip install pyradiomics` to use the "
+                "compute radiomics functionality."
+            )
+            return
+
+        # pylint: disable=invalid-name
+        AVAILABLE_RADIOMICS = {
+            "firstorder": firstorder.RadiomicsFirstOrder,
+            "shape": shape.RadiomicsShape,
+            "glcm": glcm.RadiomicsGLCM,
+            "glrlm": glrlm.RadiomicsGLRLM,
+            "glszm": glszm.RadiomicsGLSZM,
+            "ngtdm": ngtdm.RadiomicsNGTDM,
+            "gldm": gldm.RadiomicsGLDM,
+        }
+
+        FIRST_ORDER_FEATURES = firstorder.RadiomicsFirstOrder.getFeatureNames()
+        DEFAULT_RADIOMICS = {
+            "firstorder": [f for f in FIRST_ORDER_FEATURES if not FIRST_ORDER_FEATURES[f]]
+        }
+
+        # End pyradiomics workaround
 
         if patient is not None and df_process is not None:
             raise ValueError("Only one of patient and df_process pay be provided.")
