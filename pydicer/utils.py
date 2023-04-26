@@ -373,3 +373,48 @@ def get_iterator(iterable, length=None, unit="it", name=None):
         )
 
     return iterator
+
+
+def get_structures_linked_to_dose(working_directory: Path, dose_row: pd.Series) -> pd.DataFrame:
+    """Get the structure sets which are linked to a dose object.
+
+    Args:
+        working_directory (Path): The PyDicer working folder.
+        dose_row (pd.Series): The row from the converted data describing the dose object.
+
+    Returns:
+        pd.DataFrame: The data frame containing structure sets linked to row.
+    """
+    # Currently doses are linked via: plan -> struct -> image
+    df_converted = read_converted_data(working_directory)
+
+    # Find the linked plan
+    df_linked_plan = df_converted[
+        df_converted["sop_instance_uid"] == dose_row.referenced_sop_instance_uid
+    ]
+
+    if len(df_linked_plan) == 0:
+        logger.warning("No linked plans found for dose: %s", dose_row.sop_instance_uid)
+
+    # Find the linked structure set
+    df_linked_struct = None
+    if len(df_linked_plan) > 0:
+        plan_row = df_linked_plan.iloc[0]
+        df_linked_struct = df_converted[
+            df_converted["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
+        ]
+
+    # Also link via Frame of Reference
+    df_for_linked = df_converted[
+        (df_converted["modality"] == "RTSTRUCT") & (df_converted["for_uid"] == dose_row.for_uid)
+    ]
+
+    if df_linked_struct is None:
+        df_linked_struct = df_for_linked
+    else:
+        df_linked_struct = pd.concat([df_linked_struct, df_for_linked])
+
+    # Drop in case a structure was linked twice
+    df_linked_struct = df_linked_struct.drop_duplicates()
+
+    return df_linked_struct
