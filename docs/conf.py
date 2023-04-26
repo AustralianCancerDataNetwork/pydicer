@@ -18,8 +18,6 @@ import sys
 import shutil
 import datetime
 
-from pathlib import Path
-
 sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -----------------------------------------------------
