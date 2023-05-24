@@ -2,9 +2,9 @@ import logging
 from io import BytesIO
 
 import pydicom
+from pyorthanc.deprecated.client import Orthanc
 
-from pyorthanc import Orthanc
-
+from pydicer.utils import get_iterator
 from pydicer.input.base import InputBase
 
 logger = logging.getLogger(__name__)
@@ -73,7 +73,7 @@ class OrthancInput(InputBase):
         ):
             modalities = [modalities]
 
-        for patient in patients:
+        for patient in get_iterator(patients, unit="patients", name="Orthanc Fetch"):
 
             # Find the Orthanc ID for this patient
             orthanc_patient_ids = self.orthanc.c_find(

@@ -15,7 +15,7 @@ from pydicer.config import PyDicerConfig
 from pydicer.convert.pt import convert_dicom_to_nifti_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.convert.headers import convert_dicom_headers
-from pydicer.utils import hash_uid, read_preprocessed_data
+from pydicer.utils import hash_uid, read_preprocessed_data, get_iterator
 from pydicer.quarantine.treat import copy_file_to_quarantine
 
 from pydicer.constants import (
@@ -28,6 +28,7 @@ from pydicer.constants import (
     PET_IMAGE_STORAGE_UID,
     MR_IMAGE_STORAGE_UID
 )
+from pydicer.logger import PatientLogger
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +49,23 @@ DATA_OBJECT_COLUMNS = [
     "referenced_sop_instance_uid",
     "path",
 ]
+
+
+def get_object_type(sop_class_uid):
+    """Get the type of the object (used for the output path)
+
+    Args:
+        sop_class_uid (str): The SOP Class UID of the object
+
+    Returns:
+        str: The object type
+    """
+    object_type = "other"
+    for ot, sops in OBJECT_TYPES.items():
+        if sop_class_uid in sops:
+            object_type = ot
+
+    return object_type
 
 
 def handle_missing_slice(files):
@@ -197,6 +215,7 @@ def handle_missing_slice(files):
 
                 df_files = pd.concat([df_files, pd.DataFrame([interp_df_row])])
                 df_files.sort_values(by="slice_location", inplace=True)
+
     return df_files.file_path.tolist()
 
 
@@ -252,7 +271,8 @@ class ConvertData:
         patient_directory = self.output_directory.joinpath(patient_id)
         converted_df_path = patient_directory.joinpath("converted.csv")
         if converted_df_path.exists():
-            df_pat_data = pd.read_csv(converted_df_path, index_col=0)
+            col_types = {"patient_id": str, "hashed_uid": str}
+            df_pat_data = pd.read_csv(converted_df_path, index_col=0, dtype=col_types)
             df_pat_data = df_pat_data.reset_index(drop=True)
         else:
             df_pat_data = pd.DataFrame(columns=DATA_OBJECT_COLUMNS)
@@ -263,6 +283,12 @@ class ConvertData:
                 df_pat_data.loc[df_pat_data.hashed_uid == hashed_uid, c] = entry[c]
         else:
             df_pat_data = pd.concat([df_pat_data, pd.DataFrame([entry])])
+
+        logger.info(
+            "Successfully converted %s object with hashed UID: %s",
+            entry["modality"],
+            entry["hashed_uid"],
+        )
 
         # Save the patient converted dataframe
         df_pat_data = df_pat_data.reset_index(drop=True)
@@ -286,17 +312,25 @@ class ConvertData:
 
         config = PyDicerConfig()
 
-        if patient is not None and not isinstance(patient, list):
-            patient = [patient]
+        if patient is not None:
+            if not isinstance(patient, list):
+                patient = [patient]
 
-        for key, df_files in df_preprocess.groupby(["patient_id", "modality", "series_uid"]):
+            df_preprocess = df_preprocess[df_preprocess["patient_id"].isin(patient)]
+
+        for key, df_files in get_iterator(
+            df_preprocess.groupby(["patient_id", "modality", "series_uid"]),
+            unit="objects",
+            name="convert",
+        ):
 
             patient_id, _, series_uid = key
 
-            if patient is not None and patient_id not in patient:
-                continue
+            logger.info("Converting data for patient: %s", patient_id)
 
             patient_directory = self.output_directory.joinpath(patient_id)
+
+            patient_logger = PatientLogger(patient_id, self.output_directory, force=False)
 
             # Grab the sop_class_uid, modality and for_uid (should be the same for all files in
             # series)
@@ -311,10 +345,8 @@ class ConvertData:
             sop_instance_hash = hash_uid(sop_instance_uid)
 
             # Determine the output type to decide in which directory the object should be placed
-            object_type = "other"
-            for ot, sops in OBJECT_TYPES.items():
-                if sop_class_uid in sops:
-                    object_type = ot
+            object_type = get_object_type(sop_class_uid)
+
             output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
 
             entry = {
@@ -337,9 +369,10 @@ class ConvertData:
                             series_files = handle_missing_slice(df_files)
                         else:
                             # TODO Handle inconsistent slice spacing
-                            raise ValueError(
-                                "Slice Locations are not evenly spaced. Set "
-                                "interp_missing_slices to True to interpolate slices."
+                            error_log = """Slice Locations are not evenly spaced. Set
+                                interp_missing_slices to True to interpolate slices."""
+                            patient_logger.log_module_error(
+                                "convert", sop_instance_hash, error_log
                             )
 
                         output_dir.mkdir(exist_ok=True, parents=True)
@@ -389,6 +422,7 @@ class ConvertData:
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                     self.add_entry(entry)
+                    patient_logger.eval_module_process("convert", sop_instance_hash)
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
 
@@ -415,7 +449,8 @@ class ConvertData:
                     # TODO handle rendering the masks even if we don't have an image series it's
                     # linked to
                     if len(df_linked_series) == 0:
-                        raise ValueError("Series Referenced by RTSTRUCT not found")
+                        error_log = "Series Referenced by RTSTRUCT not found"
+                        patient_logger.log_module_error("convert", sop_instance_hash, error_log)
 
                     if not output_dir.exists() or force:
 
@@ -467,6 +502,10 @@ class ConvertData:
                     ] = df_linked_series.sop_instance_uid.unique()[0]
 
                     self.add_entry(entry)
+                    patient_logger.eval_module_process(
+                        "convert",
+                        sop_instance_hash,
+                    )
 
                 elif sop_class_uid == PET_IMAGE_STORAGE_UID:
 
@@ -496,6 +535,7 @@ class ConvertData:
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                     self.add_entry(entry)
+                    patient_logger.eval_module_process("convert", sop_instance_hash)
 
                 elif sop_class_uid == RT_PLAN_STORAGE_UID:
 
@@ -527,6 +567,7 @@ class ConvertData:
                         entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                         self.add_entry(entry)
+                        patient_logger.eval_module_process("convert", sop_instance_hash)
 
                 elif sop_class_uid == RT_DOSE_STORAGE_UID:
 
@@ -566,6 +607,8 @@ class ConvertData:
                         entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                         self.add_entry(entry)
+
+                        patient_logger.eval_module_process("convert", sop_instance_hash)
                 else:
                     raise NotImplementedError(
                         "Unable to convert Series with SOP Class UID: {sop_class_uid} / "
@@ -589,3 +632,4 @@ class ConvertData:
                         "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
                     )
                     copy_file_to_quarantine(Path(f), self.working_directory, e)
+                patient_logger.log_module_error("convert", sop_instance_hash, e)

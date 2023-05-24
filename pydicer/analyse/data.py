@@ -8,7 +8,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from radiomics import firstorder, shape, glcm, glrlm, glszm, ngtdm, gldm, imageoperations
 from platipy.imaging.dose.dvh import (
     calculate_dvh_for_labels,
     calculate_d_x,
@@ -17,9 +16,18 @@ from platipy.imaging.dose.dvh import (
 )
 from pydicer.constants import CONVERTED_DIR_NAME
 
-from pydicer.utils import load_object_metadata, load_dvh, parse_patient_kwarg, read_converted_data
+from pydicer.utils import (
+    load_object_metadata,
+    load_dvh,
+    parse_patient_kwarg,
+    read_converted_data,
+    get_iterator,
+    get_structures_linked_to_dose,
+)
+from pydicer.logger import PatientLogger
 
 logger = logging.getLogger(__name__)
+
 
 PYRAD_DEFAULT_SETTINGS = {
     "binWidth": 25,
@@ -27,21 +35,6 @@ PYRAD_DEFAULT_SETTINGS = {
     "interpolator": "sitkNearestNeighbor",
     "verbose": True,
     "removeOutliers": 10000,
-}
-
-AVAILABLE_RADIOMICS = {
-    "firstorder": firstorder.RadiomicsFirstOrder,
-    "shape": shape.RadiomicsShape,
-    "glcm": glcm.RadiomicsGLCM,
-    "glrlm": glrlm.RadiomicsGLRLM,
-    "glszm": glszm.RadiomicsGLSZM,
-    "ngtdm": ngtdm.RadiomicsNGTDM,
-    "gldm": gldm.RadiomicsGLDM,
-}
-
-FIRST_ORDER_FEATURES = firstorder.RadiomicsFirstOrder.getFeatureNames()
-DEFAULT_RADIOMICS = {
-    "firstorder": [f for f in FIRST_ORDER_FEATURES if not FIRST_ORDER_FEATURES[f]]
 }
 
 
@@ -56,6 +49,7 @@ class AnalyseData:
 
     def __init__(self, working_directory="."):
         self.working_directory = Path(working_directory)
+        self.output_directory = self.working_directory.joinpath(CONVERTED_DIR_NAME)
 
     def get_all_computed_radiomics_for_dataset(
         self, dataset_name=CONVERTED_DIR_NAME, patient=None
@@ -121,7 +115,11 @@ class AnalyseData:
         df_result = pd.DataFrame(columns=["patient", "struct_hash", "dose_hash", "label"])
         for _, dose_row in df_data[df_data["modality"] == "RTDOSE"].iterrows():
 
-            df_result = pd.concat([df_result, load_dvh(dose_row)])
+            struct_hashes = df_data[
+                (df_data.for_uid == dose_row.for_uid) & (df_data.modality == "RTSTRUCT")
+            ].hashed_uid.tolist()
+
+            df_result = pd.concat([df_result, load_dvh(dose_row, struct_hash=struct_hashes)])
 
         return df_result
 
@@ -200,9 +198,47 @@ class AnalyseData:
 
         df_result = pd.DataFrame()
 
-        for _, row in df_process[df_process.modality == "RTDOSE"].iterrows():
+        # For each dose, find the structures in the same frame of reference and compute the
+        # DVH
+        df_doses = df_process[df_process["modality"] == "RTDOSE"]
+        for _, row in get_iterator(
+            df_doses.iterrows(), length=len(df_doses), unit="objects", name="Compute Dose Metrics"
+        ):
+            patient_logger = PatientLogger(row.patient_id, self.output_directory, force=False)
 
-            dvh = load_dvh(row)
+            ## Currently doses are linked via: plan -> struct -> image
+
+            # Find the linked plan
+            df_linked_plan = df_process[
+                df_process["sop_instance_uid"] == row.referenced_sop_instance_uid
+            ]
+
+            if len(df_linked_plan) == 0:
+                logger.warning("No linked plans found for dose: %s", row.sop_instance_uid)
+
+            # Find the linked structure set
+            df_linked_struct = None
+            if len(df_linked_plan) > 0:
+                plan_row = df_linked_plan.iloc[0]
+                df_linked_struct = df_process[
+                    df_process["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
+                ]
+
+            # Also link via Frame of Reference
+            df_for_linked = df_process[
+                (df_process["modality"] == "RTSTRUCT") & (df_process["for_uid"] == row.for_uid)
+            ]
+
+            struct_hashes = (
+                df_linked_struct.hashed_uid.tolist() + df_for_linked.hashed_uid.tolist()
+            )
+
+            dvh = load_dvh(row, struct_hash=struct_hashes)
+
+            if len(dvh) == 0:
+                logger.warning("No DVHs found for %s", struct_hashes)
+                continue
+
             df = dvh[["patient", "struct_hash", "dose_hash", "label", "cc", "mean"]]
             df_d = calculate_d_x(dvh, d_point)
             df_v = calculate_v_x(dvh, v_point)
@@ -211,6 +247,8 @@ class AnalyseData:
             df = df.loc[:, ~df.columns.duplicated()]
 
             df_result = pd.concat([df_result, df])
+
+            patient_logger.eval_module_process("analyse_compute_dose_metrics", row.hashed_uid)
 
         return df_result
 
@@ -262,6 +300,48 @@ class AnalyseData:
             ValueError: Raised if patient is not None, a list of strings or a string.
         """
 
+        # Begin pyradiomics workaround
+        # This code should be moved back to the top of this file once pyradiomics integration into
+        # poetry issue is resolved: https://github.com/AIM-Harvard/pyradiomics/issues/787
+
+        try:
+            # pylint: disable=import-outside-toplevel
+            from radiomics import (
+                firstorder,
+                shape,
+                glcm,
+                glrlm,
+                glszm,
+                ngtdm,
+                gldm,
+                imageoperations,
+            )
+        except ImportError:
+            print(
+                "Due to some limitations in the current version of pyradiomics, pyradiomics "
+                "must be installed separately. Please run `pip install pyradiomics` to use the "
+                "compute radiomics functionality."
+            )
+            return
+
+        # pylint: disable=invalid-name
+        AVAILABLE_RADIOMICS = {
+            "firstorder": firstorder.RadiomicsFirstOrder,
+            "shape": shape.RadiomicsShape,
+            "glcm": glcm.RadiomicsGLCM,
+            "glrlm": glrlm.RadiomicsGLRLM,
+            "glszm": glszm.RadiomicsGLSZM,
+            "ngtdm": ngtdm.RadiomicsNGTDM,
+            "gldm": gldm.RadiomicsGLDM,
+        }
+
+        FIRST_ORDER_FEATURES = firstorder.RadiomicsFirstOrder.getFeatureNames()
+        DEFAULT_RADIOMICS = {
+            "firstorder": [f for f in FIRST_ORDER_FEATURES if not FIRST_ORDER_FEATURES[f]]
+        }
+
+        # End pyradiomics workaround
+
         if patient is not None and df_process is not None:
             raise ValueError("Only one of patient and df_process pay be provided.")
 
@@ -289,7 +369,14 @@ class AnalyseData:
         meta_data_cols = []
 
         # Next compute the radiomics for each structure using their linked image
-        for _, struct_row in df_process[df_process["modality"] == "RTSTRUCT"].iterrows():
+        df_structs = df_process[df_process["modality"] == "RTSTRUCT"]
+
+        for _, struct_row in get_iterator(
+            df_structs.iterrows(), length=len(df_structs), unit="objects", name="Compute Radiomics"
+        ):
+            patient_logger = PatientLogger(
+                struct_row.patient_id, self.output_directory, force=False
+            )
 
             struct_dir = Path(struct_row.path)
 
@@ -425,6 +512,9 @@ class AnalyseData:
                 output_frame.columns = columns
 
                 output_frame.to_csv(struct_radiomics_path)
+                patient_logger.eval_module_process(
+                    "analyse_compute_radiomics", struct_row.hashed_uid
+                )
 
     def compute_dvh(
         self,
@@ -469,9 +559,6 @@ class AnalyseData:
                 self.working_directory, dataset_name=dataset_name, patients=patient
             )
 
-        # Read all converted data for linkage
-        df_converted = read_converted_data(self.working_directory)
-
         if structure_meta_data_cols is None:
             structure_meta_data_cols = []
 
@@ -482,43 +569,18 @@ class AnalyseData:
 
         # For each dose, find the structures in the same frame of reference and compute the
         # DVH
-        for _, dose_row in df_process[df_process["modality"] == "RTDOSE"].iterrows():
-
-            ## Currently doses are linked via: plan -> struct -> image
+        df_doses = df_process[df_process["modality"] == "RTDOSE"]
+        for _, dose_row in get_iterator(
+            df_doses.iterrows(), length=len(df_doses), unit="objects", name="Compute DVH"
+        ):
             dose_meta_data = load_object_metadata(dose_row)
 
-            # Find the linked plan
-            df_linked_plan = df_converted[
-                df_converted["sop_instance_uid"] == dose_row.referenced_sop_instance_uid
-            ]
-
-            if len(df_linked_plan) == 0:
-                logger.warning("No linked plans found for dose: %s", dose_row.sop_instance_uid)
-
-            # Find the linked structure set
-            df_linked_struct = None
-            if len(df_linked_plan) > 0:
-                plan_row = df_linked_plan.iloc[0]
-                df_linked_struct = df_converted[
-                    df_converted["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
-                ]
-
-            # Also link via Frame of Reference
-            df_for_linked = df_converted[
-                (df_converted["modality"] == "RTSTRUCT")
-                & (df_converted["for_uid"] == dose_row.for_uid)
-            ]
-
-            if df_linked_struct is None:
-                df_linked_struct = df_for_linked
-            else:
-                df_linked_struct = pd.concat([df_linked_struct, df_for_linked])
-
-            # Drop in case a structure was linked twice
-            df_linked_struct.drop_duplicates(inplace=True)
+            df_linked_struct = get_structures_linked_to_dose(self.working_directory, dose_row)
 
             if len(df_linked_struct) == 0:
-                logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
+                logger.warning(
+                    "No linked structures found for dose: %s", dose_row.sop_instance_uid
+                )
 
             dose_file = Path(dose_row.path).joinpath("RTDOSE.nii.gz")
 
@@ -538,7 +600,7 @@ class AnalyseData:
                     struct_row.patient_id,
                 )
 
-                struct_dir = Path(struct_row.path).joinpath(struct_row.path)
+                struct_dir = Path(struct_row.path)
 
                 struct_meta_data = load_object_metadata(struct_row)
 
@@ -549,6 +611,7 @@ class AnalyseData:
                     for struct_nii in struct_dir.glob("*.nii.gz")
                 }
                 if len(structures) == 0:
+                    logger.debug("No structures found in: %s", struct_dir)
                     continue
 
                 dvh = calculate_dvh_for_labels(dose, structures, bin_width=bin_width)

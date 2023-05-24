@@ -8,13 +8,14 @@ from pydicer.constants import PYDICER_DIR_NAME
 logger = logging.getLogger(__name__)
 
 PYDICER_CONFIG = {
-    "display_progress": {
+    "verbosity": {
         "module": "general",
-        "description": "Display a progress bar when executing steps of pipeline. If True, logs "
-        "will be writtin to log files only and hidden from standard output.",
-        "type": bool,
-        "default": True,
-        "choices": None,
+        "description": "Level of output for standard out. Value indicates the Python built-in log "
+        "level. A value of 0 (not set) will display the process bar. Logs of all levels are "
+        "available in the .pydicer directory.",
+        "type": int,
+        "default": 0,
+        "choices": [logging.NOTSET, logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR],
     },
     "for_fallback_linkage": {
         "module": "general",
