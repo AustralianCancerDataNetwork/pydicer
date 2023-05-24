@@ -15,6 +15,7 @@ from pydicer.constants import (
     RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
+    MR_IMAGE_STORAGE_UID
 )
 from pydicer.quarantine.treat import copy_file_to_quarantine
 from pydicer.utils import read_preprocessed_data
@@ -169,7 +170,7 @@ class PreprocessData:
                     except AttributeError:
                         logger.warning("Unable to determine Reference Series UID")
 
-                elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID):
+                elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID, MR_IMAGE_STORAGE_UID):
 
                     image_position = np.array(ds.ImagePositionPatient, dtype=float)
                     image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
