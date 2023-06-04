@@ -54,6 +54,7 @@ directory.mkdir(exist_ok=True, parents=True)
 dicom_directory = directory.joinpath("dicom")
 dicom_directory.mkdir(exist_ok=True, parents=True)
 test_input = TestInput(dicom_directory)
+test_input.fetch_data()
 
 # Create the PyDicer tool object and add the dicom directory as an input location
 pydicer = PyDicer(directory)
