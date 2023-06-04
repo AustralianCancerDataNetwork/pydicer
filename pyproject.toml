@@ -29,6 +29,7 @@ sphinx-click = "^4.3.0"
 furo = "^2022.6.21"
 nbsphinx = "^0.8.9"
 m2r2 = "^0.3.3"
+notebook = "^6.5.4"
 
 
 [build-system]

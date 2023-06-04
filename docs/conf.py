@@ -17,6 +17,7 @@ import os
 import sys
 import shutil
 import datetime
+from pathlib import Path
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -61,6 +62,10 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "site"]
 html_theme = "furo"
 
 
+def setup(app):
+    app.add_css_file("custom.css")
+
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -70,6 +75,9 @@ html_show_sphinx = False
 
 # Copy in the files from the other repository directories to have them
 # be rendered by Sphinx
-shutil.rmtree("_examples", ignore_errors=True)
-os.mkdir("_examples")
-shutil.copy("../examples/Pipeline.ipynb", "_examples/Pipeline.ipynb")
+examples_path = Path("_examples")
+for notebook_path in examples_path.glob("*.ipynb"):
+    os.remove(notebook_path)
+
+examples_path.mkdir(exist_ok=True)
+shutil.copy("../examples/GettingStarted.ipynb", "_examples/GettingStarted.ipynb")

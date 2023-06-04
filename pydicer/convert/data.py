@@ -59,6 +59,7 @@ def get_object_type(sop_class_uid):
     Returns:
         str: The object type
     """
+
     object_type = "other"
     for ot, sops in OBJECT_TYPES.items():
         if sop_class_uid in sops:
@@ -68,28 +69,30 @@ def get_object_type(sop_class_uid):
 
 
 def handle_missing_slice(files):
-    """function to interpolate missing slices in an image
+    """Function to interpolate missing slices in an image
 
     Example usage:
-        ```
-            input_dic = [
-                {
-                    "file_path" : "Dicom_Path_1",
-                    "slice_location: -100
-                },
-                {
-                    "file_path" : "Dicom_Path_2",
-                    "slice_location: -98
-                },
-                .
-                .
-                {
-                    "file_path" : "Dicom_Path_100",
-                    "slice_location: 100
-                },
-            ]
-            file_paths_list = handle_missing_slices(input_dict)
-        ```
+
+    .. code-block:: python
+
+        from pydicer.convert.data import handle_missing_slice
+
+        input_dic = [
+            {
+                "file_path" : "path/to/dicom_file_1.dcm",
+                "slice_location: -100
+            },
+            {
+                "file_path" : "path/to/dicom_file_2.dcm",
+                "slice_location: -98
+            },
+            {
+                "file_path" : "path/to/dicom_file_3.dcm",
+                "slice_location: -96
+            },
+            ...
+        ]
+        file_paths_list = handle_missing_slices(input_dict)
 
     Args:
         df_files (pd.DataFrame|list): the DataFrame which was produced by PreprocessData

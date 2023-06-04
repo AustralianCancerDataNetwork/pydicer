@@ -5,7 +5,15 @@
     :maxdepth: 2
     :hidden:
 
-    _examples/Pipeline
+    _examples/GettingStarted
+
+.. toctree::
+    :caption: Developers
+    :maxdepth: 2
+    :hidden:
+
+    contributing
+    code_of_conduct
 
 .. toctree::
    :caption: Reference
