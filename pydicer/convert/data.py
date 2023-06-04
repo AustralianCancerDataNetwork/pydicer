@@ -315,7 +315,7 @@ class ConvertData:
             if not isinstance(patient, list):
                 patient = [patient]
 
-            df_preprocess = df_preprocess[df_preprocess["patient_id"].str.isin(patient)]
+            df_preprocess = df_preprocess[df_preprocess["patient_id"].isin(patient)]
 
         for key, df_files in get_iterator(
             df_preprocess.groupby(["patient_id", "modality", "series_uid"]),
