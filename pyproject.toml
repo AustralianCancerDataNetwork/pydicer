@@ -4,6 +4,16 @@ version = "0.1.0"
 description = "PYthon Dicom Image ConvertER"
 authors = ["Ingham Medical Physics"]
 license = "Apache License 2.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Development Status :: 4 - Beta",
+]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
