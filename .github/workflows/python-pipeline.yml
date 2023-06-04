@@ -34,7 +34,6 @@ jobs:
       - name: Install Python modules with poetry
         run: |
           poetry run pip install --upgrade pip
-          poetry run pip install itk
           poetry install
       - name: Lint with Pylint
         run: |
