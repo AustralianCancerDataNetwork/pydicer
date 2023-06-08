@@ -1,0 +1,611 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Visualisation" href="visualise.html" /><link rel="prev" title="Preprocessing" href="preprocess.html" />
+
+    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+        <title>Conversion - PyDicer 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_examples/GettingStarted.html">Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_of_conduct.html">Code of Conduct</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="input.html">Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocessing</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualise.html">Visualisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataset.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyse.html">Analyse</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="conversion">
+<h1>Conversion<a class="headerlink" href="#conversion" title="Permalink to this heading">#</a></h1>
+<section id="module-pydicer.convert.data">
+<span id="data-conversion"></span><h2>Data Conversion<a class="headerlink" href="#module-pydicer.convert.data" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydicer.convert.data.ConvertData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">ConvertData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.ConvertData" title="Permalink to this definition">#</a></dt>
+<dd><p>Class that facilitates the conversion of the data into its intended final type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>working_directory</strong> (<em>-</em>) – Main working directory for pydicer.
+Defaults to “.”.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.convert.data.ConvertData.add_entry">
+<span class="sig-name descname"><span class="pre">add_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.ConvertData.add_entry" title="Permalink to this definition">#</a></dt>
+<dd><p>Add an entry of a converted data object to the patient’s converted dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry</strong> (<em>dict</em>) – A dictionary object describing the object converted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.convert.data.ConvertData.convert">
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.ConvertData.convert" title="Permalink to this definition">#</a></dt>
+<dd><p>Converts the DICOM which was preprocessed into the pydicer output directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>patient</strong> (<em>str</em><em>|</em><em>list</em><em>, </em><em>optional</em>) – Patient ID or list of patient IDs to convert. Defaults to
+None.</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – When True objects will be converted even if the output files
+already exist. Defaults to True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.data.get_object_type">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">get_object_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sop_class_uid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.get_object_type" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the type of the object (used for the output path)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sop_class_uid</strong> (<em>str</em>) – The SOP Class UID of the object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The object type</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.data.handle_missing_slice">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">handle_missing_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.handle_missing_slice" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to interpolate missing slices in an image</p>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicer.convert.data</span> <span class="kn">import</span> <span class="n">handle_missing_slice</span>
+
+<span class="n">input_dic</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;file_path&quot;</span> <span class="p">:</span> <span class="s2">&quot;path/to/dicom_file_1.dcm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;slice_location: -100</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;file_path&quot;</span> <span class="p">:</span> <span class="s2">&quot;path/to/dicom_file_2.dcm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;slice_location: -98</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;file_path&quot;</span> <span class="p">:</span> <span class="s2">&quot;path/to/dicom_file_3.dcm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;slice_location: -96</span>
+    <span class="p">},</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+<span class="n">file_paths_list</span> <span class="o">=</span> <span class="n">handle_missing_slices</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_files</strong> (<em>pd.DataFrame</em><em>|</em><em>list</em>) – the DataFrame which was produced by PreprocessData</p></li>
+<li><p><strong>slices</strong> (<em>or list</em><em> of </em><em>filepaths to dicom</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a list of the interpolated file paths</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>file_paths(list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.data.link_via_frame_of_reference">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">link_via_frame_of_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_uid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_preprocess</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.link_via_frame_of_reference" title="Permalink to this definition">#</a></dt>
+<dd><p>Find the image series linked to this FOR</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>for_uid</strong> (<em>str</em>) – The Frame of Reference UID</p></li>
+<li><p><strong>df_preprocess</strong> (<em>pd.DataFrame</em>) – The DataFrame containing the preprocessed DICOM data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame of the linked series entries</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pydicer.convert.headers">
+<span id="header-conversion"></span><h2>Header Conversion<a class="headerlink" href="#module-pydicer.convert.headers" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.headers.convert_dicom_headers">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.headers.</span></span><span class="sig-name descname"><span class="pre">convert_dicom_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcm_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.headers.convert_dicom_headers" title="Permalink to this definition">#</a></dt>
+<dd><p>Save the DICOM Headers as a JSON file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dcm_file</strong> (<em>str</em><em>|</em><em>pathlib.Path</em>) – The files from which to save the headers.</p></li>
+<li><p><strong>binary_path</strong> (<em>str</em>) – Relative path to binary data which will be placed into JSON.</p></li>
+<li><p><strong>json_file</strong> (<em>str</em><em>|</em><em>pathlib.Path</em>) – Path to JSON file to save output.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pydicer.convert.rtstruct">
+<span id="rtstruct-conversion"></span><h2>RTSTRUCT Conversion<a class="headerlink" href="#module-pydicer.convert.rtstruct" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.rtstruct.convert_rtstruct">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.rtstruct.</span></span><span class="sig-name descname"><span class="pre">convert_rtstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcm_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dcm_rt_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Struct_'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_img</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.rtstruct.convert_rtstruct" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert a DICOM RTSTRUCT to NIFTI masks.</p>
+<p>The masks are stored as NIFTI files in the output directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dcm_img</strong> (<em>list</em><em>|</em><em>SimpleITK.Image</em>) – List of DICOM paths (as str) to use as the reference image
+series or a SimpleITK image of the already converted image.</p></li>
+<li><p><strong>dcm_rt_file</strong> (<em>str</em><em>|</em><em>pathlib.Path</em>) – Path to the DICOM RTSTRUCT file</p></li>
+<li><p><strong>prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – The prefix to give the output files. Defaults to “Struct” +
+underscore.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em><em>|</em><em>pathlib.Path</em><em>, </em><em>optional</em>) – Path to the output directory. Defaults to “.”.</p></li>
+<li><p><strong>output_img</strong> (<em>str</em><em>|</em><em>pathlib.Path</em><em>, </em><em>optional</em>) – If set, write the reference image to this file as
+in NIFTI format. Defaults to None.</p></li>
+<li><p><strong>spacing</strong> (<em>list</em><em>, </em><em>optional</em>) – Values of image spacing to override. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.rtstruct.write_nrrd_from_mask_directory">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.rtstruct.</span></span><span class="sig-name descname"><span class="pre">write_nrrd_from_mask_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.rtstruct.write_nrrd_from_mask_directory" title="Permalink to this definition">#</a></dt>
+<dd><p>Produce a NRRD file from a directory of masks in Nifti format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask_directory</strong> (<em>pathlib.Path</em><em>|</em><em>str</em>) – Path object of directory containing masks</p></li>
+<li><p><strong>output_file</strong> (<em>pathlib.Path</em><em>|</em><em>str</em>) – The output NRRD file to write to.</p></li>
+<li><p><strong>color_map</strong> (<em>matplotlib.colors.Colormap</em><em> | </em><em>dict</em><em>, </em><em>optional</em>) – Colormap to use for output.
+Defaults to cm.get_cmap(“rainbow”).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pydicer.convert.pt">
+<span id="pet-conversion"></span><h2>PET Conversion<a class="headerlink" href="#module-pydicer.convert.pt" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.pt.convert_dicom_to_nifti_pt">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">convert_dicom_to_nifti_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_filepaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_patient_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.convert_dicom_to_nifti_pt" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to convert the dicom files contained in input_filepaths to one NIFTI image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_filepaths</strong> (<em>list</em>) – list of the dicom paths</p></li>
+<li><p><strong>output_filepath</strong> (<em>str</em>) – path to the output file path where to store the NIFTI file.</p></li>
+<li><p><strong>default_patient_weight</strong> (<em>float</em><em>, </em><em>optional</em>) – If the patient’s weight is missing from the PT
+DICOM it can be provided through this argument. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>MissingWeightError</strong> – Error to alert when the weight is missing from the PT, to compute
+    the SUV.</p></li>
+<li><p><strong>RuntimeError</strong> – Error to alert when one or more slices are missing</p></li>
+<li><p><strong>ValueError</strong> – Raised when a modality or a unit (for the PT) is not handled.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The numpy image, used to compute the bounding boxes</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.pt.get_physical_values_pt">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">get_physical_values_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_weight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.get_physical_values_pt" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to Get physical values from raw PET</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slices</strong> – all pet slices of this patient</p></li>
+<li><p><strong>patient_weight</strong> – a value about this patient</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>extract physical values for pet</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.pt.get_sitk_volume_from_np">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">get_sitk_volume_from_np</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_spacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_position_patient</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.get_sitk_volume_from_np" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to get sitk volume from np image</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>np_image</strong> – extracted pet data with numpy format</p></li>
+<li><p><strong>pixel_spacing</strong> – extracted pixel spacing information</p></li>
+<li><p><strong>image_position_patient</strong> – extracted image position about this patient</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a pet sitk data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.pt.get_suv_from_bqml">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">get_suv_from_bqml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decay_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_weight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.get_suv_from_bqml" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to Get SUV from raw PET if units = “BQML”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slices</strong> – all pet slices from this patient</p></li>
+<li><p><strong>decay_time</strong> – decay time</p></li>
+<li><p><strong>patient_weight</strong> – patient weight information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>suv results</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.pt.get_suv_philips">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">get_suv_philips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.get_suv_philips" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to Get SUV from raw PET if units = “CNTS”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>slices</strong> – all pet slices from this patient</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>suv philips results</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.convert.pt.is_approx_equal">
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">is_approx_equal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.is_approx_equal" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to know is_approx_equal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>x and</em>) – two values to be compared</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True or False</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="visualise.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Visualisation</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="preprocess.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Preprocessing</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Ingham Medical Physics
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Conversion</a><ul>
+<li><a class="reference internal" href="#module-pydicer.convert.data">Data Conversion</a><ul>
+<li><a class="reference internal" href="#pydicer.convert.data.ConvertData"><code class="docutils literal notranslate"><span class="pre">ConvertData</span></code></a><ul>
+<li><a class="reference internal" href="#pydicer.convert.data.ConvertData.add_entry"><code class="docutils literal notranslate"><span class="pre">ConvertData.add_entry()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.convert.data.ConvertData.convert"><code class="docutils literal notranslate"><span class="pre">ConvertData.convert()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pydicer.convert.data.get_object_type"><code class="docutils literal notranslate"><span class="pre">get_object_type()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.convert.data.handle_missing_slice"><code class="docutils literal notranslate"><span class="pre">handle_missing_slice()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.convert.data.link_via_frame_of_reference"><code class="docutils literal notranslate"><span class="pre">link_via_frame_of_reference()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pydicer.convert.headers">Header Conversion</a><ul>
+<li><a class="reference internal" href="#pydicer.convert.headers.convert_dicom_headers"><code class="docutils literal notranslate"><span class="pre">convert_dicom_headers()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pydicer.convert.rtstruct">RTSTRUCT Conversion</a><ul>
+<li><a class="reference internal" href="#pydicer.convert.rtstruct.convert_rtstruct"><code class="docutils literal notranslate"><span class="pre">convert_rtstruct()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.convert.rtstruct.write_nrrd_from_mask_directory"><code class="docutils literal notranslate"><span class="pre">write_nrrd_from_mask_directory()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pydicer.convert.pt">PET Conversion</a><ul>
+<li><a class="reference internal" href="#pydicer.convert.pt.convert_dicom_to_nifti_pt"><code class="docutils literal notranslate"><span class="pre">convert_dicom_to_nifti_pt()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.convert.pt.get_physical_values_pt"><code class="docutils literal notranslate"><span class="pre">get_physical_values_pt()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.convert.pt.get_sitk_volume_from_np"><code class="docutils literal notranslate"><span class="pre">get_sitk_volume_from_np()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.convert.pt.get_suv_from_bqml"><code class="docutils literal notranslate"><span class="pre">get_suv_from_bqml()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.convert.pt.get_suv_philips"><code class="docutils literal notranslate"><span class="pre">get_suv_philips()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.convert.pt.is_approx_equal"><code class="docutils literal notranslate"><span class="pre">is_approx_equal()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>
