@@ -29,10 +29,10 @@ class PrepareDataset:
         # Create a copy so that we aren't manuipulating the original entry
         data_object_row = data_object_row.copy()
 
-        if data_object_row.path.startswith(str(self.working_directory)):
-            data_object_row.path = str(
-                Path(data_object_row.path).relative_to(self.working_directory)
-            )
+        object_path = Path(data_object_row.path)
+        if object_path.is_absolute():
+            data_object_row.path = str(object_path.relative_to(self.working_directory))
+            object_path = Path(data_object_row.path)
 
         object_path = Path(data_object_row.path)
         symlink_path = dataset_dir.joinpath(object_path.relative_to(CONVERTED_DIR_NAME))
