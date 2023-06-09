@@ -375,16 +375,17 @@ def get_iterator(iterable, length=None, unit="it", name=None):
     return iterator
 
 
-def map_structure_name(struct_name, path_to_struct, struct_map_dict, level):
+def map_structure_name(struct_name, struct_map_dict):
     """Function to map a structure's name according to a mapping dictionary
 
     Args:
         struct_name (str): the structure name to be mapped. If the name is remapped according to the
         mapping file, then the structure NifTi file is renamed with the mapped name
-        path_to_struct (str): path to the structure to be mapped
         struct_map_dict (dict): the mapping dictionary
-        level (str): the mapping level, either project-wide (all structures under "data") or defined
-        by a structure set id
+
+    Returns:
+
+        str: the mapped structure name
     """
     # Check if the structure name needs to be mapped
     mapped_struct_name_set = {i for i in struct_map_dict if struct_name in struct_map_dict[i]}
@@ -392,40 +393,9 @@ def map_structure_name(struct_name, path_to_struct, struct_map_dict, level):
     # If not true, then either the structure name is already in mapped form, or the structure name
     # is not being captured in the specific mapping dictionary
     if len(mapped_struct_name_set) > 0:
-        mapped_struct_name = mapped_struct_name_set.pop()
-        path_to_struct = Path(path_to_struct)
-        path_to_struct.rename(path_to_struct.parent.joinpath(f"{mapped_struct_name}.nii.gz"))
-        print(
-            f"""{level}-level mapping found for structure:
-            {struct_name} -> {mapped_struct_name}"""
-        )
+        return mapped_struct_name_set.pop()
 
-
-def map_all_structures_in_set(path_to_struct, struct_map_dict, level):
-    """Function to get all structures in a structure set and map their names according to a mapping
-    dictionary
-
-    Args:
-        path_to_struct (str): path to the structure to be mapped
-        struct_map_dict (dict): the mapping dictionary
-        level (str): the mapping level, either project-wide (all structures under "data") or defined
-        by a structure set id
-    """
-    if path_to_struct.is_dir():
-        df = pd.DataFrame(columns=["old_structure_name", "path_to_structure"])
-        # Grab the names of the structures for this set, as well as the paths
-        # to these NifTi files
-        df.old_structure_name, df.path_to_structure = (
-            [str(x.name.strip(".nii.gz")) for x in path_to_struct.glob("*nii.gz") if x.is_file()],
-            [str(x) for x in path_to_struct.glob("*nii.gz") if x.is_file()],
-        )
-        logger.debug("Mapping names for structure set: %s", path_to_struct.name)
-        df.apply(
-            lambda x: map_structure_name(
-                x.old_structure_name, x.path_to_structure, struct_map_dict, level
-            ),
-            axis=1,
-        )
+    return struct_name
 
 
 def get_structures_linked_to_dose(working_directory: Path, dose_row: pd.Series) -> pd.DataFrame:

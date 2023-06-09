@@ -4,11 +4,12 @@ import os
 from pathlib import Path
 
 import pandas as pd
+import SimpleITK as sitk
 
 from pydicer.constants import CONVERTED_DIR_NAME
 
 from pydicer.dataset import functions
-from pydicer.utils import read_converted_data, map_all_structures_in_set
+from pydicer.utils import read_converted_data, map_structure_name
 
 logger = logging.getLogger(__name__)
 
@@ -130,66 +131,68 @@ class PrepareDataset:
         self.prepare_from_dataframe(dataset_name, df_clean_data)
 
 
-class MapStructureSetNomenclature:
-    """Class to handle the mapping of structure set nomenclature"""
+class StructureSet(dict):
+    def __init__(self, structure_set_row, structure_mapping=None):
 
-    def __init__(self, working_directory: Path):
-        self.working_directory = Path(working_directory)
-        self.project_structs_map_path = self.working_directory.joinpath(".pydicer").joinpath(
-            "structures_map.json"
-        )
+        if not structure_set_row.modality == "RTSTRUCT":
+            raise AttributeError("structure_set_row modality must be of RTSTRUCT")
 
-    def map_project_structure_set_names(
-        self,
-    ):
-        """Function to perform the mapping of all structures in the converted "data" folder using
-        a project-wide mapping file
-        """
-        try:
-            with open(self.project_structs_map_path, "r", encoding="utf8") as structs_map_file:
-                struct_map_dict = json.load(structs_map_file)["structures"]
-                pat_ids = read_converted_data(self.working_directory).patient_id.unique()
-                # Get all patients
-                for pat_id in pat_ids:
-                    pat_struct_sets_path = (
-                        self.working_directory.joinpath("data")
-                        .joinpath(pat_id)
-                        .joinpath("structures")
-                    )
-                    # Get all structure sets for this patient
-                    for p in pat_struct_sets_path.rglob("*"):
-                        map_all_structures_in_set(p, struct_map_dict, "Project")
-        except FileNotFoundError:
-            logger.error(
-                """'%s' structures mapping file not
-                found for the project!""",
-                self.project_structs_map_path,
-            )
+        self.structure_set_path = Path(structure_set_row.path)
 
-    def map_specific_structure_set_names(
-        self, struct_set_id, mapping_file_name="structures_map.json"
-    ):
-        """Function to map a specific structure set structures' names according to its own mapping
-        file.
+        self.structure_names = [
+            s.name.replace(".nii.gz", "") for s in self.structure_set_path.glob("*.nii.gz")
+        ]
+
+        if structure_mapping is not None:
+            self.structure_names = list(structure_mapping.keys())
+
+        self.structure_mapping = structure_mapping
+        self.cache = {}
+
+    def __getitem__(self, item):
+
+        if self.structure_mapping is not None:
+            item = map_structure_name(item, self.structure_mapping)
+
+        if item not in self.structure_names:
+            raise KeyError(f"Structure name {item} not found in structure set.")
+
+        if item in self.cache:
+            return self.cache[item]
+
+        structure_path = self.structure_set_path.joinpath(f"{item}.nii.gz")
+
+        result = sitk.ReadImage(str(structure_path))
+
+        self.cache[item] = result
+        return result
+
+    def keys(self):
+        return self.structure_names
+
+    def create_mapping_json(self, mapping_dict, level="project"):
+        """_summary_
 
         Args:
-            struct_set_id (str): the hashed id of the structure set to be mapped
-            mapping_file_name (str, optional): name of the mapping file that must sit under the
-            "struct_set_id" directory. Defaults to "structures_map.json".
+            mapping_dict (_type_): _description_
+            level (str, optional): _description_. Defaults to "project".
         """
-        try:
-            df_converted = read_converted_data(self.working_directory)
-            patient_structs_set_path = Path(
-                df_converted[df_converted.hashed_uid == struct_set_id].path.iloc[0]
+        final_map = {}
+        final_map["structures"] = mapping_dict
+
+        if level == "project":
+            path = self.structure_set_path.parent.parent.parent.parent.joinpath(".pydicer")
+        elif level == "patient":
+            path = self.structure_set_path.parent.parent
+        elif level == "current_structure_set":
+            path = self.structure_set_path
+        else:
+            raise ValueError(
+                "level must be one of 'project', 'patient' or 'current_structure_set'."
             )
-            with open(
-                patient_structs_set_path.joinpath(mapping_file_name), "r", encoding="utf8"
-            ) as structs_map_file:
-                struct_map_dict = json.load(structs_map_file)["structures"]
-                map_all_structures_in_set(patient_structs_set_path, struct_map_dict, "Patient")
-        except FileNotFoundError:
-            logger.error(
-                """ '%s' structures mapping file not
-                found for patient ({pat_id}) structure set ({struct_set_id})!""",
-                mapping_file_name,
-            )
+
+        # Create the mapping file
+        with open(
+            path.joinpath("structures_map.json"), "w", encoding="utf8"
+        ) as structures_map_file:
+            json.dump(final_map, structures_map_file, ensure_ascii=False, indent=4)
