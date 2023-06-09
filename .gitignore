@@ -137,3 +137,10 @@ dmypy.json
 testdata/
 
 examples/data/
+
+docs/**/*.md
+docs/**/*.png
+docs/**/*.jpg
+docs/**/*.gif
+docs/site/
+docs/_examples/
