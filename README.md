@@ -94,13 +94,3 @@ pytest
 ```
 
 Add your tests to the appropriate file in the `tests/` directory. See the [pytest documention](https://docs.pytest.org/en/6.2.x/getting-started.html) for more information.
-
-
-
-# Ideas for Examples
-
-- Run Pipeline
-- Compute Radiomics
-- Compute dose metrics
-- Add auto-segmentation object
-- Prepare data for nnUNet training
