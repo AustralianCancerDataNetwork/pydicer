@@ -126,7 +126,7 @@ def load_object_metadata(row, keep_tags=None, remove_tags=None):
 
         for tag in ds_dict.keys():
 
-            if tag not in keep_tags:
+            if tag.lower() not in keep_tags:
                 remove_tags.append(tag)
 
     if remove_tags is not None:
@@ -141,7 +141,7 @@ def load_object_metadata(row, keep_tags=None, remove_tags=None):
                 t = pydicom.tag.Tag(tag_key)
                 group_str = hex(t.group).replace("0x", "").zfill(4)
                 element_str = hex(t.element).replace("0x", "").zfill(4)
-                tag = f"{group_str}{element_str}"
+                tag = f"{group_str}{element_str}".upper()
 
             if tag in ds_dict:
                 del ds_dict[tag]
