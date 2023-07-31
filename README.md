@@ -66,7 +66,12 @@ pydicer.add_input(dicom_directory)
 pydicer.run_pipeline()
 ```
 
-## Coding standards
+## Contributing
+
+PyDicer is a research tool and adding to its functionality is encouraged. All GitHub Pull Requests
+are welcome. We do ask that you abide by our code of conduct and follow our coding standards.
+
+### Coding standards
 
 Code in pydicer must conform to Python's PEP-8 standards to ensure consistent formatting between contributors. To ensure this, pylint is used to check code conforms to these standards before a Pull Request can be merged. You can run pylint from the command line using the following command:
 
@@ -78,7 +83,7 @@ But a better idea is to ensure you are using a Python IDE which supports linting
 
 If you're new to using pylint, you may like to [read this guide](https://docs.pylint.org/en/v2.11.1/tutorial.html).
 
-## Automated tests
+### Automated tests
 
 A test suite is included in pydicer which ensures that code contributed to the repository functions as expected and continues to function as further development takes place. Any code submitted via a pull request should include appropriate automated tests for the new code.
 
@@ -89,3 +94,13 @@ pytest
 ```
 
 Add your tests to the appropriate file in the `tests/` directory. See the [pytest documention](https://docs.pytest.org/en/6.2.x/getting-started.html) for more information.
+
+
+
+# Ideas for Examples
+
+- Run Pipeline
+- Compute Radiomics
+- Compute dose metrics
+- Add auto-segmentation object
+- Prepare data for nnUNet training
