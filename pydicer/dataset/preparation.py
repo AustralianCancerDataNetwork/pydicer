@@ -1,15 +1,13 @@
-import json
 import logging
 import os
 from pathlib import Path
 
 import pandas as pd
-import SimpleITK as sitk
 
 from pydicer.constants import CONVERTED_DIR_NAME
 
 from pydicer.dataset import functions
-from pydicer.utils import read_converted_data, map_structure_name
+from pydicer.utils import read_converted_data
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +54,6 @@ class PrepareDataset:
         pat_converted_csv = pat_dir.joinpath("converted.csv")
         df_pat = pd.DataFrame([data_object_row])
         if pat_converted_csv.exists():
-
             col_types = {"patient_id": str, "hashed_uid": str}
             df_converted = pd.read_csv(pat_converted_csv, index_col=0, dtype=col_types)
 
@@ -111,7 +108,6 @@ class PrepareDataset:
         """
 
         if isinstance(preparation_function, str):
-
             preparation_function = getattr(functions, preparation_function)
 
         if not callable(preparation_function):
@@ -129,70 +125,3 @@ class PrepareDataset:
         df_clean_data = preparation_function(df_converted, **kwargs)
 
         self.prepare_from_dataframe(dataset_name, df_clean_data)
-
-
-class StructureSet(dict):
-    def __init__(self, structure_set_row, structure_mapping=None):
-
-        if not structure_set_row.modality == "RTSTRUCT":
-            raise AttributeError("structure_set_row modality must be of RTSTRUCT")
-
-        self.structure_set_path = Path(structure_set_row.path)
-
-        self.structure_names = [
-            s.name.replace(".nii.gz", "") for s in self.structure_set_path.glob("*.nii.gz")
-        ]
-
-        if structure_mapping is not None:
-            self.structure_names = list(structure_mapping.keys())
-
-        self.structure_mapping = structure_mapping
-        self.cache = {}
-
-    def __getitem__(self, item):
-
-        if self.structure_mapping is not None:
-            item = map_structure_name(item, self.structure_mapping)
-
-        if item not in self.structure_names:
-            raise KeyError(f"Structure name {item} not found in structure set.")
-
-        if item in self.cache:
-            return self.cache[item]
-
-        structure_path = self.structure_set_path.joinpath(f"{item}.nii.gz")
-
-        result = sitk.ReadImage(str(structure_path))
-
-        self.cache[item] = result
-        return result
-
-    def keys(self):
-        return self.structure_names
-
-    def create_mapping_json(self, mapping_dict, level="project"):
-        """_summary_
-
-        Args:
-            mapping_dict (_type_): _description_
-            level (str, optional): _description_. Defaults to "project".
-        """
-        final_map = {}
-        final_map["structures"] = mapping_dict
-
-        if level == "project":
-            path = self.structure_set_path.parent.parent.parent.parent.joinpath(".pydicer")
-        elif level == "patient":
-            path = self.structure_set_path.parent.parent
-        elif level == "current_structure_set":
-            path = self.structure_set_path
-        else:
-            raise ValueError(
-                "level must be one of 'project', 'patient' or 'current_structure_set'."
-            )
-
-        # Create the mapping file
-        with open(
-            path.joinpath("structures_map.json"), "w", encoding="utf8"
-        ) as structures_map_file:
-            json.dump(final_map, structures_map_file, ensure_ascii=False, indent=4)

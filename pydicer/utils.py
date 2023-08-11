@@ -48,11 +48,9 @@ def determine_dcm_datetime(ds, require_time=False):
     date_type_preference = ["Series", "Study", "InstanceCreation"]
 
     for date_type in date_type_preference:
-
         type_date = f"{date_type}Date"
         type_time = f"{date_type}Time"
         if type_date in ds and len(ds[type_date].value) > 0:
-
             if type_time in ds and len(ds[type_time].value) > 0:
                 date_time_str = f"{ds[type_date].value}{ds[type_time].value}"
                 if "." in date_time_str:
@@ -86,7 +84,6 @@ def load_object_metadata(row, keep_tags=None, remove_tags=None):
 
     # If the working directory is configured and the row_path isn't relative to it, join it.
     if config is not None:
-
         try:
             row_path.relative_to(config.get_working_dir())
         except ValueError:
@@ -100,7 +97,6 @@ def load_object_metadata(row, keep_tags=None, remove_tags=None):
         ds_dict = json.load(json_file)
 
     if keep_tags is not None:
-
         clean_keep_tags = []
 
         if not isinstance(keep_tags, list):
@@ -120,22 +116,18 @@ def load_object_metadata(row, keep_tags=None, remove_tags=None):
 
     # If
     if keep_tags is not None:
-
         if remove_tags is None:
             remove_tags = []
 
         for tag in ds_dict.keys():
-
             if tag.lower() not in keep_tags:
                 remove_tags.append(tag)
 
     if remove_tags is not None:
-
         if not isinstance(remove_tags, list):
             remove_tags = [remove_tags]
 
         for tag in remove_tags:
-
             tag_key = pydicom.datadict.tag_for_keyword(tag)
             if tag_key is not None:
                 t = pydicom.tag.Tag(tag_key)
@@ -176,7 +168,6 @@ def load_dvh(row, struct_hash=None):
 
     # If the working directory is configured and the row_path isn't relative to it, join it.
     if config is not None:
-
         try:
             row_path.relative_to(config.get_working_dir())
         except ValueError:
@@ -184,7 +175,6 @@ def load_dvh(row, struct_hash=None):
 
     df_result = pd.DataFrame(columns=["patient", "struct_hash", "label", "cc", "mean"])
     for dvh_file in row_path.glob("dvh_*.csv"):
-
         if struct_hash is not None:
             file_struct_hash = dvh_file.name.replace("dvh_", "").replace(".csv", "")
 
@@ -262,7 +252,6 @@ def read_converted_data(
     df = pd.DataFrame()
 
     for pat_dir in dataset_directory.glob("*"):
-
         if not pat_dir.is_dir():
             continue
 
@@ -361,7 +350,6 @@ def get_iterator(iterable, length=None, unit="it", name=None):
 
     iterator = iterable
     if config.get_config("verbosity") == 0:
-
         if length is None:
             length = len(iterable)
 
@@ -441,3 +429,92 @@ def get_structures_linked_to_dose(working_directory: Path, dose_row: pd.Series) 
     df_linked_struct = df_linked_struct.drop_duplicates()
 
     return df_linked_struct
+
+
+def add_structure_name_mapping(
+    mapping_dict: dict,
+    mapping_id: str = "default",
+    working_directory: Path = None,
+    patient_id: str = None,
+    structure_set_row: pd.Series = None,
+):
+    """Specify a structure name mapping dictionary object where keys are the standardised structure
+    names and value is a list of strings of various structure names to map to the standard name.
+
+    If a `structure_set_row` is provided, the mapping will be stored only for that specific
+    structure. Otherwise, `working_directory` must be provided, then it will be stored at project
+    level by default, or at the patient level if `patient_id` is also provided.
+
+    Args:
+        mapping_dict (dict): Dictionary object with the standardised structure name (str) as the
+          key and a list of the various structure names to map as the value.
+        mapping_id (str, optional): The ID to refer to this mapping as. Defaults to "default".
+        working_directory (Path, optional): The working directory for this project Required if
+          `structure_set_row` is None. Defaults to None.
+        patient_id (str, optional): The ID of the patient to which this mapping belongs.
+          Defaults to None.
+        structure_set_row (pd.Series, optional): The row of the converted structure set to which
+          this mapping belongs. Defaults to None.
+
+    Raises:
+        SystemError: _description_
+        ValueError: _description_
+        ValueError: _description_
+    """
+
+    mapping_path_base = None
+    mapping_level = "project"
+
+    if structure_set_row is not None:
+        # Mapping for specific structure set
+        logger.info(
+            "Adding mapping %s for structure set %s", mapping_id, structure_set_row.hashed_uid
+        )
+
+        mapping_path_base = Path(structure_set_row.path)
+        mapping_level = "stucture_set"
+
+    elif working_directory is not None:
+        # Mapping at a higher level, set the appropriate directory based on parameters passed in
+
+        if patient_id is None:
+            # Project wide, store this in the hiddel .pydicer directory
+            mapping_path_base = working_directory.joinpath(".pydicer")
+            mapping_level = "project"
+        else:
+            # Patient specific, store this in the patient directory
+            mapping_path_base = working_directory.joinpath(
+                CONVERTED_DIR_NAME, patient_id, "structures"
+            )
+            mapping_level = "patient"
+
+    else:
+        raise SystemError("working_directory or structure_set_row must be provided")
+
+    # Perform a few checks on the mapping dict
+    for k in mapping_dict.keys():
+        if not isinstance(k, str):
+            raise ValueError("All keys in mapping dictionary must be of type str")
+
+        values_valid = isinstance(mapping_dict[k], list)
+        for value in mapping_dict[k]:
+            if not isinstance(value, str):
+                values_valid = False
+                break
+
+        if not values_valid:
+            raise ValueError(
+                "All values in mapping dictionary must be a list of str entries "
+                "(e.g. {'Lung_L': ['Left_Lung', 'LeftLung', 'lung_l']})"
+            )
+
+    logger.info("Adding mapping for %s in %s", mapping_level, mapping_path_base)
+
+    mapping_path = mapping_path_base.joinpath(".structure_set_mappings")
+    mapping_path.mkdir(exist_ok=True)
+
+    # Create the mapping file
+    with open(
+        mapping_path.joinpath(f"{mapping_id}.json"), "w", encoding="utf8"
+    ) as structures_map_file:
+        json.dump(mapping_dict, structures_map_file, ensure_ascii=False, indent=4)
