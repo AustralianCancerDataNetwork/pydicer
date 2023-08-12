@@ -148,33 +148,10 @@ class AnalyseData:
         # Init with an empty dataframe with some minimal columns names
         dfs = [pd.DataFrame(columns=["patient", "struct_hash", "dose_hash", "label"])]
         for _, dose_row in df_doses.iterrows():
-            ## Currently doses are linked via: plan -> struct -> image
+            # Find the linked structure sets to compute the dose metrics for
+            df_linked_struct = get_structures_linked_to_dose(self.working_directory, dose_row)
 
-            # Find the linked plan
-            df_linked_plan = df_process[
-                df_process["sop_instance_uid"] == dose_row.referenced_sop_instance_uid
-            ]
-
-            if len(df_linked_plan) == 0:
-                logger.warning("No linked plans found for dose: %s", dose_row.sop_instance_uid)
-
-            # Find the linked structure set
-            df_linked_struct = None
-            if len(df_linked_plan) > 0:
-                plan_row = df_linked_plan.iloc[0]
-                df_linked_struct = df_process[
-                    df_process["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
-                ]
-
-            # Also link via Frame of Reference
-            df_for_linked = df_process[
-                (df_process["modality"] == "RTSTRUCT")
-                & (df_process["for_uid"] == dose_row.for_uid)
-            ]
-
-            struct_hashes = (
-                df_linked_struct.hashed_uid.tolist() + df_for_linked.hashed_uid.tolist()
-            )
+            struct_hashes = df_linked_struct.hashed_uid.tolist()
 
             df_dvhs = load_dvh(dose_row, struct_hash=struct_hashes)
 
