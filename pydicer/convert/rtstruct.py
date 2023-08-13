@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 import pydicom
 import SimpleITK as sitk
-from matplotlib import cm
+import matplotlib
 
 from platipy.dicom.io.rtstruct_to_nifti import transform_point_set_from_dicom_struct
 from platipy.imaging.utils.io import write_nrrd_structure_set
@@ -54,7 +54,6 @@ def convert_rtstruct(
 
     image_output_path = None
     if output_img is not None:
-
         if not isinstance(output_img, Path):
             if not output_img.endswith(".nii.gz"):
                 output_img = f"{output_img}.nii.gz"
@@ -64,7 +63,6 @@ def convert_rtstruct(
         logger.debug("Image series to be converted to: %s", image_output_path)
 
     if spacing:
-
         if isinstance(spacing, str):
             spacing = [float(i) for i in spacing.split(",")]
         logger.debug("Overriding image spacing with: %s", spacing)
@@ -83,14 +81,16 @@ def convert_rtstruct(
         sitk.WriteImage(dicom_image, str(image_output_path))
 
 
-def write_nrrd_from_mask_directory(mask_directory, output_file, colormap=cm.get_cmap("rainbow")):
+def write_nrrd_from_mask_directory(
+    mask_directory, output_file, colormap=matplotlib.colormaps.get_cmap("rainbow")
+):
     """Produce a NRRD file from a directory of masks in Nifti format
 
     Args:
         mask_directory (pathlib.Path|str): Path object of directory containing masks
         output_file (pathlib.Path|str): The output NRRD file to write to.
         color_map (matplotlib.colors.Colormap | dict, optional): Colormap to use for output.
-            Defaults to cm.get_cmap("rainbow").
+            Defaults to matplotlib.colormaps.get_cmap("rainbow").
     """
 
     if isinstance(mask_directory, str):

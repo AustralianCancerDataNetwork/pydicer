@@ -1,5 +1,6 @@
 import sys
 import logging
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from pydicer.config import PyDicerConfig
@@ -82,7 +83,7 @@ class PyDicer:
         logger.handlers.clear()
         logger.setLevel(logging.DEBUG)
 
-        file_handler = logging.handlers.RotatingFileHandler(
+        file_handler = RotatingFileHandler(
             log_file_path,
             maxBytes=100 * 1024 * 1024,  # Max 100 MB per log file before rotating
             backupCount=100,  # Keep up to 100 log files in history

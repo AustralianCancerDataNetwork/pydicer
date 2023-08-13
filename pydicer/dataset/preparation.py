@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -29,10 +29,10 @@ class PrepareDataset:
         # Create a copy so that we aren't manuipulating the original entry
         data_object_row = data_object_row.copy()
 
-        if data_object_row.path.startswith(str(self.working_directory)):
-            data_object_row.path = str(
-                Path(data_object_row.path).relative_to(self.working_directory)
-            )
+        object_path = Path(data_object_row.path)
+        if object_path.is_absolute():
+            data_object_row.path = str(object_path.relative_to(self.working_directory))
+            object_path = Path(data_object_row.path)
 
         object_path = Path(data_object_row.path)
         symlink_path = dataset_dir.joinpath(object_path.relative_to(CONVERTED_DIR_NAME))
@@ -54,7 +54,6 @@ class PrepareDataset:
         pat_converted_csv = pat_dir.joinpath("converted.csv")
         df_pat = pd.DataFrame([data_object_row])
         if pat_converted_csv.exists():
-
             col_types = {"patient_id": str, "hashed_uid": str}
             df_converted = pd.read_csv(pat_converted_csv, index_col=0, dtype=col_types)
 
@@ -109,7 +108,6 @@ class PrepareDataset:
         """
 
         if isinstance(preparation_function, str):
-
             preparation_function = getattr(functions, preparation_function)
 
         if not callable(preparation_function):
