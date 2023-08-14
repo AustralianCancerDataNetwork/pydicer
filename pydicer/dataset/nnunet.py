@@ -319,11 +319,7 @@ class NNUNetDataset:
         summed_results = df_results.sum()
         incomplete_structures = []
         incomplete_patients = []
-        import matplotlib
 
-        cm = matplotlib.colormaps.get_cmap("rainbow")
-        cm = matplotlib.colors.Colormap("test")
-        cm = cm.resampled(10)
         for s in self.structure_names:
             if not num_patients == summed_results[s]:
                 missing_pats = df_results[df_results[s] == 0].patient_id.tolist()
@@ -418,7 +414,9 @@ class NNUNetDataset:
         return sitk.Resample(label_map, image)
 
     def prepare_dataset(self):
+        """Coming soon"""
         pass
 
     def generate_training_scripts(self):
+        """Coming soon"""
         pass
