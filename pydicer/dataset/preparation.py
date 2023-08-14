@@ -1,6 +1,7 @@
 import logging
 import os
 from pathlib import Path
+from typing import Callable
 
 import pandas as pd
 
@@ -16,7 +17,7 @@ class PrepareDataset:
     def __init__(self, working_directory="."):
         self.working_directory = Path(working_directory)
 
-    def add_object_to_dataset(self, dataset_name, data_object_row):
+    def add_object_to_dataset(self, dataset_name: str, data_object_row: pd.Series):
         """Add one data object to a dataset.
 
         Args:
@@ -68,7 +69,7 @@ class PrepareDataset:
         df_pat = df_pat.reset_index(drop=True)
         df_pat.to_csv(pat_dir.joinpath("converted.csv"))
 
-    def prepare_from_dataframe(self, dataset_name, df_prepare):
+    def prepare_from_dataframe(self, dataset_name: str, df_prepare: pd.DataFrame):
         """Prepare a dataset from a filtered converted dataframe
 
         Args:
@@ -92,7 +93,7 @@ class PrepareDataset:
         for _, row in df_prepare.iterrows():
             self.add_object_to_dataset(dataset_name, row)
 
-    def prepare(self, dataset_name, preparation_function, patients=None, **kwargs):
+    def prepare(self, dataset_name: str, preparation_function: Callable, patients=None, **kwargs):
         """Calls upon an appropriate preparation function to generate a clean dataset ready for
         use. Additional keyword arguments are passed through to the preparation_function.
 
