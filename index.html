@@ -266,7 +266,29 @@ environment using <code class="docutils literal notranslate"><span class="pre">p
 <span class="n">pydicer</span><span class="o">.</span><span class="n">run_pipeline</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>or check out the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/GettingStarted.html">Getting Started Example</a>.</p>
+</section>
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">#</a></h2>
+<p>PyDicer is a research tool and adding to its functionality is encouraged. All GitHub Pull Requests
+are welcome. We do ask that you abide by our code of conduct and follow our coding standards.</p>
+<section id="coding-standards">
+<h3>Coding standards<a class="headerlink" href="#coding-standards" title="Permalink to this heading">#</a></h3>
+<p>Code in pydicer must conform to Python’s PEP-8 standards to ensure consistent formatting between contributors. To ensure this, pylint is used to check code conforms to these standards before a Pull Request can be merged. You can run pylint from the command line using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pylint<span class="w"> </span>pydicer
+</pre></div>
+</div>
+<p>But a better idea is to ensure you are using a Python IDE which supports linting (such as <a class="reference external" href="https://code.visualstudio.com/docs/python/linting">VSCode</a> or PyCharm). Make sure you resolve all suggestions from pylint before submitting your pull request.</p>
+<p>If you’re new to using pylint, you may like to <a class="reference external" href="https://docs.pylint.org/en/v2.11.1/tutorial.html">read this guide</a>.</p>
+</section>
+<section id="automated-tests">
+<h3>Automated tests<a class="headerlink" href="#automated-tests" title="Permalink to this heading">#</a></h3>
+<p>A test suite is included in pydicer which ensures that code contributed to the repository functions as expected and continues to function as further development takes place. Any code submitted via a pull request should include appropriate automated tests for the new code.</p>
+<p>pytest is used as a testing library. Running the tests from the command line is really easy:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest
+</pre></div>
+</div>
+<p>Add your tests to the appropriate file in the <code class="docutils literal notranslate"><span class="pre">tests/</span></code> directory. See the <a class="reference external" href="https://docs.pytest.org/en/6.2.x/getting-started.html">pytest documention</a> for more information.
+or check out the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/GettingStarted.html">Getting Started Example</a>.</p>
 <a class="reference external image-reference" href="https://colab.research.google.com/github/australiancancerdatanetwork/pydicer/blob/main/examples/GettingStarted.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
 <div class="toctree-wrapper compound">
 </div>
@@ -274,6 +296,7 @@ environment using <code class="docutils literal notranslate"><span class="pre">p
 </div>
 <div class="toctree-wrapper compound">
 </div>
+</section>
 </section>
 </section>
 
@@ -325,7 +348,12 @@ environment using <code class="docutils literal notranslate"><span class="pre">p
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#directory-structure">Directory Structure</a></li>
 <li><a class="reference internal" href="#pipeline">Pipeline</a></li>
-<li><a class="reference internal" href="#getting-started">Getting Started</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#contributing">Contributing</a><ul>
+<li><a class="reference internal" href="#coding-standards">Coding standards</a></li>
+<li><a class="reference internal" href="#automated-tests">Automated tests</a><ul>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
