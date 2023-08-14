@@ -11,7 +11,7 @@ import pydicom
 import tqdm
 
 from pydicer.config import PyDicerConfig
-from pydicer.constants import CONVERTED_DIR_NAME, PYDICER_DIR_NAME
+from pydicer.constants import CONVERTED_DIR_NAME, PYDICER_DIR_NAME, DEFAULT_MAPPING_ID
 
 logger = logging.getLogger(__name__)
 
@@ -433,7 +433,7 @@ def get_structures_linked_to_dose(working_directory: Path, dose_row: pd.Series) 
 
 def add_structure_name_mapping(
     mapping_dict: dict,
-    mapping_id: str = "default",
+    mapping_id: str = DEFAULT_MAPPING_ID,
     working_directory: Path = None,
     patient_id: str = None,
     structure_set_row: pd.Series = None,
@@ -448,7 +448,8 @@ def add_structure_name_mapping(
     Args:
         mapping_dict (dict): Dictionary object with the standardised structure name (str) as the
           key and a list of the various structure names to map as the value.
-        mapping_id (str, optional): The ID to refer to this mapping as. Defaults to "default".
+        mapping_id (str, optional): The ID to refer to this mapping as. Defaults to
+          DEFAULT_MAPPING_ID.
         working_directory (Path, optional): The working directory for this project Required if
           `structure_set_row` is None. Defaults to None.
         patient_id (str, optional): The ID of the patient to which this mapping belongs.

@@ -15,7 +15,7 @@ from platipy.imaging.dose.dvh import (
     calculate_v_x,
     calculate_d_cc_x,
 )
-from pydicer.constants import CONVERTED_DIR_NAME
+from pydicer.constants import CONVERTED_DIR_NAME, DEFAULT_MAPPING_ID
 
 from pydicer.utils import (
     load_object_metadata,
@@ -112,7 +112,7 @@ class AnalyseData:
         dataset_name=CONVERTED_DIR_NAME,
         patient=None,
         df_process=None,
-        structure_mapping_id="default",
+        structure_mapping_id=DEFAULT_MAPPING_ID,
     ):
         """Return a DataFrame of DVHs computed for this dataset
 
@@ -184,7 +184,7 @@ class AnalyseData:
         d_point: Union[list, float, int] = None,
         v_point: Union[list, float, int] = None,
         d_cc_point: Union[list, float, int] = None,
-        structure_mapping_id: str = "default",
+        structure_mapping_id: str = DEFAULT_MAPPING_ID,
     ) -> pd.DataFrame:
         """Compute Dose metrics from a DVH
 

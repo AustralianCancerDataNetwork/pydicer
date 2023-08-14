@@ -132,7 +132,6 @@ def read_all_segmentation_logs(
         df = df[df.modality == modality]
 
     for _, row in df.iterrows():
-
         df_log = read_segmentation_log(row)
 
         df_logs = pd.concat([df_logs, df_log])
@@ -199,7 +198,6 @@ def segment_image(
 
     # Check if the segmentation has already been run for this image
     segment_struct_id = f"{segment_id}_{image_row.hashed_uid}"
-    print(segment_struct_id)
 
     # This check is to support deployments before tracking auto-seg log
     if not force and len(
@@ -216,7 +214,6 @@ def segment_image(
         return
 
     # Auto-seg log tracks passed and failed segmentation runs
-
     df_previous_runs = df_pat_autoseg[
         (df_pat_autoseg.segment_id == segment_id) & df_pat_autoseg.img_id == image_row.hashed_uid
     ]
@@ -265,7 +262,6 @@ def segment_image(
         )
 
     except Exception as e:  # pylint: disable=broad-exception-caught
-
         run_successful = False
         error_msg = str(e)
 
@@ -324,7 +320,6 @@ def segment_dataset(
     df = df[df.modality == modality]
 
     for _, image_row in tqdm(df.iterrows(), "Segmentation", total=len(df)):
-
         segment_image(
             working_directory,
             image_row,
