@@ -135,6 +135,7 @@ dmypy.json
 *.dcm
 
 testdata/
+pydicer_testdata/
 
 examples/data/
 
