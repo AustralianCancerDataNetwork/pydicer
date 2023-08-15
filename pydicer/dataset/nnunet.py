@@ -363,7 +363,6 @@ class NNUNetDataset:
             structure_names = structure_set.keys()
             for si, structure_name_i in enumerate(structure_names):
                 for sj in range(si + 1, len(structure_names)):
-                    structure_name_i = structure_names[si]
                     structure_name_j = structure_names[sj]
 
                     structure_sum = (
@@ -415,8 +414,6 @@ class NNUNetDataset:
 
     def prepare_dataset(self):
         """Coming soon"""
-        pass
 
     def generate_training_scripts(self):
         """Coming soon"""
-        pass
