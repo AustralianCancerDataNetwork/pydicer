@@ -5,6 +5,8 @@ from pathlib import Path
 import SimpleITK as sitk
 import pandas as pd
 
+from pydicer.constants import DEFAULT_MAPPING_ID
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,7 +44,7 @@ def get_mapping_for_structure_set(structure_set_row: pd.Series, mapping_id: str)
 
 
 class StructureSet(dict):
-    def __init__(self, structure_set_row, mapping_id="default"):
+    def __init__(self, structure_set_row, mapping_id=DEFAULT_MAPPING_ID):
         if not structure_set_row.modality == "RTSTRUCT":
             raise AttributeError("structure_set_row modality must be RTSTRUCT")
 
