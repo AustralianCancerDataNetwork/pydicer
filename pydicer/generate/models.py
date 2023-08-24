@@ -45,7 +45,7 @@ def run_total_segmentator(input_image: sitk.Image) -> dict:
         output_dir.mkdir()
 
         # Run total segmentator
-        totalsegmentator(input_dir, output_dir)
+        totalsegmentator(input_file, output_dir)
 
         # Load the output masks into a dict to return
         for mask_file in output_dir.glob("*.nii.gz"):
