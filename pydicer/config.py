@@ -41,6 +41,15 @@ PYDICER_CONFIG = {
         "default": True,
         "choices": None,
     },
+    "ignore_duplicate_slices": {
+        "module": "convert",
+        "description": "If two slices at the same location with different pixel data are found "
+        "then the first slice is used if ignore_duplicate_slices is True. Otherwise an error is"
+        "raised and these images are sent to quarantine",
+        "type": bool,
+        "default": False,
+        "choices": None,
+    },
     "default_patient_weight": {
         "module": "convert",
         "description": "Default patient weight to use for PET conversion if it cannot be "

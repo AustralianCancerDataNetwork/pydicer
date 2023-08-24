@@ -251,6 +251,7 @@ class AnalyseData:
         structure_meta_data=None,
         image_meta_data=None,
         resample_to_image=False,
+        custom_radiomics=None
     ):
         """
         Compute radiomics for the data in the working directory. Results are saved as csv files in
@@ -296,6 +297,10 @@ class AnalyseData:
                 self.working_directory, dataset_name=dataset_name, patients=patient
             )
 
+        available_radiomics = AVAILABLE_RADIOMICS
+        if custom_radiomics is not None:
+            available_radiomics = {**available_radiomics, **custom_radiomics}
+
         # Read all converted data for linkage
         df_converted = read_converted_data(self.working_directory)
 
@@ -336,9 +341,10 @@ class AnalyseData:
 
             if len(df_linked_img) == 0:
                 logger.warning(
-                    "No linked images found, structures won't be visualised: %s",
+                    "No linked images found, radiomics won't be computed: %s",
                     struct_row.sop_instance_uid,
                 )
+                continue
 
             for _, img_row in df_linked_img.iterrows():
 
@@ -347,6 +353,8 @@ class AnalyseData:
                 if struct_radiomics_path.exists() and not force:
                     logger.info("Radiomics already computed at %s", struct_radiomics_path)
                     continue
+
+                logger.info("Computing radiomics for structure set %s and image %s", struct_row.hashed_uid, img_row.hashed_uid)
 
                 img_file = Path(img_row.path).joinpath(f"{img_row.modality}.nii.gz")
                 img_meta_data = load_object_metadata(img_row)
@@ -357,6 +365,7 @@ class AnalyseData:
                 for struct_nii in struct_dir.glob("*.nii.gz"):
 
                     struct_name = struct_nii.name.replace(".nii.gz", "")
+                    logger.debug("Computing radiomics for structure %s", struct_name)
 
                     # If a regex is set, make sure this structure name matches it
                     if structure_match_regex:
@@ -379,17 +388,22 @@ class AnalyseData:
                         settings["resampledPixelSpacing"] = resample_pixel_spacing
 
                     if interpolator is not None and resample_pixel_spacing is not None:
-                        image, mask = imageoperations.resampleImage(image, mask, **settings)
+                        try:
+                            image, mask = imageoperations.resampleImage(image, mask, **settings)
+                        except ValueError as e:
+                            logger.exception(e)
+                            logger.error("Error during resampling")
+                            continue
 
                     df_contour = pd.DataFrame()
 
                     for rad in radiomics:
 
-                        if rad not in AVAILABLE_RADIOMICS:
+                        if rad not in available_radiomics:
                             logger.warning("Radiomic Class not found: %s", rad)
                             continue
 
-                        radiomics_obj = AVAILABLE_RADIOMICS[rad]
+                        radiomics_obj = available_radiomics[rad]
 
                         features = radiomics_obj(image, mask, **settings)
 

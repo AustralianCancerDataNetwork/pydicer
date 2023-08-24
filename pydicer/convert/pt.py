@@ -10,18 +10,15 @@ logger = logging.getLogger(__name__)
 def convert_dicom_to_nifti_pt(
     input_filepaths,
     output_filepath,
-    default_patient_weight=None,
 ):
     """Function to convert the dicom files contained in input_filepaths to one NIFTI image.
 
     Args:
         input_filepaths (list): list of the dicom paths
         output_filepath (str): path to the output file path where to store the NIFTI file.
-        default_patient_weight (float, optional): If the patient's weight is missing from the PT
-            DICOM it can be provided through this argument. Defaults to None.
 
     Raises:
-        MissingWeightError: Error to alert when the weight is missing from the PT, to compute
+        ValueError: Error to alert when the weight is missing from the PT, to compute
             the SUV.
         RuntimeError: Error to alert when one or more slices are missing
         ValueError: Raised when a modality or a unit (for the PT) is not handled.
@@ -31,16 +28,6 @@ def convert_dicom_to_nifti_pt(
     """
     slices = [pdcm.read_file(str(dcm)) for dcm in input_filepaths]
     slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
-
-    if not hasattr(slices[0], "PatientWeight") or slices[0].PatientWeight is None:
-        if hasattr(slices[0], "PatientsWeight"):
-            patient_weight = float(slices[0].PatientsWeight)
-        elif default_patient_weight is not None:
-            patient_weight = default_patient_weight
-        else:
-            raise ValueError("Cannot compute SUV the weight is missing")
-    else:
-        patient_weight = float(slices[0].PatientWeight)
 
     # Check if all the slices come from the same serie
     same_series_uid = True
@@ -73,37 +60,37 @@ def convert_dicom_to_nifti_pt(
         ]
     )
 
-    np_image = get_physical_values_pt(slices, patient_weight)
-
+    np_image = get_physical_values_pt(slices)
+    # TODO remove this code it doesn't work... Iterp should happen in the main convert function,.
     position_final_slice = (len(slices) - 1) * slice_spacing + slices[0].ImagePositionPatient[2]
     # Test whether some slices are missing
     # due to an error at line 144: TypeError: only size-1 arrays can be converted
     # to Python scalars
-    if not is_approx_equal(position_final_slice, float(slices[-1].ImagePositionPatient[2])):
-        if (position_final_slice - axial_positions[-1]) / slice_spacing < 1.5:
+#    if not is_approx_equal(position_final_slice, float(slices[-1].ImagePositionPatient[2])):
+#        if (position_final_slice - axial_positions[-1]) / slice_spacing < 1.5:
             # If only one slice is missing
-            diff = np.asarray(
-                [
-                    not is_approx_equal(
-                        float(axial_positions[ind])
-                        - float(axial_positions[ind - 1])
-                        - slice_spacing,
-                        0,
-                    )
-                    for ind in range(1, len(axial_positions))
-                ]
-            )
-            ind2interp = int(np.where(diff)[0])
-            new_slice = (np_image[:, :, ind2interp] + np_image[:, :, ind2interp + 1]) * 0.5
-            new_slice = new_slice[..., np.newaxis]
-            np_image = np.concatenate(
-                (np_image[..., :ind2interp], new_slice, np_image[..., ind2interp:]),
-                axis=2,
-            )
-            logger.warning("One slice is missing, we replaced it by linear interpolation")
-        else:
-            # if more than one slice are missing
-            raise RuntimeError("Multiple slices are missing")
+#            diff = np.asarray(
+#                [
+#                    not is_approx_equal(
+#                        float(axial_positions[ind])
+#                        - float(axial_positions[ind - 1])
+#                        - slice_spacing,
+#                        0,
+#                    )
+#                    for ind in range(1, len(axial_positions))
+#                ]
+#            )
+#            ind2interp = int(np.where(diff)[0])
+#            new_slice = (np_image[:, :, ind2interp] + np_image[:, :, ind2interp + 1]) * 0.5
+#            new_slice = new_slice[..., np.newaxis]
+#            np_image = np.concatenate(
+#                (np_image[..., :ind2interp], new_slice, np_image[..., ind2interp:]),
+#                axis=2,
+#            )
+ #           logger.warning("One slice is missing, we replaced it by linear interpolation")
+ #       else:
+ #           # if more than one slice are missing
+ #           raise RuntimeError("Multiple slices are missing")
 
     image_position_patient = [float(k) for k in slices[0].ImagePositionPatient]
     sitk_image = get_sitk_volume_from_np(np_image, pixel_spacing, image_position_patient)
@@ -141,12 +128,11 @@ def is_approx_equal(x, y, tolerance=0.05):
     return abs(x - y) <= tolerance
 
 
-def get_physical_values_pt(slices, patient_weight):
+def get_physical_values_pt(slices):
     """Function to Get physical values from raw PET
 
     Args:
         slices: all pet slices of this patient
-        patient_weight: a value about this patient
 
     Returns:
         extract physical values for pet
@@ -157,6 +143,18 @@ def get_physical_values_pt(slices, patient_weight):
     units = s.Units
 
     if units == "BQML":
+
+        # Make sure we have the patient's weight
+        if not hasattr(slices[0], "PatientWeight") or slices[0].PatientWeight is None:
+            if hasattr(slices[0], "PatientsWeight"):
+                patient_weight = float(slices[0].PatientsWeight)
+            elif default_patient_weight is not None:
+                patient_weight = default_patient_weight
+            else:
+                raise ValueError("Cannot compute SUV the weight is missing")
+        else:
+            patient_weight = float(slices[0].PatientWeight)
+
 
         # TODO: use the function in the dataset module to convert datetime
         acquisition_datetime = datetime.strptime(
@@ -215,12 +213,20 @@ def get_suv_philips(slices):
     """
     image = []
     for s in slices:
+        suv_scale_factor = None
         try:
-            im = (float(s.RescaleSlope) * s.pixel_array + float(s.RescaleIntercept)) * float(
-                s.SUVScaleFactor
-            )
+            suv_scale_factor = s.SUVScaleFactor
         except AttributeError as e:
-            raise ValueError("Cannot compute SUV from raw PET for CNTS") from e
+            try:
+                suv_scale_factor = float(s[0x7053, 0x1000].value)
+            except AttributeError as e:
+                raise ValueError("Cannot compute SUV from raw PET for CNTS") from e
+
+        assert suv_scale_factor is not None
+
+        im = (float(s.RescaleSlope) * s.pixel_array + float(s.RescaleIntercept)) * float(
+            suv_scale_factor
+        )
 
         image.append(im)
 
@@ -241,15 +247,40 @@ def get_suv_from_bqml(slices, decay_time, patient_weight):
     image = []
     for s in slices:
         pet = float(s.RescaleSlope) * s.pixel_array + float(s.RescaleIntercept)
+
+        half_life = None
+        total_dose = None
         try:
             half_life = float(s.RadiopharmaceuticalInformationSequence[0].RadionuclideHalfLife)
             total_dose = float(s.RadiopharmaceuticalInformationSequence[0].RadionuclideTotalDose)
+        except IndexError as e:
+            logger.warning("No RadiopharmaceuticalInformationSequence available")
         except AttributeError as e:
-            raise ValueError("Cannot compute SUV from raw PET for BQML") from e
+            logger.warning("Unable to read .RadionuclideHalfLife/.RadionuclideTotalDose from file")
+
+        # Couldn't find half_life or total_dose. Try to find it in another files in the series
+        if half_life is None or total_dose is None:
+            for ds in slices:
+                try:
+                    if half_life is None:
+                         half_life = float(ds.RadiopharmaceuticalInformationSequence[0].RadionuclideHalfLife)
+                    if total_dose is None:
+                         total_dose = float(ds.RadiopharmaceuticalInformationSequence[0].RadionuclideTotalDose)
+                except IndexError:
+                    pass
+                except AttributeError:
+                    pass
+
+                if half_life is not None and total_dose is not None:
+                    break
+
+        if half_life is None or total_dose is None:
+            raise ValueError("Cannot compute SUV from raw PET for BQML")
 
         decay = 2 ** (-decay_time / half_life)
         actual_activity = total_dose * decay
 
         im = pet * patient_weight * 1000 / actual_activity
         image.append(im)
+
     return np.stack(image, axis=-1).astype(np.float32)

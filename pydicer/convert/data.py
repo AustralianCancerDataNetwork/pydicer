@@ -67,7 +67,7 @@ def get_object_type(sop_class_uid):
     return object_type
 
 
-def handle_missing_slice(files):
+def handle_missing_slice(files, ignore_duplicates=False):
     """function to interpolate missing slices in an image
 
     Example usage:
@@ -123,7 +123,7 @@ def handle_missing_slice(files):
             if pix_array is None:
                 pix_array = this_pix_array
             else:
-                if not np.allclose(pix_array, this_pix_array):
+                if not np.allclose(pix_array, this_pix_array) and not ignore_duplicates:
                     raise (
                         ValueError(
                             f"{len(df_check_duplicates)} slices at location "
@@ -131,7 +131,7 @@ def handle_missing_slice(files):
                         )
                     )
 
-        logger.warning("Duplicate slices detected, pixel array the same so dropping duplicates")
+        logger.warning("Duplicate slices detected, dropping duplicates")
         df_files = df_files.drop_duplicates(subset=["slice_location"])
 
     temp_dir = Path(tempfile.mkdtemp())
@@ -365,7 +365,10 @@ class ConvertData:
                         # Only convert if it doesn't already exist or if force is True
 
                         if config.get_config("interp_missing_slices"):
-                            series_files = handle_missing_slice(df_files)
+                            series_files = handle_missing_slice(
+                                   df_files,
+                                   ignore_duplicates=config.get_config("ignore_duplicate_slices")
+                               )
                         else:
                             # TODO Handle inconsistent slice spacing
                             error_log = """Slice Locations are not evenly spaced. Set
@@ -483,9 +486,8 @@ class ConvertData:
                     if not output_dir.exists() or force:
 
                         # Only convert if it doesn't already exist or if force is True
-
-                        series_files = df_files.file_path.tolist()
-                        series_files = [str(f) for f in series_files]
+                        # TODO allow this interp to be turned off...
+                        series_files = handle_missing_slice(df_files)
 
                         output_dir.mkdir(exist_ok=True, parents=True)
                         nifti_file = output_dir.joinpath("PT.nii.gz")
@@ -493,7 +495,6 @@ class ConvertData:
                         convert_dicom_to_nifti_pt(
                             series_files,
                             nifti_file,
-                            default_patient_weight=config.get_config("default_patient_weight"),
                         )
 
                         json_file = output_dir.joinpath("metadata.json")
