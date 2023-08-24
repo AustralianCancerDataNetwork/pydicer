@@ -51,7 +51,7 @@ def run_total_segmentator(input_image: sitk.Image) -> dict:
         for mask_file in output_dir.glob("*.nii.gz"):
             mask = sitk.ReadImage(str(mask_file))
 
-            structure_name = mask_file.name.replace(".nii.gz")
+            structure_name = mask_file.name.replace(".nii.gz", "")
 
             # Check if the mask is empty, total segmentator stores empty mask files for structures
             # that aren't within FOV
