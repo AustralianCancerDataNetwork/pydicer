@@ -1,5 +1,8 @@
 import os
 import logging
+import json
+import subprocess
+import stat
 from pathlib import Path
 from typing import Union, List
 
@@ -47,16 +50,19 @@ class NNUNetDataset:
         """_summary_
 
         Args:
-            working_directory (Union[str, Path]): _description_
-            nnunet_id (int): _description_
-            nnunet_name (str): _description_
-            nnunet_description (str, optional): _description_. Defaults to "".
-            dataset_name (str, optional): _description_. Defaults to CONVERTED_DIR_NAME.
-            image_modality (str, optional): _description_. Defaults to "CT".
-            mapping_id (str, optional): _description_. Defaults to DEFAULT_MAPPING_ID.
+            working_directory (Union[str, Path]): The PyDicer working directory
+            nnunet_id (int): An ID to assign to the nnUNet dataset.
+            nnunet_name (str): A name for the nnUNet dataset.
+            nnunet_description (str, optional): A description for the nnUNet dataset. Defaults to
+              "".
+            dataset_name (str, optional): The PyDicer dataset name prepared for conversion to
+              nnUNet format. Defaults to CONVERTED_DIR_NAME.
+            image_modality (str, optional): The image modality to use for nnUNet. Defaults to "CT".
+            mapping_id (str, optional): The mapping_id used to map structure names to a
+              standardised name. Defaults to DEFAULT_MAPPING_ID.
 
         Raises:
-            SystemError: _description_
+            SystemError: Raised if the nnUNet_raw environment variable is not set.
         """
 
         # Check that the nnUNet_raw_data_base environment variable is set
@@ -412,8 +418,234 @@ class NNUNetDataset:
 
         return sitk.Resample(label_map, image)
 
-    def prepare_dataset(self):
-        """Coming soon"""
+    def prepare_dataset(self) -> Path:
+        """Prepare the dataset ready for nnUNet training on the file system.
 
-    def generate_training_scripts(self):
-        """Coming soon"""
+        Raises:
+            SystemError: Raised if split_dataset hasn't yet been run.
+            SystemError: Raised if check_structure_names has detected missing structures for
+              patients.
+
+        Returns:
+            Path: The folder in which the nnUNet dataset has been prepared.
+        """
+
+        if len(self.training_cases) == 0:
+            raise SystemError("training_cases are empty, run split_dataset function first.")
+
+        # First check that all cases (in training set) have the structures which are to be learnt
+        df_structures = self.check_structure_names()
+        df_missing = df_structures.data[df_structures.data.isin([0]).any(axis=1)]
+        if len(df_missing) > 0:
+            raise SystemError(
+                "One or more patients are missing structures. Use the "
+                "check_structure_names function to inspect which strucutures are missing and "
+                "correct before proceeding."
+            )
+
+        nnunet_dir = self.nnunet_raw_path.joinpath(f"Task{self.nnunet_id}_{self.nnunet_name}")
+
+        image_tr_path = nnunet_dir.joinpath("imagesTr")
+        image_tr_path.mkdir(exist_ok=True, parents=True)
+
+        image_ts_path = nnunet_dir.joinpath("imagesTs")
+        image_ts_path.mkdir(exist_ok=True, parents=True)
+
+        label_tr_path = nnunet_dir.joinpath("labelsTr")
+        label_tr_path.mkdir(exist_ok=True, parents=True)
+
+        label_ts_path = nnunet_dir.joinpath("labelsTs")
+        label_ts_path.mkdir(exist_ok=True, parents=True)
+
+        df = read_converted_data(self.working_directory, dataset_name=self.dataset_name)
+
+        for pat_id in self.training_cases:
+            df_pat = df[df.patient_id == pat_id]
+            img_row = df_pat[df_pat.modality == self.image_modality].iloc[0]
+            img_dir = Path(img_row.path)
+            img_file = img_dir.joinpath(f"{self.image_modality}.nii.gz")
+            img = sitk.ReadImage(str(img_file))
+
+            target_img_path = image_tr_path.joinpath(f"{pat_id}_0000.nii.gz")
+
+            target_img_path.unlink(missing_ok=True)
+            target_img_path.symlink_to(img_file)
+
+            structure_set_row = df_pat[df_pat.modality == "RTSTRUCT"].iloc[0]
+            structure_set = StructureSet(structure_set_row, self.mapping_id)
+            pat_label_map = self.prep_label_map_from_one_hot(img, structure_set)
+            target_label_path = label_tr_path.joinpath(f"{pat_id}.nii.gz")
+            sitk.WriteImage(pat_label_map, str(target_label_path))
+
+        # for pat_id in test_ids:
+        #     pat_img_path = patients[pat_id]["image"]
+        #     target_img_path = kfold_dir.joinpath("imagesTs", f"{pat_id}_0000.nii.gz")
+        #     target_img_path.symlink_to(pat_img_path)
+
+        #     pat_label_map = prep_label_map_from_one_hot(patients[pat_id])
+        #     target_label_path = kfold_dir.joinpath("labelsTs", f"{pat_id}.nii.gz")
+        #     sitk.WriteImage(pat_label_map, str(target_label_path))
+
+        # write JSON file
+        dataset_dict = {
+            "name": self.nnunet_name,
+            "description": self.nnunet_description,
+            "reference": "",
+            "licence": "N/A",
+            "release": "Not Released",
+            "tensorImageSize": "3D",
+            "modality": {"0": self.image_modality},
+            "labels": {
+                **{
+                    "0": "background",
+                },
+                **{idx + 1: struct for idx, struct in enumerate(self.structure_names)},
+            },
+            "numTraining": len(self.training_cases),
+            "numTest": len(self.testing_cases),
+            "training": [
+                {"image": f"./imagesTr/{i}.nii.gz", "label": f"./labelsTr/{i}.nii.gz"}
+                for i in self.training_cases
+            ],
+            "test": [f"./imagesTs/{i}.nii.gz" for i in self.testing_cases],
+        }
+
+        with open(nnunet_dir.joinpath("dataset.json"), "w+", encoding="utf8") as fp:
+            json.dump(dataset_dict, fp, indent=2)
+
+        return nnunet_dir
+
+    def generate_training_scripts(
+        self,
+        script_directory: Union[str, Path] = ".",
+        folds: Union[str, list] = "all",
+        models: Union[str, list] = None,
+        script_header: list = None,
+    ) -> Path:
+        """Generate the bash scripts needed to train the nnUNet
+
+        Args:
+            script_directory (Union[str, Path], optional): Directory in which to place the
+                generated script. Defaults to ".".
+            folds (Union[str, list], optional): The nnUNet folds to train. Defaults to "all".
+            models (Union[str, list], optional): The nnUNet models to train. Defaults to
+                ["2d", "3d_lowres", "3d_fullres"].
+            script_header (list, optional): An optional list of headers that will be inserted at
+                then beginning of the script. This is useful if you need to activate a Python
+                environment containing nnUNet prior to training. Defaults to None.
+
+        Raises:
+            FileNotFoundError: Raised when script_directory does not exist.
+
+        Returns:
+            Path: The path to the script file generated.
+        """
+
+        # Make sure the script folder exists
+        script_directory = Path(script_directory)
+        if not script_directory.exists():
+            raise FileNotFoundError(
+                "Ensure that the folder in which to generate the script exists."
+            )
+        script_path = script_directory.joinpath(f"train_{self.nnunet_id}_{self.nnunet_name}.sh")
+
+        if isinstance(folds, str):
+            folds = [folds]
+
+        # Set the default list for models
+        if models is None:
+            models = ["2d", "3d_lowres", "3d_fullres"]
+
+        if isinstance(models, str):
+            models = [models]
+
+        if script_header is None:
+            script_header = []
+
+        # Write the contents to the script
+        with open(script_path, "w", encoding="utf8") as f:
+            f.write("\n")
+
+            for l in script_header:
+                f.write(f"{l}\n")
+
+            f.write(
+                f"nnUNet_plan_and_preprocess -t {self.nnunet_id} --verify_dataset_integrity;\n"
+            )
+
+            f.write("\n")
+
+            for model in models:
+                for fold in folds:
+                    f.write(
+                        f"nnUNet_train {model} "
+                        f"nnUNetTrainerV2 Task{self.nnunet_id}_{self.nnunet_name} {fold};\n"
+                    )
+
+                f.write("\n")
+            f.write("\n")
+
+        # Make the script executable
+        script_path.chmod(script_path.stat().st_mode | stat.S_IEXEC)
+
+        return script_path
+
+    def train(self, script_directory: Union[str, Path] = ".", in_screen: bool = True):
+        """Start the nnUNet training script. Note this function might be useful in certain
+        circumstances, but training should mostly be managed and monitored from the terminal.
+
+        See nnUNet documentation for further information on the training process.
+
+        Args:
+            script_directory (Union[str, Path], optional): Directory containing the training script
+                generated script. Defaults to ".".
+            in_screen (bool, optional): If True, script will be started using the screen utility.
+                This runs training in the background and allows you to log out of the system. If
+                False this script will run within the current session (not recommended). Defaults
+                to True.
+
+        Raises:
+            FileNotFoundError: Raised if the training script hasn't yet been generated with the
+                generate_training_scripts function.
+        """
+        # Make sure the script folder exists
+        script_directory = Path(script_directory)
+        script_path = script_directory.joinpath(f"train_{self.nnunet_id}_{self.nnunet_name}.sh")
+
+        if not script_path.exists():
+            raise FileNotFoundError(
+                "Script bash file does not exist, run generate_training_scripts first."
+            )
+
+        if in_screen:
+            screen_name = f"train_{self.nnunet_id}_{self.nnunet_name}"
+            log_path = script_directory.joinpath(f"{screen_name}.log")
+
+            ret_code = subprocess.call(
+                [
+                    "screen",
+                    "-dm",
+                    "-L",
+                    "-Logfile",
+                    str(log_path),
+                    "-S",
+                    screen_name,
+                    f"./{script_path}",
+                ]
+            )
+
+            if ret_code == 0:
+                logger.info(
+                    "Training started, inspect in screen from terminal using: screen -r %s",
+                    screen_name,
+                )
+            else:
+                logger.error(
+                    "An error occured starting nnUNet training, is screen utility installed?"
+                )
+        else:
+            ret_code = subprocess.call([f"./{script_path}"])
+            if ret_code == 0:
+                logger.info("Training completed successfully")
+            else:
+                logger.error("An error occured during training")
