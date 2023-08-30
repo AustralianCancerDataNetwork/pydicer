@@ -477,15 +477,6 @@ class NNUNetDataset:
             target_label_path = label_tr_path.joinpath(f"{pat_id}.nii.gz")
             sitk.WriteImage(pat_label_map, str(target_label_path))
 
-        # for pat_id in test_ids:
-        #     pat_img_path = patients[pat_id]["image"]
-        #     target_img_path = kfold_dir.joinpath("imagesTs", f"{pat_id}_0000.nii.gz")
-        #     target_img_path.symlink_to(pat_img_path)
-
-        #     pat_label_map = prep_label_map_from_one_hot(patients[pat_id])
-        #     target_label_path = kfold_dir.joinpath("labelsTs", f"{pat_id}.nii.gz")
-        #     sitk.WriteImage(pat_label_map, str(target_label_path))
-
         # write JSON file
         dataset_dict = {
             "name": self.nnunet_name,
