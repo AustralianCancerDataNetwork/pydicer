@@ -36,6 +36,7 @@ jobs:
         run: |
           poetry run pip install --upgrade pip
           poetry install
+          poetry run pip install TotalSegmentator
       - name: Lint with Pylint
         run: |
           poetry run pylint pydicer
