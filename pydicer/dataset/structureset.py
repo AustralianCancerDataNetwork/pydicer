@@ -54,6 +54,7 @@ class StructureSet(dict):
         self.structure_names = [
             s.name.replace(".nii.gz", "") for s in self.structure_set_path.glob("*.nii.gz")
         ]
+        self.unmapped_structure_names = self.structure_names
 
         self.structure_mapping = None
 
