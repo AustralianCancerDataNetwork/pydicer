@@ -101,6 +101,15 @@ def compute_contour_similarity_metrics(
                     }
                     results.append(result_entry)
 
+                logger.warning(
+                    "No reference structure found for %s in %s. Available structure names are: %s",
+                    structure,
+                    row.hashed_uid_reference,
+                    ss_reference.unmapped_structure_names,
+                )
+
+                continue
+
             mask_reference = ss_reference[structure]
 
             volume_metrics = {}
