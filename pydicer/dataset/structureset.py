@@ -147,6 +147,9 @@ class StructureSet(dict):
     def values(self):
         return [self[s] for s in self.structure_names]
 
+    def items(self):
+        return [(s, self[s]) for s in self.structure_names]
+
     def get_unmapped_structures(self):
         """Get a list of structures for which no structure was found based on the mapping. If no
         mapping is being used this will always be empty.
