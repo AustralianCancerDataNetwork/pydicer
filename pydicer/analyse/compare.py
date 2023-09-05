@@ -1,8 +1,11 @@
 import logging
 from pathlib import Path
+from typing import Union
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import seaborn as sns
 
 from platipy.imaging.label.comparison import compute_volume_metrics, compute_surface_metrics
 
@@ -34,17 +37,23 @@ AVAILABLE_SURFACE_METRICS = [
 
 
 def get_all_similarity_metrics_for_dataset(
-    self, dataset_name=CONVERTED_DIR_NAME, patient=None, structure_mapping_id=DEFAULT_MAPPING_ID
+    working_directory,
+    dataset_name=CONVERTED_DIR_NAME,
+    patient=None,
+    segment_id=None,
+    structure_mapping_id=DEFAULT_MAPPING_ID,
 ):
     """Return a DataFrame of similarity metrics computed for this dataset.
 
     Args:
         dataset_name (str, optional): The name of the dataset for which to extract metrics.
-            Defaults to "data".
+            Defaults to CONVERTED_DIR_NAME.
         patient (list|str, optional): A patient ID (or list of patient IDs) to fetch metrics for.
             Defaults to None.
+        segment_id (str, optional): Only extract similarity metrics for segment ID. If none is
+            supplied then all similarity metrics will be fetched. Defaults to None.
         structure_mapping_id (str, optional): ID of a structure mapping to load computed metrics
-            for. Defaults to 'default'.
+            for. Defaults to DEFAULT_MAPPING_ID.
 
     Returns:
         pd.DataFrame: The DataFrame of all radiomics computed for dataset
@@ -52,13 +61,17 @@ def get_all_similarity_metrics_for_dataset(
 
     patient = parse_patient_kwarg(patient)
 
-    df_data = read_converted_data(self.working_directory, dataset_name, patients=patient)
+    df_data = read_converted_data(working_directory, dataset_name, patients=patient)
 
     dfs = []
     for _, struct_row in df_data[df_data["modality"] == "RTSTRUCT"].iterrows():
         struct_dir = Path(struct_row.path)
 
-        for similarity_file in struct_dir.glob(f"similarity_*_{structure_mapping_id}.csv"):
+        if segment_id is None:
+            path_glob = struct_dir.glob(f"similarity_*_{structure_mapping_id}.csv")
+        else:
+            path_glob = struct_dir.glob(f"similarity_{segment_id}_*_{structure_mapping_id}.csv")
+        for similarity_file in path_glob:
             col_types = {
                 "patient_id": str,
                 "hashed_uid_target": str,
@@ -66,8 +79,8 @@ def get_all_similarity_metrics_for_dataset(
                 "structure": str,
                 "value": float,
             }
-            df_rad = pd.read_csv(similarity_file, index_col=0, dtype=col_types)
-            dfs.append(df_rad)
+            df_metrics = pd.read_csv(similarity_file, index_col=0, dtype=col_types)
+            dfs.append(df_metrics)
 
     if len(dfs) == 0:
         df = pd.DataFrame(
@@ -80,6 +93,115 @@ def get_all_similarity_metrics_for_dataset(
     )
 
     return df
+
+
+def prepare_similarity_metric_analysis(
+    working_directory: Union[str, Path],
+    analysis_output_directory: Union[str, Path] = None,
+    df: pd.DataFrame = None,
+    dataset_name: str = CONVERTED_DIR_NAME,
+    patient: Union[str, list] = None,
+    segment_id: str = None,
+    structure_mapping_id: str = DEFAULT_MAPPING_ID,
+):
+    """Prepare the similarity metric analysis and stores raw metrics and statistics as .csv files
+    within the analysis_output_directory. Plots and statistics are also saved as .png files within
+    this directory for inspection.
+
+    Args:
+        working_directory (Union[str, Path]): The working directory of the PyDicer project.
+        analysis_output_directory (Union[str, Path], optional): The directory in which to store the
+            output. If none is provided analysis will be generated in a directory named
+            similarity_analysis within the working_directory. Defaults to None.
+        df (pd.DataFrame, optional): A DataFrame generated using the
+            get_all_similarity_metrics_for_dataset function. This might be useful if you wish to
+            further filter the DataFrame prior to generating analysis. If none is provided the
+            get_all_similarity_metrics_for_dataset will be used to generate the DataFrame. Defaults
+            to None.
+        dataset_name (str, optional): The name of the dataset to analyse similarity metrics for.
+            Defaults to CONVERTED_DIR_NAME.
+        patient (Union[str, list], optional): The patients to analyse similarity metrics for.
+            Defaults to None.
+        segment_id (str, optional): The segment ID to analyse similarity metrics for. Defaults to
+            None.
+        structure_mapping_id (str, optional): ID of a structure mapping to load computed metrics
+            for. Defaults to DEFAULT_MAPPING_ID.
+    """
+
+    # Specify a default analysis directory and create it if it doesn't yet exist
+    if analysis_output_directory is None:
+        analysis_output_directory = working_directory.joinpath("similarity_analysis")
+
+    analysis_output_directory = Path(analysis_output_directory)
+    analysis_output_directory.mkdir(exist_ok=True)
+
+    # The user might pass in a dataframe for analysis, if not fetch it.
+    if df is None:
+        df = get_all_similarity_metrics_for_dataset(
+            working_directory=working_directory,
+            dataset_name=dataset_name,
+            patient=patient,
+            segment_id=segment_id,
+            structure_mapping_id=structure_mapping_id,
+        )
+
+    # Save off the raw metrics to the output folder
+    if segment_id is None:
+        raw_metrics_output_csv = analysis_output_directory.joinpath(
+            f"raw_{structure_mapping_id}.csv"
+        )
+    else:
+        raw_metrics_output_csv = analysis_output_directory.joinpath(
+            f"raw_{segment_id}_{structure_mapping_id}.csv"
+        )
+
+    df.to_csv(raw_metrics_output_csv)
+
+    # For each metric, generate a plot and a stats csv
+    for _, metric in enumerate(df.metric.unique()):
+        plt.figure(figsize=(16, 10))
+        plt.rcParams.update({"font.size": 22})
+
+        ax = sns.boxplot(data=df[df.metric == metric], x="structure", y="value", hue="segment_id")
+        ax.set_ylim([0, max(1, df[df.metric == metric].value.max())])
+        ax.set_ylabel(metric)
+        ax.set_xlabel("")
+        plt.xticks(rotation=45)
+
+        df_stats = (
+            df[df.metric == metric][["segment_id", "structure", "value"]]
+            .groupby(["segment_id", "structure"])
+            .agg(["mean", "std", "max", "min", "count"])
+        )
+        df_stats = df_stats.reset_index()
+        cols = [c[1] if c[1] else c[0] for c in df_stats]
+        df_stats.columns = cols
+        pd.plotting.table(
+            ax=ax,
+            data=df_stats.round(2),
+            cellLoc="center",
+            rowLoc="center",
+            loc="bottom",
+            bbox=[0.0, -(len(df_stats) * 0.1) - 0.2, 1.0, len(df_stats) * 0.1],
+        )
+
+        if segment_id is None:
+            stats_output_csv = analysis_output_directory.joinpath(
+                f"stats_{metric}_{structure_mapping_id}.csv"
+            )
+            plot_output = analysis_output_directory.joinpath(
+                f"plot_{metric}_{structure_mapping_id}.png"
+            )
+        else:
+            stats_output_csv = analysis_output_directory.joinpath(
+                f"stats_{metric}_{segment_id}_{structure_mapping_id}.csv"
+            )
+            plot_output = analysis_output_directory.joinpath(
+                f"plot_{metric}_{segment_id}_{structure_mapping_id}.png"
+            )
+        df_stats.to_csv(stats_output_csv)
+
+        plt.savefig(plot_output)
 
 
 def compute_contour_similarity_metrics(
