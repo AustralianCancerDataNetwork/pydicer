@@ -207,7 +207,7 @@ def prepare_similarity_metric_analysis(
         df_stats["metric"] = metric
         df_final_stats = pd.concat([df_final_stats, df_stats])
 
-    df_stats.to_csv(stats_output_csv)
+    df_final_stats.to_csv(stats_output_csv)
 
 
 def compute_contour_similarity_metrics(
