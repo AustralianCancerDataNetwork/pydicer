@@ -79,7 +79,10 @@ class AnalyseData:
         self.output_directory = self.working_directory.joinpath(CONVERTED_DIR_NAME)
 
     def get_all_computed_radiomics_for_dataset(
-        self, dataset_name=CONVERTED_DIR_NAME, patient=None, structure_mapping_id="default"
+        self,
+        dataset_name=CONVERTED_DIR_NAME,
+        patient=None,
+        structure_mapping_id=DEFAULT_MAPPING_ID,
     ):
         """Return a DataFrame of radiomics computed for this dataset
 

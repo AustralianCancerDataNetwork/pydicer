@@ -6,10 +6,10 @@ import numpy as np
 
 from platipy.imaging.label.comparison import compute_volume_metrics, compute_surface_metrics
 
-from pydicer.constants import DEFAULT_MAPPING_ID
+from pydicer.constants import DEFAULT_MAPPING_ID, CONVERTED_DIR_NAME
 from pydicer.dataset.structureset import StructureSet
 
-from pydicer.utils import get_iterator
+from pydicer.utils import get_iterator, parse_patient_kwarg, read_converted_data
 
 logger = logging.getLogger(__name__)
 
@@ -33,9 +33,59 @@ AVAILABLE_SURFACE_METRICS = [
 ]
 
 
+def get_all_similarity_metrics_for_dataset(
+    self, dataset_name=CONVERTED_DIR_NAME, patient=None, structure_mapping_id=DEFAULT_MAPPING_ID
+):
+    """Return a DataFrame of similarity metrics computed for this dataset.
+
+    Args:
+        dataset_name (str, optional): The name of the dataset for which to extract metrics.
+            Defaults to "data".
+        patient (list|str, optional): A patient ID (or list of patient IDs) to fetch metrics for.
+            Defaults to None.
+        structure_mapping_id (str, optional): ID of a structure mapping to load computed metrics
+            for. Defaults to 'default'.
+
+    Returns:
+        pd.DataFrame: The DataFrame of all radiomics computed for dataset
+    """
+
+    patient = parse_patient_kwarg(patient)
+
+    df_data = read_converted_data(self.working_directory, dataset_name, patients=patient)
+
+    dfs = []
+    for _, struct_row in df_data[df_data["modality"] == "RTSTRUCT"].iterrows():
+        struct_dir = Path(struct_row.path)
+
+        for similarity_file in struct_dir.glob(f"similarity_*_{structure_mapping_id}.csv"):
+            col_types = {
+                "patient_id": str,
+                "hashed_uid_target": str,
+                "hashed_uid_reference": str,
+                "structure": str,
+                "value": float,
+            }
+            df_rad = pd.read_csv(similarity_file, index_col=0, dtype=col_types)
+            dfs.append(df_rad)
+
+    if len(dfs) == 0:
+        df = pd.DataFrame(
+            columns=["patient_id", "hashed_uid_target", "hashed_uid_reference", "structure"]
+        )
+
+    df = pd.concat(dfs)
+    df.sort_values(
+        ["patient_id", "hashed_uid_target", "hashed_uid_reference", "structure"], inplace=True
+    )
+
+    return df
+
+
 def compute_contour_similarity_metrics(
     df_target: pd.DataFrame,
     df_reference: pd.DataFrame,
+    segment_id: str,
     mapping_id: str = DEFAULT_MAPPING_ID,
     compute_metrics: list = None,
     force: bool = False,
@@ -48,6 +98,7 @@ def compute_contour_similarity_metrics(
         df_reference (pd.DataFrame): DataFrame containing structure set rows to use as reference
             for similarity metric computation. Each row in reference will be match to target which
             reference the same referenced_sop_instance_uid (image to which they are attached).
+        segment_id (str): ID to reference the segmentation for which these metrics are computed.
         mapping_id (str, optional):The mapping ID to use for structure name mapping. Defaults to
             DEFAULT_MAPPING_ID.
         compute_metrics (list, optional): _description_. Defaults to ["DSC", "hausdorffDistance",
@@ -73,7 +124,9 @@ def compute_contour_similarity_metrics(
         df.iterrows(), length=len(df), unit="structure sets", name="Compare Structures"
     ):
         target_path = Path(row.path_target)
-        similarity_csv = target_path.joinpath(f"similarity_{row.hashed_uid_reference}.csv")
+        similarity_csv = target_path.joinpath(
+            f"similarity_{segment_id}_{row.hashed_uid_reference}_{mapping_id}.csv"
+        )
         if similarity_csv.exists() and not force:
             logger.info("Similarity metrics already computed at %s", similarity_csv)
             continue
@@ -127,6 +180,7 @@ def compute_contour_similarity_metrics(
                     "patient_id": row.patient_id_target,
                     "hashed_uid_target": row.hashed_uid_target,
                     "hashed_uid_reference": row.hashed_uid_reference,
+                    "segment_id": segment_id,
                     "structure": structure,
                     "metric": metric,
                     "value": metrics[metric],
