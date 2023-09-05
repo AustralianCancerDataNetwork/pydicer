@@ -34,8 +34,28 @@ AVAILABLE_SURFACE_METRICS = [
 
 
 def compute_contour_similarity_metrics(
-    df_target, df_reference, mapping_id=DEFAULT_MAPPING_ID, compute_metrics=None, force=False
+    df_target: pd.DataFrame,
+    df_reference: pd.DataFrame,
+    mapping_id: str = DEFAULT_MAPPING_ID,
+    compute_metrics: list = None,
+    force: bool = False,
 ):
+    """_summary_
+
+    Args:
+        df_target (pd.DataFrame): DataFrame containing structure set rows to use as target for
+            similarity metric computation.
+        df_reference (pd.DataFrame): DataFrame containing structure set rows to use as reference
+            for similarity metric computation. Each row in reference will be match to target which
+            reference the same referenced_sop_instance_uid (image to which they are attached).
+        mapping_id (str, optional):The mapping ID to use for structure name mapping. Defaults to
+            DEFAULT_MAPPING_ID.
+        compute_metrics (list, optional): _description_. Defaults to ["DSC", "hausdorffDistance",
+            "meanSurfaceDistance", "surfaceDSC"].
+        force (bool, optional): If True, metrics will be recomputed even if they have been
+            previously computed. Defaults to False.
+    """
+
     # Merge the DataFrames to have a row for each target-reference combination based on the image
     # they are referencing
     df = pd.merge(
@@ -68,7 +88,7 @@ def compute_contour_similarity_metrics(
             mapping_id=mapping_id,
         )
 
-        for structure in ss_target.keys():
+        for structure, mask_target in ss_target.items():
             if structure in ss_reference.get_unmapped_structures():
                 for metric in compute_metrics:
                     result_entry = {
@@ -81,7 +101,6 @@ def compute_contour_similarity_metrics(
                     }
                     results.append(result_entry)
 
-            mask_target = ss_target[structure]
             mask_reference = ss_reference[structure]
 
             volume_metrics = {}
