@@ -150,9 +150,13 @@ def prepare_similarity_metric_analysis(
         raw_metrics_output_csv = analysis_output_directory.joinpath(
             f"raw_{structure_mapping_id}.csv"
         )
+        stats_output_csv = analysis_output_directory.joinpath(f"stats_{structure_mapping_id}.csv")
     else:
         raw_metrics_output_csv = analysis_output_directory.joinpath(
             f"raw_{segment_id}_{structure_mapping_id}.csv"
+        )
+        stats_output_csv = analysis_output_directory.joinpath(
+            f"stats_{segment_id}_{structure_mapping_id}.csv"
         )
 
     df.to_csv(raw_metrics_output_csv)
@@ -161,6 +165,7 @@ def prepare_similarity_metric_analysis(
     df = df.dropna(subset="value")
 
     # For each metric, generate a plot and a stats csv
+    df_final_stats = pd.DataFrame()
     for _, metric in enumerate(df.metric.unique()):
         plt.figure(figsize=(16, 10))
         plt.rcParams.update({"font.size": 22})
@@ -189,22 +194,20 @@ def prepare_similarity_metric_analysis(
         )
 
         if segment_id is None:
-            stats_output_csv = analysis_output_directory.joinpath(
-                f"stats_{metric}_{structure_mapping_id}.csv"
-            )
             plot_output = analysis_output_directory.joinpath(
                 f"plot_{metric}_{structure_mapping_id}.png"
             )
         else:
-            stats_output_csv = analysis_output_directory.joinpath(
-                f"stats_{metric}_{segment_id}_{structure_mapping_id}.csv"
-            )
             plot_output = analysis_output_directory.joinpath(
                 f"plot_{metric}_{segment_id}_{structure_mapping_id}.png"
             )
-        df_stats.to_csv(stats_output_csv)
 
-        plt.savefig(plot_output)
+        plt.savefig(plot_output, bbox_inches="tight")
+
+        df_stats["metric"] = metric
+        df_final_stats = pd.concat([df_final_stats, df_stats])
+
+    df_stats.to_csv(stats_output_csv)
 
 
 def compute_contour_similarity_metrics(
