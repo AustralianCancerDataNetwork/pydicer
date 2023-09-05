@@ -157,6 +157,9 @@ def prepare_similarity_metric_analysis(
 
     df.to_csv(raw_metrics_output_csv)
 
+    # Drop NaN's for stats computation
+    df = df.dropna(subset="value")
+
     # For each metric, generate a plot and a stats csv
     for _, metric in enumerate(df.metric.unique()):
         plt.figure(figsize=(16, 10))
