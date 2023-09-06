@@ -51,7 +51,7 @@ class VisualiseData:
             join_working_directory=True,
         )
 
-        visualise_modalities = ["CT", "RTSTRUCT", "RTDOSE"]
+        visualise_modalities = ["CT", "MR", "RTSTRUCT", "RTDOSE"]
         df_process = df_process[df_process.modality.isin(visualise_modalities)]
 
         for _, row in get_iterator(
@@ -109,6 +109,57 @@ class VisualiseData:
 
                 patient_logger.eval_module_process("visualise", row.hashed_uid)
                 logger.debug("Created CT visualisation: %s", vis_filename)
+
+            if row.modality == "MR":
+                img_path = Path(row.path)
+                vis_filename = img_path.joinpath("MR.png")
+
+                if vis_filename.exists() and not force:
+                    logger.info("Visualisation already exists at %s", vis_filename)
+                    continue
+
+                img = sitk.ReadImage(str(img_path.joinpath(f"{row.modality}.nii.gz")))
+
+                vis = ImageVisualiser(img)
+                fig = vis.show()
+                # load meta data from json file
+                ds_dict = load_object_metadata(row)
+                # deal with missing value in study description
+                if "StudyDescription" not in ds_dict:
+                    ds_dict.StudyDescription = "NaN"
+                # choose axis one
+                # (this is the top-right box that is blank)
+                ax = fig.axes[1]
+
+                # choose a sensible font size
+                # this will depend on the figure size you set
+                fs = 9
+
+                # insert metadata information
+                ax.text(
+                    x=0.02,
+                    y=0.90,
+                    s=f"Patient ID: {ds_dict.PatientID}\n"
+                    f"Series Instance UID: \n"
+                    f"{ds_dict.SeriesInstanceUID}\n"
+                    f"Study Description: {ds_dict.StudyDescription}\n"
+                    f"Study Date: {ds_dict.StudyDate}",
+                    color="black",
+                    ha="left",
+                    va="top",
+                    size=fs,
+                    wrap=True,
+                    bbox={"boxstyle": "square", "fc": "w", "ec": "r"},
+                )
+
+                fig.savefig(
+                    vis_filename,
+                    dpi=fig.dpi,
+                )
+                plt.close(fig)
+
+                patient_logger.eval_module_process("visualise", row.hashed_uid)
+                logger.debug("Created MR visualisation: %s", vis_filename)
 
             # Visualise the structures on top of their linked image
             if row.modality == "RTSTRUCT":

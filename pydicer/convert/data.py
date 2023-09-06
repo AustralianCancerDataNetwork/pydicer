@@ -397,7 +397,7 @@ class ConvertData:
                     
                 elif sop_class_uid == MR_IMAGE_STORAGE_UID:
                     # TODO Handle inconsistent slice spacing
-                    if INTERPOLATE_MISSING_DATA:
+                    if config.get_config("interp_missing_slices"):
                         series_files = handle_missing_slice(df_files)
                     else:
                         raise ValueError("Slice Locations are not evenly spaced")
