@@ -123,7 +123,7 @@ def run_mhub_model(
             requested. Use the `get_available_mhub_models` function to determine available models.
 
     Returns:
-        dict: _description_
+        dict: Dictionary of segmentations with structure name as key and sitk.Image mask as value.
     """
 
     try:
@@ -138,6 +138,15 @@ def run_mhub_model(
     client = docker.from_env()
 
     mhub_image = f"mhubai/{mhub_model}"
+
+    # Try pulling the image
+    try:
+        client.images.pull(mhub_image)
+    except docker.errors.ImageNotFound as inf:
+        raise docker.errors.ImageNotFound(
+            f"The mhub image {mhub_image} could not be pulled. "
+            "Check if this model is available using the get_available_mhub_models function."
+        ) from inf
 
     if mhub_config_file is None:
         available_mhub_models = get_available_mhub_models()
