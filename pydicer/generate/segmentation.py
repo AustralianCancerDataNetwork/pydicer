@@ -136,6 +136,10 @@ def read_all_segmentation_logs(
 
         df_logs = pd.concat([df_logs, df_log])
 
+    # Reading logs like this can result in duplicates... not ideal, but just drop duplicates for
+    # now
+    df_logs = df_logs.drop_duplicates()
+
     df_logs = df_logs.reset_index(drop=True)
 
     if segment_id is not None:

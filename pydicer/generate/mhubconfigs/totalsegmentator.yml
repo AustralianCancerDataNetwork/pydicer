@@ -1,0 +1,23 @@
+general:
+  data_base_dir: /app/data
+  version: 1.0.0
+  description: custom pipeline from nifti to nifti
+
+execute:
+  - FileStructureImporter
+  - TotalSegmentatorRunner
+  - DataOrganizer
+
+modules:
+  FileStructureImporter:
+    input_dir: "input_data"
+    structures:
+      - image.nii.gz@instance@nifti:mod=ct
+    import_id: _instance
+
+  TotalSegmentatorRunner:
+    use_fast_mode: true
+
+  DataOrganizer:
+    targets:
+      - nifti:mod=seg-->/app/data/output_data/[d:roi].nii.gz

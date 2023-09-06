@@ -1,0 +1,30 @@
+general:
+  data_base_dir: /app/data
+  version: 1.0.0
+  description: custom pipeline from nifti to nifti
+
+execute:
+  - FileStructureImporter
+  - NNUnetRunner
+  - CasustRunner
+  - DataOrganizer
+
+modules:
+  FileStructureImporter:
+    input_dir: "input_data"
+    structures:
+      - image.nii.gz@instance@nifti:mod=ct
+    import_id: _instance
+
+  NNUnetRunner:
+    folds: all
+    nnunet_task: Task400_OPEN_HEART_1FOLD
+    nnunet_model: 3d_lowres
+    roi: HEART
+
+  CasustRunner:
+    test_time_augmentation: 0
+
+  DataOrganizer:
+    targets:
+      - nifti:mod=seg-->/app/data/output_data/[d:roi].nii.gz
