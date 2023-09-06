@@ -132,7 +132,6 @@ def read_all_segmentation_logs(
         df = df[df.modality == modality]
 
     for _, row in df.iterrows():
-
         df_log = read_segmentation_log(row)
 
         df_logs = pd.concat([df_logs, df_log])
@@ -164,16 +163,50 @@ def segment_image(
     function to match this notation. For example, to run the TotalSegmentator, you can define
     a warpper function like:
 
-    ```
+    ```python
     import tempfile
+    from pathlib import Path
+    import SimpleITK as sitk
 
-    def run_total_segmentator(img: SimpleITK.Image) -> dict:
+    def run_total_segmentator(input_image: sitk.Image) -> dict:
 
-        temp_path = Path(tempfile.mkdtemp())
-        sitk.WriteImage(img, str(temp_path.joinpath("img.nii.gz")))
+    # Import within function since this is an optional dependency
+        from totalsegmentator.python_api import (
+            totalsegmentator,  # pylint: disable=import-outside-toplevel
+        )
 
-        // TODO fix this
+        results = {}
 
+        with tempfile.TemporaryDirectory() as working_dir:
+            working_dir = Path(working_dir)
+
+            # Save the temporary image file for total segmentator to find
+            input_dir = working_dir.joinpath("input")
+            input_dir.mkdir()
+            input_file = input_dir.joinpath("img.nii.gz")
+            sitk.WriteImage(input_image, str(input_file))
+
+            # Prepare a temporary folder for total segmentator to store the output
+            output_dir = working_dir.joinpath("output")
+            output_dir.mkdir()
+
+            # Run total segmentator
+            totalsegmentator(input_dir, output_dir)
+
+            # Load the output masks into a dict to return
+            for mask_file in output_dir.glob("*.nii.gz"):
+                mask = sitk.ReadImage(str(mask_file))
+
+                # Check if the mask is empty, total segmentator stores empty mask files for
+                # structures that aren't within FOV
+                if sitk.GetArrayFromImage(mask).sum() == 0:
+                    continue
+
+                structure_name = mask_file.name.replace(".nii.gz")
+
+                results[structure_name] = mask
+
+        return results
     ```
 
     Args:
@@ -199,7 +232,6 @@ def segment_image(
 
     # Check if the segmentation has already been run for this image
     segment_struct_id = f"{segment_id}_{image_row.hashed_uid}"
-    print(segment_struct_id)
 
     # This check is to support deployments before tracking auto-seg log
     if not force and len(
@@ -216,7 +248,6 @@ def segment_image(
         return
 
     # Auto-seg log tracks passed and failed segmentation runs
-
     df_previous_runs = df_pat_autoseg[
         (df_pat_autoseg.segment_id == segment_id) & df_pat_autoseg.img_id == image_row.hashed_uid
     ]
@@ -265,7 +296,6 @@ def segment_image(
         )
 
     except Exception as e:  # pylint: disable=broad-exception-caught
-
         run_successful = False
         error_msg = str(e)
 
@@ -324,7 +354,6 @@ def segment_dataset(
     df = df[df.modality == modality]
 
     for _, image_row in tqdm(df.iterrows(), "Segmentation", total=len(df)):
-
         segment_image(
             working_directory,
             image_row,

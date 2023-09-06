@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 import SimpleITK as sitk
+import matplotlib
 import matplotlib.pyplot as plt
 from platipy.imaging import ImageVisualiser
 from pydicer.constants import CONVERTED_DIR_NAME
@@ -163,7 +164,6 @@ class VisualiseData:
 
             # Visualise the structures on top of their linked image
             if row.modality == "RTSTRUCT":
-
                 struct_dir = Path(row.path)
 
                 # Find the linked image
@@ -179,7 +179,6 @@ class VisualiseData:
                     )
 
                 for _, img_row in df_linked_img.iterrows():
-
                     img_path = Path(img_row.path)
 
                     # save image inside structure directory
@@ -214,7 +213,6 @@ class VisualiseData:
 
             # Next visualise the doses on top of their linked image
             if row.modality == "RTDOSE":
-
                 df_linked_struct = get_structures_linked_to_dose(self.working_directory, row)
 
                 if len(df_linked_struct) == 0:
@@ -224,7 +222,6 @@ class VisualiseData:
                 dose_file = dose_path.joinpath("RTDOSE.nii.gz")
 
                 for _, struct_row in df_linked_struct.iterrows():
-
                     # Find the linked image
                     df_linked_img = df_process[
                         df_process["sop_instance_uid"] == struct_row.referenced_sop_instance_uid
@@ -239,7 +236,6 @@ class VisualiseData:
                     struct_dir = Path(struct_row.path)
 
                     for _, img_row in df_linked_img.iterrows():
-
                         img_path = Path(img_row.path)
 
                         # save image inside dose directory
@@ -259,7 +255,7 @@ class VisualiseData:
                             dose_img,
                             "Dose",
                             discrete_levels=20,
-                            colormap=plt.cm.get_cmap("inferno"),
+                            colormap=matplotlib.colormaps.get_cmap("inferno"),
                         )
 
                         masks = {
