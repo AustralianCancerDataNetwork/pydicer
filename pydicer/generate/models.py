@@ -94,8 +94,7 @@ def get_available_mhub_models() -> dict:
     """
 
     available_models = {}
-    model_config_directory = Path(__file__).parent
-    print(model_config_directory)
+    model_config_directory = Path(__file__).parent.joinpath("mhubconfigs")
     for model_config in model_config_directory.glob("*.yml"):
         available_models[model_config.name.replace(".yml", "")] = model_config.absolute()
 
