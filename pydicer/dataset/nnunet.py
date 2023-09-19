@@ -247,10 +247,13 @@ class NNUNetDataset:
         # Check to see if we have any duplicate image spacing and sizes, if so inspect these
         # further
         duplicated_rows = df_img_stats.duplicated(subset=["spacing", "size"], keep=False)
-        df_duplicated = df_img_stats[duplicated_rows]
-        df_duplicated.loc[duplicated_rows, "voxel_sum"] = df_duplicated.img_path.apply(
-            lambda img_path: sitk.GetArrayFromImage(sitk.ReadImage(img_path)).sum()
+        df_img_stats["voxel_sum"] = df_img_stats.apply(
+            lambda row: sitk.GetArrayFromImage(sitk.ReadImage(row.img_path)).sum()
+            if row.name in duplicated_rows.index
+            else None,
+            axis=1,
         )
+        df_duplicated = df_img_stats[duplicated_rows]
 
         duplicates_found = False
         for _, df_group in df_duplicated.groupby("voxel_sum"):
