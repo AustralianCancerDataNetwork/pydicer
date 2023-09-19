@@ -95,9 +95,11 @@ def get_available_mhub_models() -> dict:
 
     available_models = {}
     model_config_directory = Path(__file__).parent.joinpath("mhubconfigs")
+    logger.debug("Loading mHub model configs from %s", model_config_directory)
     for model_config in model_config_directory.glob("*.yml"):
         available_models[model_config.name.replace(".yml", "")] = model_config.absolute()
 
+    logger.debug("Found available configs: %s", available_models)
     return available_models
 
 
@@ -157,6 +159,7 @@ def run_mhub_model(
         mhub_config_file = available_mhub_models[mhub_model]
 
     with tempfile.TemporaryDirectory() as working_dir:
+        logger.info("Running mHub model %s in temporary %s", mhub_model, working_dir)
         working_dir = Path(working_dir)
         input_dir = working_dir.joinpath("input")
         input_dir.mkdir()
@@ -187,5 +190,7 @@ def run_mhub_model(
 
         # Load the output masks into a dict to return
         results = load_output_nifti(output_dir)
+
+    logger.debug("mHub segmentation complete")
 
     return results

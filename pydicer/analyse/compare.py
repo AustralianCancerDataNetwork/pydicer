@@ -72,6 +72,7 @@ def get_all_similarity_metrics_for_dataset(
         else:
             path_glob = struct_dir.glob(f"similarity_{segment_id}_*_{structure_mapping_id}.csv")
         for similarity_file in path_glob:
+            logger.debug("Loading similarity metrics from: %s", similarity_file)
             col_types = {
                 "patient_id": str,
                 "hashed_uid_target": str,
@@ -134,6 +135,7 @@ def prepare_similarity_metric_analysis(
 
     analysis_output_directory = Path(analysis_output_directory)
     analysis_output_directory.mkdir(exist_ok=True)
+    logger.info("Generating analysis in directory: %s", analysis_output_directory)
 
     # The user might pass in a dataframe for analysis, if not fetch it.
     if df is None:
@@ -160,6 +162,7 @@ def prepare_similarity_metric_analysis(
         )
 
     df.to_csv(raw_metrics_output_csv)
+    logger.info("Saved raw metrics: %s", raw_metrics_output_csv)
 
     # Drop NaN's for stats computation
     df = df.dropna(subset="value")
@@ -203,11 +206,13 @@ def prepare_similarity_metric_analysis(
             )
 
         plt.savefig(plot_output, bbox_inches="tight")
+        logger.info("Saved %s plot: %s", metric, plot_output)
 
         df_stats["metric"] = metric
         df_final_stats = pd.concat([df_final_stats, df_stats])
 
     df_final_stats.to_csv(stats_output_csv)
+    logger.info("Saved metric stats: %s", stats_output_csv)
 
 
 def compute_contour_similarity_metrics(
@@ -218,7 +223,9 @@ def compute_contour_similarity_metrics(
     compute_metrics: list = None,
     force: bool = False,
 ):
-    """_summary_
+    """Computes structure similarity metrics between corresponding entries in a target DataFrame
+    and reference DataFrame. Targets are matched to reference using the referenced_sop_instance_uid
+    which is the image to which these structure sets are attached.
 
     Args:
         df_target (pd.DataFrame): DataFrame containing structure set rows to use as target for
@@ -259,6 +266,11 @@ def compute_contour_similarity_metrics(
             logger.info("Similarity metrics already computed at %s", similarity_csv)
             continue
 
+        logger.info(
+            "Computing metrics for target %s and reference %s",
+            row.hashed_uid_target,
+            row.hashed_uid_reference,
+        )
         results = []
 
         ss_target = StructureSet(
@@ -295,10 +307,12 @@ def compute_contour_similarity_metrics(
 
             volume_metrics = {}
             if set(compute_metrics).intersection(set(AVAILABLE_VOLUME_METRICS)):
+                logger.debug("Computing volume metrics")
                 volume_metrics = compute_volume_metrics(mask_target, mask_reference)
 
             surface_metrics = {}
             if set(compute_metrics).intersection(set(AVAILABLE_SURFACE_METRICS)):
+                logger.debug("Computing surface metrics")
                 surface_metrics = compute_surface_metrics(mask_target, mask_reference)
 
             metrics = {**volume_metrics, **surface_metrics}
@@ -313,7 +327,9 @@ def compute_contour_similarity_metrics(
                     "metric": metric,
                     "value": metrics[metric],
                 }
+                logger.debug("Computed %d of %.4f", metric, metrics[metric])
                 results.append(result_entry)
 
         df_results = pd.DataFrame(results)
         df_results.to_csv(similarity_csv)
+        logger.debug("Saved computed metrics to %s", similarity_csv)
