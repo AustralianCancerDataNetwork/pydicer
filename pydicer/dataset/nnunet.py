@@ -384,6 +384,8 @@ class NNUNetDataset:
 
         if has_overlapping_structures:
             logger.warning("Overlapping structures were detected")
+        else:
+            logger.info("No overlapping structures detected")
 
     def prep_label_map_from_one_hot(
         self, image: sitk.Image, structure_set: StructureSet
