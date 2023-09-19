@@ -378,7 +378,7 @@ class NNUNetDataset:
                     if arr.max() > 1:
                         print(
                             f"{structure_name_i} overlaps with {structure_name_j} for patient "
-                            f"{row.patient_id} structure set {row.struct_hash}"
+                            f"{row.patient_id} structure set {row.hashed_uid}"
                         )
                         has_overlapping_structures = True
 
