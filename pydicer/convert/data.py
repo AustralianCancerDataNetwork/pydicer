@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import SimpleITK as sitk
 import pydicom
-from matplotlib import cm
+import matplotlib
 
 from platipy.dicom.io.rtdose_to_nifti import convert_rtdose
 from pydicer.config import PyDicerConfig
@@ -59,6 +59,7 @@ def get_object_type(sop_class_uid):
     Returns:
         str: The object type
     """
+
     object_type = "other"
     for ot, sops in OBJECT_TYPES.items():
         if sop_class_uid in sops:
@@ -71,25 +72,27 @@ def handle_missing_slice(files, ignore_duplicates=False):
     """function to interpolate missing slices in an image
 
     Example usage:
-        ```
-            input_dic = [
-                {
-                    "file_path" : "Dicom_Path_1",
-                    "slice_location: -100
-                },
-                {
-                    "file_path" : "Dicom_Path_2",
-                    "slice_location: -98
-                },
-                .
-                .
-                {
-                    "file_path" : "Dicom_Path_100",
-                    "slice_location: 100
-                },
-            ]
-            file_paths_list = handle_missing_slices(input_dict)
-        ```
+
+    .. code-block:: python
+
+        from pydicer.convert.data import handle_missing_slice
+
+        input_dic = [
+            {
+                "file_path" : "path/to/dicom_file_1.dcm",
+                "slice_location: -100
+            },
+            {
+                "file_path" : "path/to/dicom_file_2.dcm",
+                "slice_location: -98
+            },
+            {
+                "file_path" : "path/to/dicom_file_3.dcm",
+                "slice_location: -96
+            },
+            ...
+        ]
+        file_paths_list = handle_missing_slices(input_dict)
 
     Args:
         df_files (pd.DataFrame|list): the DataFrame which was produced by PreprocessData
@@ -146,14 +149,12 @@ def handle_missing_slice(files, ignore_duplicates=False):
     slice_thickness_variations = ~np.isclose(slice_location_diffs, expected_slice_diff, rtol=0.02)
 
     if np.any(slice_thickness_variations):
-
         logger.warning("Missing DICOM slices found")
 
         # find where the missing slices are
         missing_indices = np.where(slice_thickness_variations)[0]
 
         for missing_index in missing_indices:
-
             num_missing_slices = int(slice_location_diffs[missing_index] / expected_slice_diff) - 1
 
             # locate nearest DICOM files to the missing slices
@@ -169,7 +170,6 @@ def handle_missing_slice(files, ignore_duplicates=False):
             next_array = next_dcm.pixel_array.astype(float)
 
             for missing_slice in range(num_missing_slices):
-
                 # TODO add other interp options (cubic)
                 interp_array = np.array(
                     prior_array
@@ -315,14 +315,13 @@ class ConvertData:
             if not isinstance(patient, list):
                 patient = [patient]
 
-            df_preprocess = df_preprocess[df_preprocess["patient_id"].str.isin(patient)]
+            df_preprocess = df_preprocess[df_preprocess["patient_id"].isin(patient)]
 
         for key, df_files in get_iterator(
             df_preprocess.groupby(["patient_id", "modality", "series_uid"]),
             unit="objects",
             name="convert",
         ):
-
             patient_id, _, series_uid = key
 
             logger.info("Converting data for patient: %s", patient_id)
@@ -359,16 +358,14 @@ class ConvertData:
 
             try:
                 if sop_class_uid == CT_IMAGE_STORAGE_UID:
-
                     if not output_dir.exists() or force:
-
                         # Only convert if it doesn't already exist or if force is True
 
                         if config.get_config("interp_missing_slices"):
                             series_files = handle_missing_slice(
-                                   df_files,
-                                   ignore_duplicates=config.get_config("ignore_duplicate_slices")
-                               )
+                                df_files,
+                                ignore_duplicates=config.get_config("ignore_duplicate_slices"),
+                            )
                         else:
                             # TODO Handle inconsistent slice spacing
                             error_log = """Slice Locations are not evenly spaced. Set
@@ -399,7 +396,6 @@ class ConvertData:
                     patient_logger.eval_module_process("convert", sop_instance_hash)
 
                 elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
-
                     # If we have multiple structure sets with the same sop_instance_uid we'll just
                     # drop them
                     df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
@@ -427,7 +423,6 @@ class ConvertData:
                         patient_logger.log_module_error("convert", sop_instance_hash, error_log)
 
                     if not output_dir.exists() or force:
-
                         # Only convert if it doesn't already exist or if force is True
                         output_dir.mkdir(exist_ok=True, parents=True)
 
@@ -456,7 +451,7 @@ class ConvertData:
                             write_nrrd_from_mask_directory(
                                 output_dir,
                                 nrrd_file,
-                                colormap=cm.get_cmap(config.get_config("nrrd_colormap")),
+                                matplotlib.colormaps.get_cmap(config.get_config("nrrd_colormap")),
                             )
 
                         # Save JSON
@@ -482,9 +477,7 @@ class ConvertData:
                     )
 
                 elif sop_class_uid == PET_IMAGE_STORAGE_UID:
-
                     if not output_dir.exists() or force:
-
                         # Only convert if it doesn't already exist or if force is True
                         # TODO allow this interp to be turned off...
                         series_files = handle_missing_slice(df_files)
@@ -510,7 +503,6 @@ class ConvertData:
                     patient_logger.eval_module_process("convert", sop_instance_hash)
 
                 elif sop_class_uid == RT_PLAN_STORAGE_UID:
-
                     # If we have multiple plans with the same sop_instance_uid we'll just drop them
                     df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
 
@@ -518,14 +510,12 @@ class ConvertData:
 
                     # If there are multiple RTPLANs in the same series then just save them all
                     for _, rt_plan_file in df_files.iterrows():
-
                         sop_instance_hash = hash_uid(rt_plan_file.sop_instance_uid)
 
                         # Update the output directory for this plan
                         output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
 
                         if not output_dir.exists() or force:
-
                             # Only convert if it doesn't already exist or if force is True
                             output_dir.mkdir(exist_ok=True, parents=True)
 
@@ -542,20 +532,17 @@ class ConvertData:
                         patient_logger.eval_module_process("convert", sop_instance_hash)
 
                 elif sop_class_uid == RT_DOSE_STORAGE_UID:
-
                     # If we have multiple doses with the same sop_instance_uid we'll just drop them
                     df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
 
                     # If there are multiple RTDOSEs in the same series then just save them all
                     for _, rt_dose_file in df_files.iterrows():
-
                         sop_instance_hash = hash_uid(rt_dose_file.sop_instance_uid)
 
                         # Update the output directory for this plan
                         output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
 
                         if not output_dir.exists() or force:
-
                             # Only convert if it doesn't already exist or if force is True
                             output_dir.mkdir(exist_ok=True, parents=True)
 

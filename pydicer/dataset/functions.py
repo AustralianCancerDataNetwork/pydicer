@@ -14,6 +14,7 @@ def rt_latest_struct(df, **kwargs):
 
     Example of matching the latest structure set with Series Description being "FINAL" or
     "APPROVED"
+
     .. code-block:: python
 
         prepare_dataset = PrepareDataset(working_directory)
@@ -33,21 +34,18 @@ def rt_latest_struct(df, **kwargs):
     keep_rows = []
 
     for pat_id, df_patient in df.groupby("patient_id"):
-
         logger.debug("Selecting data for patient: %s", pat_id)
 
         df_patient["datetime"] = pd.NaT
 
         struct_indicies = []
         for idx, row in df_patient[df_patient["modality"] == "RTSTRUCT"].iterrows():
-
-            struct_ds = load_object_metadata(row)
+            struct_ds = load_object_metadata(row, keep_tags=list(kwargs))
             ds_date = determine_dcm_datetime(struct_ds)
             df_patient.loc[idx, "datetime"] = ds_date
 
             skip_series = False
             for k, item in kwargs.items():
-
                 if not k in struct_ds:
                     logger.debug("Attribute %s not in metadata", k)
                     skip_series = True
@@ -110,6 +108,7 @@ def rt_latest_dose(df, **kwargs):
     lists of values to these, one of which should match to select that series.
 
     Example of matching the latest dose with Series Description being "FINAL" or "APPROVED"
+
     .. code-block:: python
 
         prepare_dataset = PrepareDataset(working_directory)
@@ -131,7 +130,6 @@ def rt_latest_dose(df, **kwargs):
     keep_rows = []
 
     for pat_id in patients:
-
         logger.debug("Selecting data for patient: %s", pat_id)
 
         df_patient = df[df["patient_id"] == pat_id]
@@ -141,14 +139,12 @@ def rt_latest_dose(df, **kwargs):
         dose_indicies = []
         dose_dates = []
         for idx, row in df_doses.iterrows():
-
-            dose_ds = load_object_metadata(row)
+            dose_ds = load_object_metadata(row, keep_tags=list(kwargs))
             ds_date = determine_dcm_datetime(dose_ds)
             dose_dates.append(ds_date)
 
             skip_series = False
             for k, item in kwargs.items():
-
                 if not k in dose_ds:
                     logger.debug("Attribute %s not in metadata", k)
                     skip_series = True

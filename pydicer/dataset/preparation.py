@@ -1,6 +1,7 @@
-import os
 import logging
+import os
 from pathlib import Path
+from typing import Callable
 
 import pandas as pd
 
@@ -16,7 +17,7 @@ class PrepareDataset:
     def __init__(self, working_directory="."):
         self.working_directory = Path(working_directory)
 
-    def add_object_to_dataset(self, dataset_name, data_object_row):
+    def add_object_to_dataset(self, dataset_name: str, data_object_row: pd.Series):
         """Add one data object to a dataset.
 
         Args:
@@ -29,10 +30,10 @@ class PrepareDataset:
         # Create a copy so that we aren't manuipulating the original entry
         data_object_row = data_object_row.copy()
 
-        if data_object_row.path.startswith(str(self.working_directory)):
-            data_object_row.path = str(
-                Path(data_object_row.path).relative_to(self.working_directory)
-            )
+        object_path = Path(data_object_row.path)
+        if object_path.is_absolute():
+            data_object_row.path = str(object_path.relative_to(self.working_directory))
+            object_path = Path(data_object_row.path)
 
         object_path = Path(data_object_row.path)
         symlink_path = dataset_dir.joinpath(object_path.relative_to(CONVERTED_DIR_NAME))
@@ -54,7 +55,6 @@ class PrepareDataset:
         pat_converted_csv = pat_dir.joinpath("converted.csv")
         df_pat = pd.DataFrame([data_object_row])
         if pat_converted_csv.exists():
-
             col_types = {"patient_id": str, "hashed_uid": str}
             df_converted = pd.read_csv(pat_converted_csv, index_col=0, dtype=col_types)
 
@@ -69,7 +69,7 @@ class PrepareDataset:
         df_pat = df_pat.reset_index(drop=True)
         df_pat.to_csv(pat_dir.joinpath("converted.csv"))
 
-    def prepare_from_dataframe(self, dataset_name, df_prepare):
+    def prepare_from_dataframe(self, dataset_name: str, df_prepare: pd.DataFrame):
         """Prepare a dataset from a filtered converted dataframe
 
         Args:
@@ -93,7 +93,7 @@ class PrepareDataset:
         for _, row in df_prepare.iterrows():
             self.add_object_to_dataset(dataset_name, row)
 
-    def prepare(self, dataset_name, preparation_function, patients=None, **kwargs):
+    def prepare(self, dataset_name: str, preparation_function: Callable, patients=None, **kwargs):
         """Calls upon an appropriate preparation function to generate a clean dataset ready for
         use. Additional keyword arguments are passed through to the preparation_function.
 
@@ -109,7 +109,6 @@ class PrepareDataset:
         """
 
         if isinstance(preparation_function, str):
-
             preparation_function = getattr(functions, preparation_function)
 
         if not callable(preparation_function):

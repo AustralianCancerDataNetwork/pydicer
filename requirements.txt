@@ -2,6 +2,6 @@ pydicom >= 2.1.2
 SimpleITK >= 2.0.2
 platipy >= 0.5.0
 pyorthanc >= 0.2.14
-pyradiomics >= 3.0.1
+pyradiomics >= 3.1.0
 argparse >=  1.4.0
 tqdm >=  4.55.1
