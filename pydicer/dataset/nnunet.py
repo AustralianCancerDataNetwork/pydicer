@@ -560,10 +560,13 @@ class NNUNetDataset:
 
         # Write the contents to the script
         with open(script_path, "w", encoding="utf8") as f:
+            f.write("!#/bin/bash")
             f.write("\n")
 
             for l in script_header:
                 f.write(f"{l}\n")
+
+            f.write("\n")
 
             f.write(
                 f"nnUNet_plan_and_preprocess -t {self.nnunet_id} --verify_dataset_integrity;\n"
