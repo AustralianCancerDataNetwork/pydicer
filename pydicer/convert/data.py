@@ -236,8 +236,8 @@ def link_via_frame_of_reference(for_uid, df_preprocess):
 
     df_linked_series = df_linked_series[df_linked_series.modality.isin(modality_prefs)]
     df_linked_series.loc[:, "modality"] = df_linked_series.modality.astype("category")
-    df_linked_series.modality.cat.set_categories(modality_prefs, inplace=True)
-    df_linked_series.sort_values(["modality"])
+    df_linked_series.modality = df_linked_series.modality.cat.set_categories(modality_prefs)
+    df_linked_series.sort_values(["modality"], inplace=True)
 
     return df_linked_series
 
