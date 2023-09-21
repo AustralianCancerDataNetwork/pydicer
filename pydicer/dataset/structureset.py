@@ -54,6 +54,7 @@ class StructureSet(dict):
         self.structure_names = [
             s.name.replace(".nii.gz", "") for s in self.structure_set_path.glob("*.nii.gz")
         ]
+        self.unmapped_structure_names = self.structure_names
 
         self.structure_mapping = None
 
@@ -145,6 +146,9 @@ class StructureSet(dict):
 
     def values(self):
         return [self[s] for s in self.structure_names]
+
+    def items(self):
+        return [(s, self[s]) for s in self.structure_names]
 
     def get_unmapped_structures(self):
         """Get a list of structures for which no structure was found based on the mapping. If no

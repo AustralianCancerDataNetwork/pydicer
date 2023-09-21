@@ -247,10 +247,13 @@ class NNUNetDataset:
         # Check to see if we have any duplicate image spacing and sizes, if so inspect these
         # further
         duplicated_rows = df_img_stats.duplicated(subset=["spacing", "size"], keep=False)
-        df_duplicated = df_img_stats[duplicated_rows]
-        df_duplicated.loc[duplicated_rows, "voxel_sum"] = df_duplicated.img_path.apply(
-            lambda img_path: sitk.GetArrayFromImage(sitk.ReadImage(img_path)).sum()
+        df_img_stats["voxel_sum"] = df_img_stats.apply(
+            lambda row: sitk.GetArrayFromImage(sitk.ReadImage(row.img_path)).sum()
+            if row.name in duplicated_rows.index
+            else None,
+            axis=1,
         )
+        df_duplicated = df_img_stats[duplicated_rows]
 
         duplicates_found = False
         for _, df_group in df_duplicated.groupby("voxel_sum"):
@@ -378,12 +381,14 @@ class NNUNetDataset:
                     if arr.max() > 1:
                         print(
                             f"{structure_name_i} overlaps with {structure_name_j} for patient "
-                            f"{row.patient_id} structure set {row.struct_hash}"
+                            f"{row.patient_id} structure set {row.hashed_uid}"
                         )
                         has_overlapping_structures = True
 
         if has_overlapping_structures:
             logger.warning("Overlapping structures were detected")
+        else:
+            logger.info("No overlapping structures detected")
 
     def prep_label_map_from_one_hot(
         self, image: sitk.Image, structure_set: StructureSet
@@ -555,10 +560,13 @@ class NNUNetDataset:
 
         # Write the contents to the script
         with open(script_path, "w", encoding="utf8") as f:
+            f.write("!#/bin/bash")
             f.write("\n")
 
             for l in script_header:
                 f.write(f"{l}\n")
+
+            f.write("\n")
 
             f.write(
                 f"nnUNet_plan_and_preprocess -t {self.nnunet_id} --verify_dataset_integrity;\n"
