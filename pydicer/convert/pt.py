@@ -61,36 +61,6 @@ def convert_dicom_to_nifti_pt(
     )
 
     np_image = get_physical_values_pt(slices)
-    # TODO remove this code it doesn't work... Iterp should happen in the main convert function,.
-    position_final_slice = (len(slices) - 1) * slice_spacing + slices[0].ImagePositionPatient[2]
-    # Test whether some slices are missing
-    # due to an error at line 144: TypeError: only size-1 arrays can be converted
-    # to Python scalars
-#    if not is_approx_equal(position_final_slice, float(slices[-1].ImagePositionPatient[2])):
-#        if (position_final_slice - axial_positions[-1]) / slice_spacing < 1.5:
-            # If only one slice is missing
-#            diff = np.asarray(
-#                [
-#                    not is_approx_equal(
-#                        float(axial_positions[ind])
-#                        - float(axial_positions[ind - 1])
-#                        - slice_spacing,
-#                        0,
-#                    )
-#                    for ind in range(1, len(axial_positions))
-#                ]
-#            )
-#            ind2interp = int(np.where(diff)[0])
-#            new_slice = (np_image[:, :, ind2interp] + np_image[:, :, ind2interp + 1]) * 0.5
-#            new_slice = new_slice[..., np.newaxis]
-#            np_image = np.concatenate(
-#                (np_image[..., :ind2interp], new_slice, np_image[..., ind2interp:]),
-#                axis=2,
-#            )
- #           logger.warning("One slice is missing, we replaced it by linear interpolation")
- #       else:
- #           # if more than one slice are missing
- #           raise RuntimeError("Multiple slices are missing")
 
     image_position_patient = [float(k) for k in slices[0].ImagePositionPatient]
     sitk_image = get_sitk_volume_from_np(np_image, pixel_spacing, image_position_patient)
@@ -143,18 +113,14 @@ def get_physical_values_pt(slices):
     units = s.Units
 
     if units == "BQML":
-
         # Make sure we have the patient's weight
         if not hasattr(slices[0], "PatientWeight") or slices[0].PatientWeight is None:
             if hasattr(slices[0], "PatientsWeight"):
                 patient_weight = float(slices[0].PatientsWeight)
-            elif default_patient_weight is not None:
-                patient_weight = default_patient_weight
             else:
                 raise ValueError("Cannot compute SUV the weight is missing")
         else:
             patient_weight = float(slices[0].PatientWeight)
-
 
         # TODO: use the function in the dataset module to convert datetime
         acquisition_datetime = datetime.strptime(
@@ -216,11 +182,11 @@ def get_suv_philips(slices):
         suv_scale_factor = None
         try:
             suv_scale_factor = s.SUVScaleFactor
-        except AttributeError as e:
+        except AttributeError:
             try:
                 suv_scale_factor = float(s[0x7053, 0x1000].value)
-            except AttributeError as e:
-                raise ValueError("Cannot compute SUV from raw PET for CNTS") from e
+            except AttributeError as exp:
+                raise ValueError("Cannot compute SUV from raw PET for CNTS") from exp
 
         assert suv_scale_factor is not None
 
@@ -253,9 +219,9 @@ def get_suv_from_bqml(slices, decay_time, patient_weight):
         try:
             half_life = float(s.RadiopharmaceuticalInformationSequence[0].RadionuclideHalfLife)
             total_dose = float(s.RadiopharmaceuticalInformationSequence[0].RadionuclideTotalDose)
-        except IndexError as e:
+        except IndexError:
             logger.warning("No RadiopharmaceuticalInformationSequence available")
-        except AttributeError as e:
+        except AttributeError:
             logger.warning("Unable to read .RadionuclideHalfLife/.RadionuclideTotalDose from file")
 
         # Couldn't find half_life or total_dose. Try to find it in another files in the series
@@ -263,9 +229,13 @@ def get_suv_from_bqml(slices, decay_time, patient_weight):
             for ds in slices:
                 try:
                     if half_life is None:
-                         half_life = float(ds.RadiopharmaceuticalInformationSequence[0].RadionuclideHalfLife)
+                        half_life = float(
+                            ds.RadiopharmaceuticalInformationSequence[0].RadionuclideHalfLife
+                        )
                     if total_dose is None:
-                         total_dose = float(ds.RadiopharmaceuticalInformationSequence[0].RadionuclideTotalDose)
+                        total_dose = float(
+                            ds.RadiopharmaceuticalInformationSequence[0].RadionuclideTotalDose
+                        )
                 except IndexError:
                     pass
                 except AttributeError:
