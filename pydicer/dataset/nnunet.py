@@ -62,17 +62,17 @@ class NNUNetDataset:
               standardised name. Defaults to DEFAULT_MAPPING_ID.
 
         Raises:
-            SystemError: Raised if the nnUNet_raw environment variable is not set.
+            SystemError: Raised if the nnUNet_raw_data_base environment variable is not set.
         """
 
         # Check that the nnUNet_raw_data_base environment variable is set
-        if not "nnUNet_raw" in os.environ:
+        if not "nnUNet_raw_data_base" in os.environ:
             raise SystemError(
-                "'nnUNet_raw' environment variable not set. "
+                "'nnUNet_raw_data_base' environment variable not set. "
                 "Ensure nnUNet has been properly configured before continuing."
             )
 
-        self.nnunet_raw_path = Path(os.environ["nnUNet_raw"])
+        self.nnunet_raw_path = Path(os.environ["nnUNet_raw_data_base"])
 
         self.working_directory = working_directory
         self.nnunet_id = nnunet_id
