@@ -449,7 +449,7 @@ class AnalyseData:
                     df_contour = pd.DataFrame()
 
                     for rad in radiomics:
-                        if rad not in AVAILABLE_RADIOMICS:
+                        if rad not in available_radiomics:
                             logger.warning("Radiomic Class not found: %s", rad)
                             continue
 
