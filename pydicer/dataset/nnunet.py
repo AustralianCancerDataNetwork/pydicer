@@ -448,7 +448,9 @@ class NNUNetDataset:
                 "correct before proceeding."
             )
 
-        nnunet_dir = self.nnunet_raw_path.joinpath(f"Task{self.nnunet_id}_{self.nnunet_name}")
+        nnunet_dir = self.nnunet_raw_path.joinpath(
+            "nnUNet_raw_data", f"Task{self.nnunet_id}_{self.nnunet_name}"
+        )
 
         image_tr_path = nnunet_dir.joinpath("imagesTr")
         image_tr_path.mkdir(exist_ok=True, parents=True)
