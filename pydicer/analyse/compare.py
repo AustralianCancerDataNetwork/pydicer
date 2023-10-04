@@ -87,8 +87,9 @@ def get_all_similarity_metrics_for_dataset(
         df = pd.DataFrame(
             columns=["patient_id", "hashed_uid_target", "hashed_uid_reference", "structure"]
         )
+    else:
+        df = pd.concat(dfs)
 
-    df = pd.concat(dfs)
     df.sort_values(
         ["patient_id", "hashed_uid_target", "hashed_uid_reference", "structure"], inplace=True
     )
@@ -305,15 +306,24 @@ def compute_contour_similarity_metrics(
 
             mask_reference = ss_reference[structure]
 
+            should_compute_volume_metrics = set(compute_metrics).intersection(set(AVAILABLE_VOLUME_METRICS))
             volume_metrics = {}
-            if set(compute_metrics).intersection(set(AVAILABLE_VOLUME_METRICS)):
+            if should_compute_volume_metrics:
                 logger.debug("Computing volume metrics")
                 volume_metrics = compute_volume_metrics(mask_target, mask_reference)
 
+            should_compute_surface_metrics = set(compute_metrics).intersection(set(AVAILABLE_SURFACE_METRICS))
             surface_metrics = {}
-            if set(compute_metrics).intersection(set(AVAILABLE_SURFACE_METRICS)):
+            if should_compute_surface_metrics:
                 logger.debug("Computing surface metrics")
-                surface_metrics = compute_surface_metrics(mask_target, mask_reference)
+                try:
+                    surface_metrics = compute_surface_metrics(mask_target, mask_reference)
+                except Exception as e:
+                    logger.exception(e)
+                    logger.error("Unable to compute surface metrics")
+                    for metric in should_compute_surface_metrics:
+                        logger.debug("Setting value of metric %s to NaN", metric)
+                        surface_metrics[metric] = np.nan
 
             metrics = {**volume_metrics, **surface_metrics}
 
@@ -327,7 +337,7 @@ def compute_contour_similarity_metrics(
                     "metric": metric,
                     "value": metrics[metric],
                 }
-                logger.debug("Computed %d of %.4f", metric, metrics[metric])
+                logger.debug("Computed %s of %.4f", metric, metrics[metric])
                 results.append(result_entry)
 
         df_results = pd.DataFrame(results)

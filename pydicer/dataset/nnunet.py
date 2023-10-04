@@ -484,6 +484,26 @@ class NNUNetDataset:
             target_label_path = label_tr_path.joinpath(f"{pat_id}.nii.gz")
             sitk.WriteImage(pat_label_map, str(target_label_path))
 
+        for pat_id in self.testing_cases:
+            df_pat = df[df.patient_id == pat_id]
+            img_row = df_pat[df_pat.modality == self.image_modality].iloc[0]
+            img_dir = Path(img_row.path)
+            img_file = img_dir.joinpath(f"{self.image_modality}.nii.gz")
+            img = sitk.ReadImage(str(img_file))
+
+            target_img_path = image_ts_path.joinpath(f"{pat_id}_0000.nii.gz")
+
+            target_img_path.unlink(missing_ok=True)
+            target_img_path.symlink_to(img_file)
+
+            structure_set_row = df_pat[df_pat.modality == "RTSTRUCT"].iloc[0]
+            structure_set = StructureSet(structure_set_row, self.mapping_id)
+            pat_label_map = self.prep_label_map_from_one_hot(img, structure_set)
+            target_label_path = label_ts_path.joinpath(f"{pat_id}.nii.gz")
+            sitk.WriteImage(pat_label_map, str(target_label_path))
+
+
+
         # write JSON file
         dataset_dict = {
             "name": self.nnunet_name,
