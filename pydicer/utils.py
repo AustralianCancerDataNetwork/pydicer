@@ -525,6 +525,26 @@ def add_structure_name_mapping(
         json.dump(mapping_dict, structures_map_file, ensure_ascii=False, indent=4)
 
 
+def download_and_extract_zip_file(zip_url, output_directory):
+    """Downloads a zip file from the URL specified and extracts the contents to the output
+    directory.
+
+    Args:
+        zip_url (str): The URL of the zip file.
+        output_directory (str|pathlib.Path): The path in which to extract the contents.
+    """
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_file = temp_dir.joinpath("tmp.zip")
+
+        with urllib.request.urlopen(zip_url) as dl_file:
+            with open(temp_file, "wb") as out_file:
+                out_file.write(dl_file.read())
+
+        with zipfile.ZipFile(temp_file, "r") as zip_ref:
+            zip_ref.extractall(output_directory)
+
+
 def fetch_converted_test_data(working_directory=None, dataset="HNSCC"):
     """Fetch some public data which has already been converted using PyDicer.
     Useful for unit testing as well as examples.
@@ -559,17 +579,8 @@ def fetch_converted_test_data(working_directory=None, dataset="HNSCC"):
         raise ValueError(f"Unknown dataset {dataset}")
 
     with tempfile.TemporaryDirectory() as temp_dir:
-        temp_dir = Path(temp_dir)
-        temp_file = temp_dir.joinpath("tmp.zip")
-        output_directory = temp_dir.joinpath("output")
-
-        with urllib.request.urlopen(zip_url) as dl_file:
-            with open(temp_file, "wb") as out_file:
-                out_file.write(dl_file.read())
-
-        with zipfile.ZipFile(temp_file, "r") as zip_ref:
-            zip_ref.extractall(output_directory)
-
+        output_directory = Path(temp_dir).joinpath("output")
+        download_and_extract_zip_file(zip_url, output_directory)
         shutil.copytree(output_directory.joinpath(working_name), working_directory)
 
     return working_directory
