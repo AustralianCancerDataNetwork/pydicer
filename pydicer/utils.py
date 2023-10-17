@@ -2,6 +2,10 @@ import os
 import hashlib
 import json
 import logging
+import tempfile
+import urllib
+import zipfile
+import shutil
 from datetime import datetime
 from pathlib import Path
 
@@ -519,3 +523,53 @@ def add_structure_name_mapping(
         mapping_path.joinpath(f"{mapping_id}.json"), "w", encoding="utf8"
     ) as structures_map_file:
         json.dump(mapping_dict, structures_map_file, ensure_ascii=False, indent=4)
+
+
+def fetch_converted_test_data(working_directory=None, dataset="HNSCC"):
+    """Fetch some public data which has already been converted using PyDicer.
+    Useful for unit testing as well as examples.
+
+    Args:
+        working_directory (str|pathlib.Path, optional): The working directory in which to
+          place the test data. Defaults to None.
+        dataset (str, optional): The name of the dataset to fetch, either HNSCC or LCTSC.
+          Defaults to "HNSCC".
+
+    Returns:
+        pathlib.Path: The path to the working directory.
+    """
+
+    if working_directory is None:
+        working_directory = Path(".")
+        working_directory.joinpath(dataset)
+
+    working_directory = Path(working_directory)
+
+    if working_directory.exists():
+        logger.warning("Working directory %s aready exists, won't download test data.")
+        return
+
+    if dataset == "HNSCC":
+        zip_url = "https://zenodo.org/record/8237552/files/HNSCC_pydicer.zip"
+        working_name = "testdata"
+    elif dataset == "LCTSC":
+        zip_url = "https://zenodo.org/records/10005835/files/LCTSC_pydicer.zip"
+        working_name = "LCTSC"
+    else:
+        raise ValueError(f"Unknown dataset {dataset}")
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = Path(temp_dir)
+        temp_file = temp_dir.joinpath("tmp.zip")
+        output_directory = temp_dir.joinpath("output")
+
+        with urllib.request.urlopen(zip_url) as dl_file:
+            with open(temp_file, "wb") as out_file:
+                out_file.write(dl_file.read())
+
+        with zipfile.ZipFile(temp_file, "r") as zip_ref:
+            zip_ref.extractall(output_directory)
+
+        shutil.copytree(output_directory.joinpath(working_name), working_directory)
+
+    return working_directory
