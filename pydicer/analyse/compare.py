@@ -306,19 +306,23 @@ def compute_contour_similarity_metrics(
 
             mask_reference = ss_reference[structure]
 
-            should_compute_volume_metrics = set(compute_metrics).intersection(set(AVAILABLE_VOLUME_METRICS))
+            should_compute_volume_metrics = set(compute_metrics).intersection(
+                set(AVAILABLE_VOLUME_METRICS)
+            )
             volume_metrics = {}
             if should_compute_volume_metrics:
                 logger.debug("Computing volume metrics")
                 volume_metrics = compute_volume_metrics(mask_target, mask_reference)
 
-            should_compute_surface_metrics = set(compute_metrics).intersection(set(AVAILABLE_SURFACE_METRICS))
+            should_compute_surface_metrics = set(compute_metrics).intersection(
+                set(AVAILABLE_SURFACE_METRICS)
+            )
             surface_metrics = {}
             if should_compute_surface_metrics:
                 logger.debug("Computing surface metrics")
                 try:
                     surface_metrics = compute_surface_metrics(mask_target, mask_reference)
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-exception-caught
                     logger.exception(e)
                     logger.error("Unable to compute surface metrics")
                     for metric in should_compute_surface_metrics:
