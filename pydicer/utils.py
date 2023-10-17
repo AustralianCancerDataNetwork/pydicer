@@ -567,7 +567,7 @@ def fetch_converted_test_data(working_directory=None, dataset="HNSCC"):
 
     if working_directory.exists():
         logger.warning("Working directory %s aready exists, won't download test data.")
-        return
+        return working_directory
 
     if dataset == "HNSCC":
         zip_url = "https://zenodo.org/record/8237552/files/HNSCC_pydicer.zip"
