@@ -535,6 +535,7 @@ def download_and_extract_zip_file(zip_url, output_directory):
     """
 
     with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = Path(temp_dir)
         temp_file = temp_dir.joinpath("tmp.zip")
 
         with urllib.request.urlopen(zip_url) as dl_file:
