@@ -269,8 +269,8 @@ already exist. Defaults to True.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicer.convert.data.handle_missing_slice">
-<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">handle_missing_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.handle_missing_slice" title="Permalink to this definition">#</a></dt>
-<dd><p>Function to interpolate missing slices in an image</p>
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">handle_missing_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_duplicates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.handle_missing_slice" title="Permalink to this definition">#</a></dt>
+<dd><p>function to interpolate missing slices in an image</p>
 <p>Example usage:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicer.convert.data</span> <span class="kn">import</span> <span class="n">handle_missing_slice</span>
 
@@ -392,20 +392,18 @@ Defaults to matplotlib.colormaps.get_cmap(“rainbow”).</p></li>
 <span id="pet-conversion"></span><h2>PET Conversion<a class="headerlink" href="#module-pydicer.convert.pt" title="Permalink to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicer.convert.pt.convert_dicom_to_nifti_pt">
-<span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">convert_dicom_to_nifti_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_filepaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_patient_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.convert_dicom_to_nifti_pt" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">convert_dicom_to_nifti_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_filepaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.convert_dicom_to_nifti_pt" title="Permalink to this definition">#</a></dt>
 <dd><p>Function to convert the dicom files contained in input_filepaths to one NIFTI image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>input_filepaths</strong> (<em>list</em>) – list of the dicom paths</p></li>
 <li><p><strong>output_filepath</strong> (<em>str</em>) – path to the output file path where to store the NIFTI file.</p></li>
-<li><p><strong>default_patient_weight</strong> (<em>float</em><em>, </em><em>optional</em>) – If the patient’s weight is missing from the PT
-DICOM it can be provided through this argument. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>MissingWeightError</strong> – Error to alert when the weight is missing from the PT, to compute
+<li><p><strong>ValueError</strong> – Error to alert when the weight is missing from the PT, to compute
     the SUV.</p></li>
 <li><p><strong>RuntimeError</strong> – Error to alert when one or more slices are missing</p></li>
 <li><p><strong>ValueError</strong> – Raised when a modality or a unit (for the PT) is not handled.</p></li>
@@ -422,14 +420,11 @@ DICOM it can be provided through this argument. Defaults to None.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicer.convert.pt.get_physical_values_pt">
-<span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">get_physical_values_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_weight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.get_physical_values_pt" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.pt.</span></span><span class="sig-name descname"><span class="pre">get_physical_values_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.pt.get_physical_values_pt" title="Permalink to this definition">#</a></dt>
 <dd><p>Function to Get physical values from raw PET</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>slices</strong> – all pet slices of this patient</p></li>
-<li><p><strong>patient_weight</strong> – a value about this patient</p></li>
-</ul>
+<dd class="field-odd"><p><strong>slices</strong> – all pet slices of this patient</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>extract physical values for pet</p>
