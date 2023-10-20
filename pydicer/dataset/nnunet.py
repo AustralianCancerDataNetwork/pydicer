@@ -62,17 +62,17 @@ class NNUNetDataset:
               standardised name. Defaults to DEFAULT_MAPPING_ID.
 
         Raises:
-            SystemError: Raised if the nnUNet_raw environment variable is not set.
+            SystemError: Raised if the nnUNet_raw_data_base environment variable is not set.
         """
 
         # Check that the nnUNet_raw_data_base environment variable is set
-        if not "nnUNet_raw" in os.environ:
+        if not "nnUNet_raw_data_base" in os.environ:
             raise SystemError(
-                "'nnUNet_raw' environment variable not set. "
+                "'nnUNet_raw_data_base' environment variable not set. "
                 "Ensure nnUNet has been properly configured before continuing."
             )
 
-        self.nnunet_raw_path = Path(os.environ["nnUNet_raw"])
+        self.nnunet_raw_path = Path(os.environ["nnUNet_raw_data_base"])
 
         self.working_directory = working_directory
         self.nnunet_id = nnunet_id
@@ -448,7 +448,9 @@ class NNUNetDataset:
                 "correct before proceeding."
             )
 
-        nnunet_dir = self.nnunet_raw_path.joinpath(f"Task{self.nnunet_id}_{self.nnunet_name}")
+        nnunet_dir = self.nnunet_raw_path.joinpath(
+            "nnUNet_raw_data", f"Task{self.nnunet_id}_{self.nnunet_name}"
+        )
 
         image_tr_path = nnunet_dir.joinpath("imagesTr")
         image_tr_path.mkdir(exist_ok=True, parents=True)
@@ -481,6 +483,26 @@ class NNUNetDataset:
             pat_label_map = self.prep_label_map_from_one_hot(img, structure_set)
             target_label_path = label_tr_path.joinpath(f"{pat_id}.nii.gz")
             sitk.WriteImage(pat_label_map, str(target_label_path))
+
+        for pat_id in self.testing_cases:
+            df_pat = df[df.patient_id == pat_id]
+            img_row = df_pat[df_pat.modality == self.image_modality].iloc[0]
+            img_dir = Path(img_row.path)
+            img_file = img_dir.joinpath(f"{self.image_modality}.nii.gz")
+            img = sitk.ReadImage(str(img_file))
+
+            target_img_path = image_ts_path.joinpath(f"{pat_id}_0000.nii.gz")
+
+            target_img_path.unlink(missing_ok=True)
+            target_img_path.symlink_to(img_file)
+
+            structure_set_row = df_pat[df_pat.modality == "RTSTRUCT"].iloc[0]
+            structure_set = StructureSet(structure_set_row, self.mapping_id)
+            pat_label_map = self.prep_label_map_from_one_hot(img, structure_set)
+            target_label_path = label_ts_path.joinpath(f"{pat_id}.nii.gz")
+            sitk.WriteImage(pat_label_map, str(target_label_path))
+
+
 
         # write JSON file
         dataset_dict = {
@@ -560,7 +582,7 @@ class NNUNetDataset:
 
         # Write the contents to the script
         with open(script_path, "w", encoding="utf8") as f:
-            f.write("!#/bin/bash")
+            f.write("#!/bin/bash")
             f.write("\n")
 
             for l in script_header:

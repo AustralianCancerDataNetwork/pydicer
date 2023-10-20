@@ -52,7 +52,7 @@ class VisualiseData:
             join_working_directory=True,
         )
 
-        visualise_modalities = ["CT", "RTSTRUCT", "RTDOSE"]
+        visualise_modalities = ["CT", "RTSTRUCT", "RTDOSE", "PT"]
         df_process = df_process[df_process.modality.isin(visualise_modalities)]
 
         for _, row in get_iterator(
@@ -74,9 +74,13 @@ class VisualiseData:
                 fig = vis.show()
                 # load meta data from json file
                 ds_dict = load_object_metadata(row)
-                # deal with missing value in study description
+                # deal with missing value in study description & date
                 if "StudyDescription" not in ds_dict:
                     ds_dict.StudyDescription = "NaN"
+
+                if "StudyDate" not in ds_dict:
+                    ds_dict.StudyDate = "NaT"
+
                 # choose axis one
                 # (this is the top-right box that is blank)
                 ax = fig.axes[1]
@@ -110,6 +114,29 @@ class VisualiseData:
 
                 patient_logger.eval_module_process("visualise", row.hashed_uid)
                 logger.debug("Created CT visualisation: %s", vis_filename)
+
+            if row.modality == "PT":
+                img_path = Path(row.path)
+                vis_filename = img_path.joinpath("PT.png")
+
+                if vis_filename.exists() and not force:
+                    logger.info("Visualisation already exists at %s", vis_filename)
+                    continue
+
+                img = sitk.ReadImage(str(img_path.joinpath(f"{row.modality}.nii.gz")))
+
+                # TODO find linked CT and render PT on top of that
+                vis = ImageVisualiser(img)
+                fig = vis.show()
+
+                fig.savefig(
+                    vis_filename,
+                    dpi=fig.dpi,
+                )
+                plt.close(fig)
+
+                patient_logger.eval_module_process("visualise", row.hashed_uid)
+                logger.debug("Created PT visualisation: %s", vis_filename)
 
             # Visualise the structures on top of their linked image
             if row.modality == "RTSTRUCT":
