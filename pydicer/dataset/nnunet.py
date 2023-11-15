@@ -287,6 +287,7 @@ class NNUNetDataset:
         """
 
         df = read_converted_data(self.working_directory, dataset_name=self.dataset_name)
+        df = df[df.patient_id.isin(self.testing_cases + self.training_cases)]
         df_structure_sets = df[df.modality == "RTSTRUCT"]
 
         # First get a set of all unique structure names available
@@ -363,6 +364,7 @@ class NNUNetDataset:
                 "overlapping structures."
             )
         df = read_converted_data(self.working_directory, dataset_name=self.dataset_name)
+        df = df[df.patient_id.isin(self.testing_cases + self.training_cases)]
         df_structure_sets = df[df.modality == "RTSTRUCT"]
 
         has_overlapping_structures = False
@@ -501,8 +503,6 @@ class NNUNetDataset:
             pat_label_map = self.prep_label_map_from_one_hot(img, structure_set)
             target_label_path = label_ts_path.joinpath(f"{pat_id}.nii.gz")
             sitk.WriteImage(pat_label_map, str(target_label_path))
-
-
 
         # write JSON file
         dataset_dict = {
