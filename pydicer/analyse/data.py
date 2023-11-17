@@ -201,6 +201,8 @@ class AnalyseData:
         df = pd.concat(dfs)
         df.sort_values(["patient", "struct_hash", "dose_hash", "label"], inplace=True)
         df.reset_index(inplace=True, drop=True)
+        # Fill NaN with zeros since these can appear after concat
+        df.fillna(0, inplace=True)
 
         return df
 
