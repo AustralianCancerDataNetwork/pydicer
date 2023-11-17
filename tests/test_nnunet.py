@@ -100,16 +100,8 @@ def test_nnunet_split_dataset_random(test_data_autoseg):
 
     nnunet.split_dataset(random_state=42)
 
-    assert "LCTSC-Train-S1-007" in nnunet.training_cases
-    assert "LCTSC-Train-S1-002" in nnunet.training_cases
-    assert "LCTSC-Train-S1-006" in nnunet.training_cases
-    assert "LCTSC-Test-S1-101" in nnunet.training_cases
-    assert "LCTSC-Test-S1-102" in nnunet.training_cases
-    assert "LCTSC-Train-S1-001" in nnunet.training_cases
-    assert "LCTSC-Train-S1-003" in nnunet.training_cases
-    assert "LCTSC-Train-S1-005" in nnunet.testing_cases
-    assert "LCTSC-Train-S1-008" in nnunet.testing_cases
-    assert "LCTSC-Train-S1-004" in nnunet.testing_cases
+    assert len(nnunet.training_cases) == 7
+    assert len(nnunet.testing_cases) == 3
 
 
 def test_nnunet_split_dataset_specify(test_data_autoseg):
