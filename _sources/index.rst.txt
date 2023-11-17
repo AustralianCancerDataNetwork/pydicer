@@ -20,6 +20,7 @@
    :maxdepth: 5
    :hidden:
 
+   tool
    input
    config
    preprocess
@@ -27,3 +28,4 @@
    visualise
    dataset
    analyse
+   nnunet

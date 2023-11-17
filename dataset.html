@@ -166,6 +166,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tool.html">PyDicer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input.html">Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocessing</a></li>
@@ -173,6 +174,7 @@
 <li class="toctree-l1"><a class="reference internal" href="visualise.html">Visualisation</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Dataset Preparation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nnunet.html">nnUNet</a></li>
 </ul>
 
 </div>
@@ -211,6 +213,67 @@
 <h1>Dataset Preparation<a class="headerlink" href="#dataset-preparation" title="Permalink to this heading">#</a></h1>
 <section id="module-pydicer.dataset.preparation">
 <span id="prepare-dataset"></span><h2>Prepare Dataset<a class="headerlink" href="#module-pydicer.dataset.preparation" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydicer.dataset.preparation.PrepareDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicer.dataset.preparation.</span></span><span class="sig-name descname"><span class="pre">PrepareDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.dataset.preparation.PrepareDataset" title="Permalink to this definition">#</a></dt>
+<dd><p>Class that provides functionality for prepartion of subsets of data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>working_directory</strong> (<em>-</em>) – Main working directory for pydicer.
+Defaults to “.”.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.dataset.preparation.PrepareDataset.add_object_to_dataset">
+<span class="sig-name descname"><span class="pre">add_object_to_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_object_row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.dataset.preparation.PrepareDataset.add_object_to_dataset" title="Permalink to this definition">#</a></dt>
+<dd><p>Add one data object to a dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_name</strong> (<em>str</em>) – The name of the dataset to add the object to.</p></li>
+<li><p><strong>data_object_row</strong> (<em>pd.Series</em>) – The DataFrame row of the converted object.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.dataset.preparation.PrepareDataset.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preparation_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patients</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.dataset.preparation.PrepareDataset.prepare" title="Permalink to this definition">#</a></dt>
+<dd><p>Calls upon an appropriate preparation function to generate a clean dataset ready for
+use. Additional keyword arguments are passed through to the preparation_function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_name</strong> (<em>str</em>) – The name of the dataset to generate</p></li>
+<li><p><strong>preparation_function</strong> (<em>function</em><em>|</em><em>str</em>) – the function use for preparation</p></li>
+<li><p><strong>patients</strong> (<em>list</em>) – The list of patient IDs to use for dataset. If None then all patients
+will be considered. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AttributeError</strong> – Raised if preparation_function is not a function or a string defining
+    a known preparation function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.dataset.preparation.PrepareDataset.prepare_from_dataframe">
+<span class="sig-name descname"><span class="pre">prepare_from_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_prepare</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.dataset.preparation.PrepareDataset.prepare_from_dataframe" title="Permalink to this definition">#</a></dt>
+<dd><p>Prepare a dataset from a filtered converted dataframe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_name</strong> (<em>str</em>) – The name of the dataset to generate</p></li>
+<li><p><strong>df_prepare</strong> (<em>pd.DataFrame</em>) – Filtered Pandas DataFrame containing rows of converted data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-pydicer.dataset.functions">
 <span id="preparation-functions"></span><h2>Preparation Functions<a class="headerlink" href="#module-pydicer.dataset.functions" title="Permalink to this heading">#</a></h2>
@@ -329,7 +392,15 @@ to these, one of which should match to select that series.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Dataset Preparation</a><ul>
-<li><a class="reference internal" href="#module-pydicer.dataset.preparation">Prepare Dataset</a></li>
+<li><a class="reference internal" href="#module-pydicer.dataset.preparation">Prepare Dataset</a><ul>
+<li><a class="reference internal" href="#pydicer.dataset.preparation.PrepareDataset"><code class="docutils literal notranslate"><span class="pre">PrepareDataset</span></code></a><ul>
+<li><a class="reference internal" href="#pydicer.dataset.preparation.PrepareDataset.add_object_to_dataset"><code class="docutils literal notranslate"><span class="pre">PrepareDataset.add_object_to_dataset()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.dataset.preparation.PrepareDataset.prepare"><code class="docutils literal notranslate"><span class="pre">PrepareDataset.prepare()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.dataset.preparation.PrepareDataset.prepare_from_dataframe"><code class="docutils literal notranslate"><span class="pre">PrepareDataset.prepare_from_dataframe()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-pydicer.dataset.functions">Preparation Functions</a><ul>
 <li><a class="reference internal" href="#pydicer.dataset.functions.rt_latest_dose"><code class="docutils literal notranslate"><span class="pre">rt_latest_dose()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.dataset.functions.rt_latest_struct"><code class="docutils literal notranslate"><span class="pre">rt_latest_struct()</span></code></a></li>
