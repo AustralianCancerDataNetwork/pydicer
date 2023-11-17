@@ -47,7 +47,13 @@ class NNUNetDataset:
         image_modality: str = "CT",
         mapping_id=DEFAULT_MAPPING_ID,
     ):
-        """_summary_
+        """Prepare a dataset to train models using nnUNet.
+
+        Ensure that nnUNet is installed in your Python environment.
+        For details on nnUNet see: https://github.com/MIC-DKFZ/nnUNet
+
+        > Note: This class currently support nnUNet v1. Contributions welcome to add support for
+          nnUNet v2.
 
         Args:
             working_directory (Union[str, Path]): The PyDicer working directory
@@ -501,8 +507,6 @@ class NNUNetDataset:
             pat_label_map = self.prep_label_map_from_one_hot(img, structure_set)
             target_label_path = label_ts_path.joinpath(f"{pat_id}.nii.gz")
             sitk.WriteImage(pat_label_map, str(target_label_path))
-
-
 
         # write JSON file
         dataset_dict = {

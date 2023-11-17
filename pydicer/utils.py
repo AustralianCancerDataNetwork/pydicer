@@ -70,13 +70,15 @@ def determine_dcm_datetime(ds, require_time=False):
     return None
 
 
-def load_object_metadata(row, keep_tags=None, remove_tags=None):
+def load_object_metadata(row: pd.Series, keep_tags=None, remove_tags=None):
     """Loads the object's metadata
 
     Args:
         row (pd.Series): The row of the converted DataFrame for which to load the metadata
-        keep_tags TODO
-        remove_tag TODO
+        keep_tags (str|list, optional): DICOM tag keywords keep when loading data. If set all other
+          tags will be removed. Defaults to None.
+        remove_tag (str|list, optional): DICOM tag keywords keep when loading data. If set all
+          other tags will be kept. Defaults to None.
 
     Returns:
         pydicom.Dataset: The dataset object containing the original DICOM metadata
@@ -462,9 +464,9 @@ def add_structure_name_mapping(
           this mapping belongs. Defaults to None.
 
     Raises:
-        SystemError: _description_
-        ValueError: _description_
-        ValueError: _description_
+        SystemError: Ensure working_directory or structure_set is provided.
+        ValueError: All keys in mapping dictionary must be of type `str`.
+        ValueError: All values in mapping dictionary must be a list of `str` entries.
     """
 
     mapping_path_base = None
@@ -585,3 +587,40 @@ def fetch_converted_test_data(working_directory=None, dataset="HNSCC"):
         shutil.copytree(output_directory.joinpath(working_name), working_directory)
 
     return working_directory
+
+
+def copy_doc(copy_func, remove_args=None):
+    """Copies the doc string of the given function to another.
+    This function is intended to be used as a decorator.
+
+    Remove args listed in `remove_args` from the docstring.
+
+    This function was adapted from:
+    https://stackoverflow.com/questions/68901049/copying-the-docstring-of-function-onto-another-function-by-name
+
+    .. code-block:: python3
+
+        def foo():
+            '''This is a foo doc string'''
+            ...
+
+        @copy_doc(foo)
+        def bar():
+            ...
+
+    """
+
+    if remove_args is None:
+        remove_args = []
+
+    def wrapped(func):
+        func.__doc__ = copy_func.__doc__
+
+        for arg in remove_args:
+            func.__doc__ = "\n".join(
+                [line for line in func.__doc__.split("\n") if not line.strip().startswith(arg)]
+            )
+
+        return func
+
+    return wrapped

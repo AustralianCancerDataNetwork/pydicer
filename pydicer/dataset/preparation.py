@@ -14,6 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 class PrepareDataset:
+    """
+    Class that provides functionality for prepartion of subsets of data.
+
+    Args:
+        - working_directory (str|pathlib.Path, optional): Main working directory for pydicer.
+            Defaults to ".".
+    """
+
     def __init__(self, working_directory="."):
         self.working_directory = Path(working_directory)
 
