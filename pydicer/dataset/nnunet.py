@@ -47,7 +47,13 @@ class NNUNetDataset:
         image_modality: str = "CT",
         mapping_id=DEFAULT_MAPPING_ID,
     ):
-        """_summary_
+        """Prepare a dataset to train models using nnUNet.
+
+        Ensure that nnUNet is installed in your Python environment.
+        For details on nnUNet see: https://github.com/MIC-DKFZ/nnUNet
+
+        > Note: This class currently support nnUNet v1. Contributions welcome to add support for
+          nnUNet v2.
 
         Args:
             working_directory (Union[str, Path]): The PyDicer working directory

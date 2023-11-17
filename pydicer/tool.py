@@ -3,6 +3,8 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
+import pandas as pd
+
 from pydicer.config import PyDicerConfig
 from pydicer.constants import CONVERTED_DIR_NAME, PYDICER_DIR_NAME
 
@@ -14,10 +16,31 @@ from pydicer.visualise.data import VisualiseData
 from pydicer.dataset.preparation import PrepareDataset
 from pydicer.analyse.data import AnalyseData
 
+from pydicer.utils import read_converted_data, add_structure_name_mapping, copy_doc
+
+from pydicer.generate.object import add_object, add_structure_object, add_dose_object
+from pydicer.generate.segmentation import (
+    read_all_segmentation_logs,
+    segment_image,
+    segment_dataset,
+)
+
 logger = logging.getLogger()
 
 
 class PyDicer:
+    """The PyDicer class provides easy access to all the key PyDicer functionality.
+
+    Args:
+        working_directory (str|pathlib.Path, optional): Directory in which data is stored. Defaults
+          to ".".
+
+    :ivar convert: Instance of :class:`~pydicer.convert.data.ConvertData`
+    :ivar visualise: Instance of :class:`~pydicer.visualise.data.VisualiseData`
+    :ivar dataset: Instance of :class:`~pydicer.dataset.preparation.PrepareDataset`
+    :ivar analyse: Instance of :class:`~pydicer.analyse.data.AnalyseData`
+    """
+
     def __init__(self, working_directory="."):
 
         self.working_directory = Path(working_directory)
@@ -135,8 +158,8 @@ class PyDicer:
         if len(self.dicom_directories) == 0:
             raise ValueError("No DICOM input locations set. Add one using the add_input function.")
 
-        pd = PreprocessData(self.working_directory)
-        pd.preprocess(self.dicom_directories, force=force)
+        preprocess_data = PreprocessData(self.working_directory)
+        preprocess_data.preprocess(self.dicom_directories, force=force)
 
         self.preprocessed_data = read_preprocessed_data(self.working_directory)
 
@@ -161,33 +184,60 @@ class PyDicer:
         )
         self.analyse.compute_dvh(dataset_name=CONVERTED_DIR_NAME, patient=patient, force=force)
 
-    # Object generation (insert in dataset(s) or all data)
-    def add_object_to_dataset(
-        self,
-        uid,
-        patient_id,
-        obj_type,
-        modality,
-        for_uid=None,
-        referenced_sop_instance_uid=None,
-        datasets=None,
-    ):
-        """_summary_
+    @copy_doc(add_structure_name_mapping, remove_args=["working_directory"])
+    def add_structure_name_mapping(  # pylint: disable=missing-function-docstring
+        self, *args, **kwargs
+    ) -> pd.DataFrame:
 
-        Args:
-            uid (_type_): _description_
-            patient_id (_type_): _description_
-            obj_type (_type_): _description_
-            modality (_type_): _description_
-            for_uid (_type_, optional): _description_. Defaults to None.
-            referenced_sop_instance_uid (_type_, optional): _description_. Defaults to None.
-            datasets (_type_, optional): _description_. Defaults to None.
-        """
+        return add_structure_name_mapping(
+            *args, working_directory=self.working_directory, **kwargs
+        )
 
-        # Check that object folder exists, if not provide instructions for adding
+    @copy_doc(read_converted_data, remove_args=["working_directory"])
+    def read_converted_data(  # pylint: disable=missing-function-docstring
+        self, *_, **kwargs
+    ) -> pd.DataFrame:
 
-        # Check that no object with uid already exists
+        return read_converted_data(working_directory=self.working_directory, **kwargs)
 
-        # Check that references sop uid exists, only warning if not
+    @copy_doc(add_object, remove_args=["working_directory"])
+    def add_object(  # pylint: disable=missing-function-docstring
+        self, *args, **kwargs
+    ) -> pd.DataFrame:
 
-        # Once ready, add to converted.csv for each dataset specified
+        return add_object(self.working_directory, *args, **kwargs)
+
+    @copy_doc(add_structure_object, remove_args=["working_directory"])
+    def add_structure_object(  # pylint: disable=missing-function-docstring
+        self, *args, **kwargs
+    ) -> pd.DataFrame:
+
+        return add_structure_object(self.working_directory, *args, **kwargs)
+
+    @copy_doc(add_dose_object, remove_args=["working_directory"])
+    def add_dose_object(  # pylint: disable=missing-function-docstring
+        self, *args, **kwargs
+    ) -> pd.DataFrame:
+
+        return add_dose_object(self.working_directory, *args, **kwargs)
+
+    @copy_doc(read_all_segmentation_logs, remove_args=["working_directory"])
+    def read_all_segmentation_logs(  # pylint: disable=missing-function-docstring
+        self, *args, **kwargs
+    ) -> pd.DataFrame:
+
+        return read_all_segmentation_logs(self.working_directory, *args, **kwargs)
+
+    @copy_doc(segment_image, remove_args=["working_directory"])
+    def segment_image(  # pylint: disable=missing-function-docstring
+        self, *args, **kwargs
+    ) -> pd.DataFrame:
+
+        return segment_image(self.working_directory, *args, **kwargs)
+
+    @copy_doc(segment_dataset, remove_args=["working_directory"])
+    def segment_dataset(  # pylint: disable=missing-function-docstring
+        self, *args, **kwargs
+    ) -> pd.DataFrame:
+
+        return segment_dataset(self.working_directory, *args, **kwargs)
