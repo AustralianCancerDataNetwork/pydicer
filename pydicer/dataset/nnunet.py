@@ -293,6 +293,7 @@ class NNUNetDataset:
         """
 
         df = read_converted_data(self.working_directory, dataset_name=self.dataset_name)
+        df = df[df.patient_id.isin(self.testing_cases + self.training_cases)]
         df_structure_sets = df[df.modality == "RTSTRUCT"]
 
         # First get a set of all unique structure names available
@@ -369,6 +370,7 @@ class NNUNetDataset:
                 "overlapping structures."
             )
         df = read_converted_data(self.working_directory, dataset_name=self.dataset_name)
+        df = df[df.patient_id.isin(self.testing_cases + self.training_cases)]
         df_structure_sets = df[df.modality == "RTSTRUCT"]
 
         has_overlapping_structures = False
