@@ -549,10 +549,10 @@ class AnalyseData:
               already exists. Defaults to True.
             bin_width (float, optional): The bin width of the Dose Volume Histogram.
             structure_meta_data_cols (list, optional): A list of DICOM tags which will be extracted
-                from the structure DICOM headers and included in the resulting table of radiomics.
+                from the structure DICOM headers and included in the resulting table of DVHs.
                 Defaults to None.
             dose_meta_data_cols (list, optional): A list of DICOM tags which will be extracted from
-                the Dose DICOM headers and included in the resulting table of radiomics.
+                the Dose DICOM headers and included in the resulting table of DVHs.
                 Defaults to None.
 
         Raises:
