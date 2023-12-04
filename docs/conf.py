@@ -82,4 +82,6 @@ for notebook_path in examples_path.glob("*.ipynb"):
 examples_path.mkdir(exist_ok=True)
 shutil.copy("../examples/GettingStarted.ipynb", "_examples/GettingStarted.ipynb")
 shutil.copy("../examples/ConvertingData.ipynb", "_examples/ConvertingData.ipynb")
-shutil.copy("../examples/VisualisingData.ipynb", "_examples/VisualisingData.ipynb")
+shutil.copy("../examples/VisualiseData.ipynb", "_examples/VisualiseData.ipynb")
+shutil.copy("../examples/DoseMetrics.ipynb", "_examples/DoseMetrics.ipynb")
+shutil.copy("../examples/Radiomics.ipynb", "_examples/Radiomics.ipynb")

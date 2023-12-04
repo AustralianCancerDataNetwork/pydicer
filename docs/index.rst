@@ -7,7 +7,9 @@
 
     _examples/GettingStarted
     _examples/ConvertingData
-    _examples/VisualisingData
+    _examples/VisualiseData
+    _examples/Radiomics
+    _examples/DoseMetrics
 
 .. toctree::
     :caption: Developers
