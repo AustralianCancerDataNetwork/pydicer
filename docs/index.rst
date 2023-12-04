@@ -6,6 +6,8 @@
     :hidden:
 
     _examples/GettingStarted
+    _examples/ConvertingData
+    _examples/VisualisingData
 
 .. toctree::
     :caption: Developers
