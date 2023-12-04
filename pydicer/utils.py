@@ -583,7 +583,7 @@ def fetch_converted_test_data(working_directory=None, dataset="HNSCC"):
         zip_url = "https://zenodo.org/record/8237552/files/HNSCC_pydicer.zip"
         working_name = "testdata"
     elif dataset == "LCTSC":
-        zip_url = "https://zenodo.org/records/10253689/files/LCTSC_pydicer.zip"
+        zip_url = "https://zenodo.org/records/10254078/files/LCTSC_pydicer.zip"
         working_name = "LCTSC"
     else:
         raise ValueError(f"Unknown dataset {dataset}")
