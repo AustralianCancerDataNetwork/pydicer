@@ -16,7 +16,12 @@ from pydicer.visualise.data import VisualiseData
 from pydicer.dataset.preparation import PrepareDataset
 from pydicer.analyse.data import AnalyseData
 
-from pydicer.utils import read_converted_data, add_structure_name_mapping, copy_doc
+from pydicer.utils import (
+    read_converted_data,
+    add_structure_name_mapping,
+    get_structures_linked_to_dose,
+    copy_doc,
+)
 from pydicer.quarantine import read_quarantined_data
 
 from pydicer.generate.object import add_object, add_structure_object, add_dose_object
@@ -218,6 +223,11 @@ class PyDicer:
     # pylint: disable=missing-function-docstring
     def read_quarantined_data(self) -> pd.DataFrame:
         return read_quarantined_data(working_directory=self.working_directory)
+
+    @copy_doc(read_quarantined_data, remove_args=["working_directory"])
+    # pylint: disable=missing-function-docstring
+    def get_structures_linked_to_dose(self, *args, **kwargs) -> pd.DataFrame:
+        return get_structures_linked_to_dose(self.working_directory, *args, **kwargs)
 
     @copy_doc(add_object, remove_args=["working_directory"])
     def add_object(  # pylint: disable=missing-function-docstring

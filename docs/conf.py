@@ -85,3 +85,6 @@ shutil.copy("../examples/ConvertingData.ipynb", "_examples/ConvertingData.ipynb"
 shutil.copy("../examples/VisualiseData.ipynb", "_examples/VisualiseData.ipynb")
 shutil.copy("../examples/DoseMetrics.ipynb", "_examples/DoseMetrics.ipynb")
 shutil.copy("../examples/Radiomics.ipynb", "_examples/Radiomics.ipynb")
+shutil.copy(
+    "../examples/DatasetPreparation.ipynb", "_examples/DatasetPreparation.ipynb"
+)

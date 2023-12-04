@@ -10,6 +10,7 @@
     _examples/VisualiseData
     _examples/Radiomics
     _examples/DoseMetrics
+    _examples/DatasetPreparation
 
 .. toctree::
     :caption: Developers

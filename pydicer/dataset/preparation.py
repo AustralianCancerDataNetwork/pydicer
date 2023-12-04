@@ -47,7 +47,10 @@ class PrepareDataset:
         symlink_path = dataset_dir.joinpath(object_path.relative_to(CONVERTED_DIR_NAME))
 
         rel_part = os.sep.join(
-            [".." for _ in symlink_path.parent.relative_to(self.working_directory).parts]
+            [
+                ".."
+                for _ in symlink_path.parent.relative_to(self.working_directory).parts
+            ]
         )
         src_path = Path(f"{rel_part}{os.sep}{object_path}")
 
@@ -67,7 +70,10 @@ class PrepareDataset:
             df_converted = pd.read_csv(pat_converted_csv, index_col=0, dtype=col_types)
 
             # Check if this object already exists in the converted dataframe
-            if len(df_converted[df_converted.hashed_uid == data_object_row.hashed_uid]) == 0:
+            if (
+                len(df_converted[df_converted.hashed_uid == data_object_row.hashed_uid])
+                == 0
+            ):
                 # If not add it
                 df_pat = pd.concat([df_converted, df_pat])
             else:
@@ -92,6 +98,9 @@ class PrepareDataset:
                 "remove the existing directory"
             )
 
+        # Create a copy of df_prepare
+        df_prepare = df_prepare.copy()
+
         # Remove the working directory part for when we re-save off the filtered converted csv
         df_prepare.path = df_prepare.path.apply(
             lambda p: str(Path(p).relative_to(self.working_directory))
@@ -101,7 +110,9 @@ class PrepareDataset:
         for _, row in df_prepare.iterrows():
             self.add_object_to_dataset(dataset_name, row)
 
-    def prepare(self, dataset_name: str, preparation_function: Callable, patients=None, **kwargs):
+    def prepare(
+        self, dataset_name: str, preparation_function: Callable, patients=None, **kwargs
+    ):
         """Calls upon an appropriate preparation function to generate a clean dataset ready for
         use. Additional keyword arguments are passed through to the preparation_function.
 
@@ -124,7 +135,11 @@ class PrepareDataset:
                 "preparation_function must be a function or a str defined in pydicer.dataset"
             )
 
-        logger.info("Preparing dataset %s using function: %s", dataset_name, preparation_function)
+        logger.info(
+            "Preparing dataset %s using function: %s",
+            dataset_name,
+            preparation_function,
+        )
 
         # Grab the DataFrame containing all the converted data
         df_converted = read_converted_data(self.working_directory, patients=patients)
