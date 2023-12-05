@@ -1,0 +1,1428 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Contributing" href="../contributing.html" /><link rel="prev" title="Dataset Preparation" href="DatasetPreparation.html" />
+
+    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+        <title>Working with Data - PyDicer 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="GettingStarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConvertingData.html">Converting Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="VisualiseData.html">Visualise Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Radiomics.html">Compute Radiomics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DoseMetrics.html">Dose Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DatasetPreparation.html">Dataset Preparation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Working with Data</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_of_conduct.html">Code of Conduct</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tool.html">PyDicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input.html">Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../preprocess.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../convert.html">Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualise.html">Visualisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nnunet.html">nnUNet</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars and line breaks on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+    white-space: pre;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Working-with-Data">
+<h1>Working with Data<a class="headerlink" href="#Working-with-Data" title="Permalink to this heading">#</a></h1>
+<p>Here we present some useful tips &amp; tricks which to help working with data which has been converted using PyDicer. As you will see, working with data in PyDicer is heavily oriented around DataFrames provided by the Pandas library. If you aren’t familiar with Pandas, we recommend working through the <a class="reference external" href="https://pandas.pydata.org/docs/getting_started/index.html">Pandas Getting Started Tutorials</a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pydicer</span> <span class="kn">import</span> <span class="n">PyDicer</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>pydicer
+    <span class="kn">from</span> <span class="nn">pydicer</span> <span class="kn">import</span> <span class="n">PyDicer</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">SimpleITK</span> <span class="k">as</span> <span class="nn">sitk</span>
+
+<span class="kn">from</span> <span class="nn">pydicer.utils</span> <span class="kn">import</span> <span class="n">fetch_converted_test_data</span>
+
+<span class="kn">from</span> <span class="nn">pydicer.utils</span> <span class="kn">import</span> <span class="n">load_object_metadata</span><span class="p">,</span> <span class="n">determine_dcm_datetime</span>
+</pre></div>
+</div>
+</div>
+<section id="Setup-PyDicer">
+<h2>Setup PyDicer<a class="headerlink" href="#Setup-PyDicer" title="Permalink to this heading">#</a></h2>
+<p>Here we load the LCTSC data which has already been converted. This is downloaded into the <code class="docutils literal notranslate"><span class="pre">testdata_lctsc</span></code> directory. We also initialise a <code class="docutils literal notranslate"><span class="pre">PyDicer</span></code> object.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">working_directory</span> <span class="o">=</span> <span class="n">fetch_converted_test_data</span><span class="p">(</span><span class="s2">&quot;./testdata_lctsc&quot;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;LCTSC&quot;</span><span class="p">)</span>
+
+<span class="n">pydicer</span> <span class="o">=</span> <span class="n">PyDicer</span><span class="p">(</span><span class="n">working_directory</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Working directory %s aready exists, won&#39;t download test data.
+</pre></div></div>
+</div>
+</section>
+<section id="Read-Converted-Data">
+<h2>Read Converted Data<a class="headerlink" href="#Read-Converted-Data" title="Permalink to this heading">#</a></h2>
+<p>To obtain a DataFrame of the converted data, use the <code class="docutils literal notranslate"><span class="pre">read_converted_data</span></code> function.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pydicer</span><span class="o">.</span><span class="n">read_converted_data</span><span class="p">()</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sop_instance_uid</th>
+      <th>hashed_uid</th>
+      <th>modality</th>
+      <th>patient_id</th>
+      <th>series_uid</th>
+      <th>for_uid</th>
+      <th>referenced_sop_instance_uid</th>
+      <th>path</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
+      <td>914d57</td>
+      <td>CT</td>
+      <td>LCTSC-Test-S1-102</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.639871532605...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-102/images/9...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
+      <td>6c6ea4</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Test-S1-102</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-102/structur...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
+      <td>aa38e6</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-002</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.234842392725...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.145984743865...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-002/images/...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.291449913947...</td>
+      <td>f036b8</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-002</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.291449913947...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.145984743865...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-002/structu...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
+      <td>6834c9</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-001</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.330486033168...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-001/images/...</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
+      <td>b5bddb</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-001</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-001/structu...</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.141349678572...</td>
+      <td>d91c84</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-004</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.269433294341...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.313160975008...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-004/images/...</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.595315284787...</td>
+      <td>61758b</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-004</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.595315284787...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.313160975008...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.141349678572...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-004/structu...</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>738c1a</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.338518041666...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-005/images/...</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>68d663</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-005/structu...</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
+      <td>5adf40</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-007</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.335375068555...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-007/images/...</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
+      <td>ed6686</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-007</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-007/structu...</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
+      <td>dd0026</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-008</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.135073567254...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-008/images/...</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
+      <td>48a970</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-008</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-008/structu...</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>2bf2f9</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.742383887179...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-003/images/...</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>8e34f9</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-003/structu...</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.333558838494...</td>
+      <td>666be6</td>
+      <td>CT</td>
+      <td>LCTSC-Test-S1-101</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.106943890850...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.171234424242...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-101/images/6...</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.929007819506...</td>
+      <td>cc682f</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Test-S1-101</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.280355341349...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.171234424242...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.333558838494...</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-101/structur...</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
+      <td>88c5ef</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-006</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.770569242984...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-006/images/...</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
+      <td>ceb111</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-006</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-006/structu...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Iterating-Over-Objects">
+<h2>Iterating Over Objects<a class="headerlink" href="#Iterating-Over-Objects" title="Permalink to this heading">#</a></h2>
+<p>If you want to perform some operation on (for example) all images in your dataset, you can iterate over each image row like this. Within each loop we load each image as a <code class="docutils literal notranslate"><span class="pre">SimpleITK</span></code> image (just for demonstration purposes).)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ct_row</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">modality</span><span class="o">==</span><span class="s2">&quot;CT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading image with hashed UID: </span><span class="si">{</span><span class="n">ct_row</span><span class="o">.</span><span class="n">hashed_uid</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">img_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ct_row</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;CT.nii.gz&quot;</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">ReadImage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">img_path</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; Complete&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Loading image with hashed UID: 914d57... Complete
+Loading image with hashed UID: aa38e6... Complete
+Loading image with hashed UID: 6834c9... Complete
+Loading image with hashed UID: d91c84... Complete
+Loading image with hashed UID: 738c1a... Complete
+Loading image with hashed UID: 5adf40... Complete
+Loading image with hashed UID: dd0026... Complete
+Loading image with hashed UID: 2bf2f9... Complete
+Loading image with hashed UID: 666be6... Complete
+Loading image with hashed UID: 88c5ef... Complete
+</pre></div></div>
+</div>
+</section>
+<section id="Loading-Object-Metadata">
+<h2>Loading Object Metadata<a class="headerlink" href="#Loading-Object-Metadata" title="Permalink to this heading">#</a></h2>
+<p>The metadata from the DICOM headers is stored by PyDicer and can be easily loaded using the <code class="docutils literal notranslate"><span class="pre">load_object_metadata</span></code> function. Simply pass a row from the converted DataFrame into this function to load the metadata for that object.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">first_row</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">load_object_metadata</span><span class="p">(</span><span class="n">first_row</span><span class="p">)</span>
+<span class="n">ds</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(0008, 0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;
+(0008, 0008) Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AXIAL&#39;, &#39;CT_SOM5 SPI&#39;]
+(0008, 0012) Instance Creation Date              DA: &#39;20050726&#39;
+(0008, 0013) Instance Creation Time              TM: &#39;091720.609000&#39;
+(0008, 0016) SOP Class UID                       UI: CT Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364823930179693677352
+(0008, 0020) Study Date                          DA: &#39;20031104&#39;
+(0008, 0021) Series Date                         DA: &#39;20031104&#39;
+(0008, 0023) Content Date                        DA: &#39;20031104&#39;
+(0008, 0030) Study Time                          TM: &#39;112017.690000&#39;
+(0008, 0031) Series Time                         TM: &#39;114545.847000&#39;
+(0008, 0033) Content Time                        TM: &#39;114241.493000&#39;
+(0008, 0050) Accession Number                    SH: &#39;2356173256177297&#39;
+(0008, 0060) Modality                            CS: &#39;CT&#39;
+(0008, 0070) Manufacturer                        LO: &#39;SIEMENS&#39;
+(0008, 0090) Referring Physician&#39;s Name          PN: &#39;&#39;
+(0008, 1030) Study Description                   LO: &#39;RT^RCCT_THORAX_8F_High (Adult)&#39;
+(0008, 103e) Series Description                  LO: &#39;CT114545:RespCT  3.0  B30f  50% Ex&#39;
+(0008, 1090) Manufacturer&#39;s Model Name           LO: &#39;Sensation Open&#39;
+(0010, 0010) Patient&#39;s Name                      PN: &#39;LCTSC-Test-S1-102&#39;
+(0010, 0020) Patient ID                          LO: &#39;LCTSC-Test-S1-102&#39;
+(0010, 0030) Patient&#39;s Birth Date                DA: &#39;&#39;
+(0010, 0040) Patient&#39;s Sex                       CS: &#39;F&#39;
+(0012, 0062) Patient Identity Removed            CS: &#39;YES&#39;
+(0012, 0063) De-identification Method            LO: [&#39;Per DICOM PS 3.15 AnnexE. Details in 0012,0064&#39;, &#39;Per DICOM PS 3.15 AnnexE. Details in 0012,0064&#39;]
+(0012, 0064)  De-identification Method Code Sequence  16 item(s) ----
+   (0008, 0100) Code Value                          SH: &#39;113100&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Basic Application Confidentiality Profile&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113101&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Clean Pixel Data Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113104&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Clean Structured Content Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113105&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Clean Descriptors Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113107&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Retain Longitudinal Temporal Information Modified Dates Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113108&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Retain Patient Characteristics Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113109&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Retain Device Identity Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113111&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Retain Safe Private Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113100&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Basic Application Confidentiality Profile&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113101&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Clean Pixel Data Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113104&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Clean Structured Content Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113105&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Clean Descriptors Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113107&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Retain Longitudinal Temporal Information Modified Dates Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113108&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Retain Patient Characteristics Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113109&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Retain Device Identity Option&#39;
+   ---------
+   (0008, 0100) Code Value                          SH: &#39;113111&#39;
+   (0008, 0102) Coding Scheme Designator            SH: &#39;DCM&#39;
+   (0008, 0104) Code Meaning                        LO: &#39;Retain Safe Private Option&#39;
+   ---------
+(0013, 0010) Private Creator                     LO: &#39;CTP&#39;
+(0013, 1010) Private tag data                    LO: &#39;LCTSC&#39;
+(0013, 1013) Private tag data                    LO: &#39;70144598&#39;
+(0018, 0015) Body Part Examined                  CS: &#39;LUNG&#39;
+(0018, 0050) Slice Thickness                     DS: &#39;3.0&#39;
+(0018, 0060) KVP                                 DS: &#39;120.0&#39;
+(0018, 0090) Data Collection Diameter            DS: &#39;500.0&#39;
+(0018, 1100) Reconstruction Diameter             DS: &#39;500.0&#39;
+(0018, 1110) Distance Source to Detector         DS: &#39;1040.0&#39;
+(0018, 1111) Distance Source to Patient          DS: &#39;570.0&#39;
+(0018, 1120) Gantry/Detector Tilt                DS: &#39;0.0&#39;
+(0018, 1130) Table Height                        DS: &#39;200.0&#39;
+(0018, 1140) Rotation Direction                  CS: &#39;CW&#39;
+(0018, 1150) Exposure Time                       IS: &#39;361&#39;
+(0018, 1151) X-Ray Tube Current                  IS: &#39;100&#39;
+(0018, 1152) Exposure                            IS: &#39;500&#39;
+(0018, 1160) Filter Type                         SH: &#39;0&#39;
+(0018, 1170) Generator Power                     IS: &#39;12&#39;
+(0018, 1190) Focal Spot(s)                       DS: &#39;1.2&#39;
+(0018, 1210) Convolution Kernel                  SH: &#39;B30f&#39;
+(0018, 5100) Patient Position                    CS: &#39;HFS&#39;
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.238478060677653494401819620444
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.639871532605224417554459681163
+(0020, 0010) Study ID                            SH: &#39;&#39;
+(0020, 0011) Series Number                       IS: &#39;0&#39;
+(0020, 0012) Acquisition Number                  IS: &#39;2&#39;
+(0020, 0013) Instance Number                     IS: &#39;148&#39;
+(0020, 0032) Image Position (Patient)            DS: [-249.51171875, -449.51171875, -663.5]
+(0020, 0037) Image Orientation (Patient)         DS: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497667143598295356169
+(0020, 1040) Position Reference Indicator        LO: &#39;&#39;
+(0020, 1041) Slice Location                      DS: &#39;-663.5&#39;
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: &#39;MONOCHROME2&#39;
+(0028, 0010) Rows                                US: 512
+(0028, 0011) Columns                             US: 512
+(0028, 0030) Pixel Spacing                       DS: [0.9765625, 0.9765625]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 12
+(0028, 0102) High Bit                            US: 11
+(0028, 0103) Pixel Representation                US: 0
+(0028, 0303) Longitudinal Temporal Information M CS: &#39;MODIFIED&#39;
+(0028, 1050) Window Center                       DS: &#39;40.0&#39;
+(0028, 1051) Window Width                        DS: &#39;400.0&#39;
+(0028, 1052) Rescale Intercept                   DS: &#39;-1024.0&#39;
+(0028, 1053) Rescale Slope                       DS: &#39;1.0&#39;
+(3253, 0010) Private Creator                     LO: &#39;Varian Medical Systems VISION 3253&#39;
+(7fe0, 0010) Pixel Data                          OW: None
+</pre></div></div>
+</div>
+<section id="Keep-only-specific-header-tags">
+<h3>Keep only specific header tags<a class="headerlink" href="#Keep-only-specific-header-tags" title="Permalink to this heading">#</a></h3>
+<p>Loading object metadata can be slow, especially when doing this for many objects at once. So, you can specify the <code class="docutils literal notranslate"><span class="pre">keep_tags</span></code> argument if you know which header attributes you want to use. This speeds up loading metadata significantly.</p>
+<p>Here we load only the <code class="docutils literal notranslate"><span class="pre">StudyDate</span></code>, <code class="docutils literal notranslate"><span class="pre">PatientSex</span></code> and <code class="docutils literal notranslate"><span class="pre">Manufacturer</span></code>.</p>
+<blockquote>
+<div><p>Tip: These tags are defined by the DICOM standard, and we use <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> to load this metadata. In fact, the metadata returned is a <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> Dataset. Check out the <code class="docutils literal notranslate"><span class="pre">`pydicom</span></code> documentation &lt;<a class="reference external" href="https://pydicom.github.io/pydicom/dev/old/pydicom_user_guide.html">https://pydicom.github.io/pydicom/dev/old/pydicom_user_guide.html</a>&gt;`__ for more information.</p>
+</div></blockquote>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_object_metadata</span><span class="p">(</span><span class="n">first_row</span><span class="p">,</span> <span class="n">keep_tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;StudyDate&quot;</span><span class="p">,</span> <span class="s2">&quot;PatientSex&quot;</span><span class="p">,</span> <span class="s2">&quot;Manufacturer&quot;</span><span class="p">])</span>
+<span class="n">ds</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(0008, 0020) Study Date                          DA: &#39;20031104&#39;
+(0008, 0070) Manufacturer                        LO: &#39;SIEMENS&#39;
+(0010, 0040) Patient&#39;s Sex                       CS: &#39;F&#39;
+</pre></div></div>
+</div>
+</section>
+<section id="Loading-metadata-for-all-data-objects">
+<h3>Loading metadata for all data objects<a class="headerlink" href="#Loading-metadata-for-all-data-objects" title="Permalink to this heading">#</a></h3>
+<p>You can use the Pandas <code class="docutils literal notranslate"><span class="pre">apply</span></code> function to load metadata for all rows and add it as a column to the converted DataFrame.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;StudyDescription&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">load_object_metadata</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">keep_tags</span><span class="o">=</span><span class="s2">&quot;StudyDescription&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">StudyDescription</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sop_instance_uid</th>
+      <th>hashed_uid</th>
+      <th>modality</th>
+      <th>patient_id</th>
+      <th>series_uid</th>
+      <th>for_uid</th>
+      <th>referenced_sop_instance_uid</th>
+      <th>path</th>
+      <th>StudyDescription</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
+      <td>914d57</td>
+      <td>CT</td>
+      <td>LCTSC-Test-S1-102</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.639871532605...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-102/images/9...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
+      <td>6c6ea4</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Test-S1-102</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-102/structur...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
+      <td>aa38e6</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-002</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.234842392725...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.145984743865...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-002/images/...</td>
+      <td>RT^RCCT_THORAX_8F (Adult)</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.291449913947...</td>
+      <td>f036b8</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-002</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.291449913947...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.145984743865...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-002/structu...</td>
+      <td>RT^RCCT_THORAX_8F (Adult)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
+      <td>6834c9</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-001</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.330486033168...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-001/images/...</td>
+      <td>RT^RCCT_THORAX_8F_Low (Adult)</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
+      <td>b5bddb</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-001</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-001/structu...</td>
+      <td>RT^RCCT_THORAX_8F_Low (Adult)</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.141349678572...</td>
+      <td>d91c84</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-004</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.269433294341...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.313160975008...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-004/images/...</td>
+      <td>RT^RCCT_THORAX_8F_High_CONTRAST (Adult)</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.595315284787...</td>
+      <td>61758b</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-004</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.595315284787...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.313160975008...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.141349678572...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-004/structu...</td>
+      <td>RT^RCCT_THORAX_8F_High_CONTRAST (Adult)</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>738c1a</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.338518041666...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-005/images/...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>68d663</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-005/structu...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
+      <td>5adf40</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-007</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.335375068555...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-007/images/...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
+      <td>ed6686</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-007</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-007/structu...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
+      <td>dd0026</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-008</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.135073567254...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-008/images/...</td>
+      <td>Specials^RCCTPET_THORAX_8F (Adult)</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
+      <td>48a970</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-008</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-008/structu...</td>
+      <td>Specials^RCCTPET_THORAX_8F (Adult)</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>2bf2f9</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.742383887179...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-003/images/...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>8e34f9</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-003/structu...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.333558838494...</td>
+      <td>666be6</td>
+      <td>CT</td>
+      <td>LCTSC-Test-S1-101</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.106943890850...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.171234424242...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-101/images/6...</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.929007819506...</td>
+      <td>cc682f</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Test-S1-101</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.280355341349...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.171234424242...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.333558838494...</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-101/structur...</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
+      <td>88c5ef</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-006</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.770569242984...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-006/images/...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
+      <td>ceb111</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-006</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-006/structu...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Determine-Date-of-Object">
+<h3>Determine Date of Object<a class="headerlink" href="#Determine-Date-of-Object" title="Permalink to this heading">#</a></h3>
+<p>There are several DICOM header tags which could define the date of an object. The DICOM standard doesn’t require all of these to be set within the metadata. PyDicer provides the <code class="docutils literal notranslate"><span class="pre">determine_dcm_datetime</span></code> function to extract the date from the DICOM header.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_object_metadata</span><span class="p">(</span><span class="n">first_row</span><span class="p">)</span>
+<span class="n">obj_datetime</span> <span class="o">=</span> <span class="n">determine_dcm_datetime</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_datetime</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2003-11-04 11:45:45.847000
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../contributing.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Contributing</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="DatasetPreparation.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Dataset Preparation</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Ingham Medical Physics
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Working with Data</a><ul>
+<li><a class="reference internal" href="#Setup-PyDicer">Setup PyDicer</a></li>
+<li><a class="reference internal" href="#Read-Converted-Data">Read Converted Data</a></li>
+<li><a class="reference internal" href="#Iterating-Over-Objects">Iterating Over Objects</a></li>
+<li><a class="reference internal" href="#Loading-Object-Metadata">Loading Object Metadata</a><ul>
+<li><a class="reference internal" href="#Keep-only-specific-header-tags">Keep only specific header tags</a></li>
+<li><a class="reference internal" href="#Loading-metadata-for-all-data-objects">Loading metadata for all data objects</a></li>
+<li><a class="reference internal" href="#Determine-Date-of-Object">Determine Date of Object</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

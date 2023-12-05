@@ -1,0 +1,233 @@
+{
+ "cells": [
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Converting Data\n",
+    "\n",
+    "In this example, the preprocessing and conversion of DICOM data is demonstrated. These are\n",
+    "essential first steps before data can be analysed using PyDicer."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "try:\n",
+    "    from pydicer import PyDicer\n",
+    "except ImportError:\n",
+    "    !pip install pydicer\n",
+    "    from pydicer import PyDicer\n",
+    "\n",
+    "from pathlib import Path\n",
+    "\n",
+    "from pydicer.input.test import TestInput"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Setup PyDicer\n",
+    "\n",
+    "As in the `Getting Started` example, we must first define a working directory for our dataset. We\n",
+    "also create a `PyDicer` object."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "directory = Path(\"./working\")\n",
+    "pydicer = PyDicer(directory)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Fetch some data\n",
+    "\n",
+    "A TestInput class is provided in pydicer to download some sample data to work with. Several other\n",
+    "input classes exist if you'd like to retrieve DICOM data for conversion from somewhere else. See \n",
+    "the [docs for information](https://australiancancerdatanetwork.github.io/pydicer/html/input.html)\n",
+    "on how the PyDicer input classes work.\n",
+    "\n",
+    "Most commonly, if you have DICOM files stored within a folder on your file system you can simply\n",
+    "pass the path to your DICOM directory to the `pydicer.add_input()` function."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dicom_directory = directory.joinpath(\"dicom\")\n",
+    "test_input = TestInput(dicom_directory)\n",
+    "test_input.fetch_data()\n",
+    "\n",
+    "# Add the input DICOM location to the pydicer object\n",
+    "pydicer.add_input(dicom_directory)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Preprocess\n",
+    "\n",
+    "With some DICOM data ready to work with, we must first use the PyDicer `preprocess` module. This\n",
+    "module will crawl over all DICOM data available and will index all information required for\n",
+    "conversion of the data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pydicer.preprocess()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Inspect Preprocessed Data\n",
+    "\n",
+    "Here we load the data that was indexed during preprocessing and output the first rows. This data\n",
+    "will be used by the following step of data conversion."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_preprocessed = pydicer.read_preprocessed_data()\n",
+    "df_preprocessed.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Convert Data\n",
+    "\n",
+    "With the DICOM data having been indexed during preprocessing, we are now ready to convert this data\n",
+    "into NIfTI format which will be stored within the PyDicer standard directory structure.\n",
+    "\n",
+    "Running the following cell will begin the conversion process. While this cell is running, take a\n",
+    "look inside the `working/data` directory to see how the converted data is being stored.\n",
+    "\n",
+    "Notice the `converted.csv` file stored for each patient. This tracks each converted data object.\n",
+    "This will be loaded as a Pandas DataFrame for use throughout PyDicer.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pydicer.convert.convert()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Load Converted DataFrame\n",
+    "\n",
+    "Once data is converted, we can load a Pandas DataFrame which contains a description of each object\n",
+    "converted.\n",
+    "\n",
+    "The most useful columns in the DataFrame for working with this data in PyDicer are:\n",
+    "- `hashed_uid`: This is a 6 character hexidecimal hash of the associated DICOM SeriesInstanceUID.\n",
+    "  PyDicer refers to objects using this hashed identifier for a more consice representation.\n",
+    "- `modality`: The modality of the data object.\n",
+    "- `patient_id`: The ID of the patient this data object belongs to.\n",
+    "- `path`: The path within the working directory where files for this data object are stored."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pydicer.read_converted_data()\n",
+    "df"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Data Quarantine\n",
+    "\n",
+    "If anything goes wrong while converting a DICOM object during either the preprocess step or the\n",
+    "conversion step, the problematic DICOM data will be copied to the `working/quarantine` directory.\n",
+    "\n",
+    "It's a good idea to regularly check your quarantine directory to ensure that no critical data\n",
+    "objects are being quarantine. If so you may want to consider rectifying the issue and running the\n",
+    "preprocess and conversion steps again.\n",
+    "\n",
+    "As can be seen by running the cell below, there were several DICOM objects moved to the quarantine\n",
+    "during for our test dataset. This was due to there being multiple slices at the same location with\n",
+    "differing pixel data in one CT image series."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_quarantine = pydicer.read_quarantined_data()\n",
+    "df_quarantine"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "interpreter": {
+   "hash": "814af119db7f8f2860617be3dcd1d37c560587d11c65bd58c45b1679d3ee6ea4"
+  },
+  "kernelspec": {
+   "display_name": "Python 3.8.0 64-bit ('pydicer': pyenv)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.16"
+  },
+  "orig_nbformat": 4
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

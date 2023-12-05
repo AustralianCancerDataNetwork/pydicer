@@ -6,6 +6,18 @@
     :hidden:
 
     _examples/GettingStarted
+    _examples/ConvertingData
+    _examples/VisualiseData
+    _examples/Radiomics
+    _examples/DoseMetrics
+    _examples/DatasetPreparation
+
+.. toctree::
+    :caption: Guides
+    :maxdepth: 2
+    :hidden:
+
+    _examples/WorkingWithData
 
 .. toctree::
     :caption: Developers

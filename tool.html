@@ -158,6 +158,15 @@
   <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="_examples/GettingStarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/ConvertingData.html">Converting Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/VisualiseData.html">Visualise Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/Radiomics.html">Compute Radiomics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/DoseMetrics.html">Dose Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/DatasetPreparation.html">Dataset Preparation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithData.html">Working with Data</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -364,6 +373,21 @@ to None.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydicer.tool.PyDicer.get_structures_linked_to_dose">
+<span class="sig-name descname"><span class="pre">get_structures_linked_to_dose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pydicer.tool.PyDicer.get_structures_linked_to_dose" title="Permalink to this definition">#</a></dt>
+<dd><p>A function to read the data from the quarantine summary.</p>
+<p>Args:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A DataFrame summarising the contents of the quarantine.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydicer.tool.PyDicer.preprocess">
 <span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.tool.PyDicer.preprocess" title="Permalink to this definition">#</a></dt>
 <dd><p>Preprocess the DICOM data in preparation for conversion</p>
@@ -414,6 +438,39 @@ relative to the working_directory.</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.tool.PyDicer.read_preprocessed_data">
+<span class="sig-name descname"><span class="pre">read_preprocessed_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pydicer.tool.PyDicer.read_preprocessed_data" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads the pydicer preprocessed data</p>
+<p>Args:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>SystemError</strong> – Error raised when preprocessed data doesn’t yet exist</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The preprocessed data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.tool.PyDicer.read_quarantined_data">
+<span class="sig-name descname"><span class="pre">read_quarantined_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pydicer.tool.PyDicer.read_quarantined_data" title="Permalink to this definition">#</a></dt>
+<dd><p>A function to read the data from the quarantine summary.</p>
+<p>Args:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A DataFrame summarising the contents of the quarantine.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -622,9 +679,12 @@ display a progress bar. Other values indicate Python’s build in logging levels
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.add_object"><code class="docutils literal notranslate"><span class="pre">PyDicer.add_object()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.add_structure_name_mapping"><code class="docutils literal notranslate"><span class="pre">PyDicer.add_structure_name_mapping()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.add_structure_object"><code class="docutils literal notranslate"><span class="pre">PyDicer.add_structure_object()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.tool.PyDicer.get_structures_linked_to_dose"><code class="docutils literal notranslate"><span class="pre">PyDicer.get_structures_linked_to_dose()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.preprocess"><code class="docutils literal notranslate"><span class="pre">PyDicer.preprocess()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.read_all_segmentation_logs"><code class="docutils literal notranslate"><span class="pre">PyDicer.read_all_segmentation_logs()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.read_converted_data"><code class="docutils literal notranslate"><span class="pre">PyDicer.read_converted_data()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.tool.PyDicer.read_preprocessed_data"><code class="docutils literal notranslate"><span class="pre">PyDicer.read_preprocessed_data()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.tool.PyDicer.read_quarantined_data"><code class="docutils literal notranslate"><span class="pre">PyDicer.read_quarantined_data()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.run_pipeline"><code class="docutils literal notranslate"><span class="pre">PyDicer.run_pipeline()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.segment_dataset"><code class="docutils literal notranslate"><span class="pre">PyDicer.segment_dataset()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.segment_image"><code class="docutils literal notranslate"><span class="pre">PyDicer.segment_image()</span></code></a></li>
