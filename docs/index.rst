@@ -11,6 +11,7 @@
     _examples/Radiomics
     _examples/DoseMetrics
     _examples/DatasetPreparation
+    _examples/nnUNet
 
 .. toctree::
     :caption: Guides
