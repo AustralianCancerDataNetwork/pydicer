@@ -89,3 +89,6 @@ shutil.copy(
     "../examples/DatasetPreparation.ipynb", "_examples/DatasetPreparation.ipynb"
 )
 shutil.copy("../examples/WorkingWithData.ipynb", "_examples/WorkingWithData.ipynb")
+shutil.copy(
+    "../examples/WorkingWithStructures.ipynb", "_examples/WorkingWithStructures.ipynb"
+)

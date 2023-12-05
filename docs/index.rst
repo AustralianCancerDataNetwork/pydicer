@@ -18,6 +18,7 @@
     :hidden:
 
     _examples/WorkingWithData
+    _examples/WorkingWithStructures
 
 .. toctree::
     :caption: Developers
@@ -35,6 +36,7 @@
    tool
    input
    config
+   utils
    preprocess
    convert
    visualise
