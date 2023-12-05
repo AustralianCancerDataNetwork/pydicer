@@ -92,3 +92,4 @@ shutil.copy("../examples/WorkingWithData.ipynb", "_examples/WorkingWithData.ipyn
 shutil.copy(
     "../examples/WorkingWithStructures.ipynb", "_examples/WorkingWithStructures.ipynb"
 )
+shutil.copy("../examples/Configuration.ipynb", "_examples/Configuration.ipynb")

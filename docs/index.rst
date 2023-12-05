@@ -19,6 +19,7 @@
 
     _examples/WorkingWithData
     _examples/WorkingWithStructures
+    _examples/Configuration
 
 .. toctree::
     :caption: Developers
