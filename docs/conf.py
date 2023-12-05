@@ -93,3 +93,5 @@ shutil.copy(
     "../examples/WorkingWithStructures.ipynb", "_examples/WorkingWithStructures.ipynb"
 )
 shutil.copy("../examples/Configuration.ipynb", "_examples/Configuration.ipynb")
+
+shutil.copy("../examples/ObjectGeneration.ipynb", "_examples/ObjectGeneration.ipynb")

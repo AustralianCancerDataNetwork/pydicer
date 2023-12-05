@@ -24,7 +24,12 @@ from pydicer.utils import (
 )
 from pydicer.quarantine import read_quarantined_data
 
-from pydicer.generate.object import add_object, add_structure_object, add_dose_object
+from pydicer.generate.object import (
+    add_object,
+    add_image_object,
+    add_structure_object,
+    add_dose_object,
+)
 from pydicer.generate.segmentation import (
     read_all_segmentation_logs,
     segment_image,
@@ -234,6 +239,12 @@ class PyDicer:
         self, *args, **kwargs
     ) -> pd.DataFrame:
         return add_object(self.working_directory, *args, **kwargs)
+
+    @copy_doc(add_image_object, remove_args=["working_directory"])
+    def add_image_object(  # pylint: disable=missing-function-docstring
+        self, *args, **kwargs
+    ) -> pd.DataFrame:
+        return add_image_object(self.working_directory, *args, **kwargs)
 
     @copy_doc(add_structure_object, remove_args=["working_directory"])
     def add_structure_object(  # pylint: disable=missing-function-docstring

@@ -56,9 +56,14 @@ class VisualiseData:
         df_process = df_process[df_process.modality.isin(visualise_modalities)]
 
         for _, row in get_iterator(
-            df_process.iterrows(), length=len(df_process), unit="objects", name="visualise"
+            df_process.iterrows(),
+            length=len(df_process),
+            unit="objects",
+            name="visualise",
         ):
-            patient_logger = PatientLogger(row.patient_id, self.output_directory, force=False)
+            patient_logger = PatientLogger(
+                row.patient_id, self.output_directory, force=False
+            )
 
             if row.modality == "CT":
                 img_path = Path(row.path)
@@ -90,14 +95,33 @@ class VisualiseData:
                 fs = 9
 
                 # insert metadata information
+                patient_id_text = ""
+                if "PatientID" in ds_dict:
+                    patient_id_text = f"Patient ID: {ds_dict.PatientID}"
+
+                series_instance_uid_text = ""
+                if "SeriesInstanceUID" in ds_dict:
+                    series_instance_uid_text = (
+                        f"Series Instance UID: {ds_dict.SeriesInstanceUID}"
+                    )
+
+                study_description_text = ""
+                if "StudyDescription" in ds_dict:
+                    study_description_text = (
+                        f"Study Description: {ds_dict.StudyDescription}"
+                    )
+
+                study_date_text = ""
+                if "StudyDate" in ds_dict:
+                    study_date_text = f"Study Description: {ds_dict.StudyDate}"
+
                 ax.text(
                     x=0.02,
                     y=0.90,
-                    s=f"Patient ID: {ds_dict.PatientID}\n"
-                    f"Series Instance UID: \n"
-                    f"{ds_dict.SeriesInstanceUID}\n"
-                    f"Study Description: {ds_dict.StudyDescription}\n"
-                    f"Study Date: {ds_dict.StudyDate}",
+                    s=f"{patient_id_text}\n"
+                    f"{series_instance_uid_text}\n"
+                    f"{study_description_text}\n"
+                    f"{study_date_text}",
                     color="black",
                     ha="left",
                     va="top",
@@ -164,7 +188,9 @@ class VisualiseData:
                         logger.info("Visualisation already exists at %s", vis_filename)
                         continue
 
-                    img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
+                    img = sitk.ReadImage(
+                        str(img_path.joinpath(f"{img_row.modality}.nii.gz"))
+                    )
 
                     vis = ImageVisualiser(img)
                     masks = {
@@ -189,10 +215,14 @@ class VisualiseData:
 
             # Next visualise the doses on top of their linked image
             if row.modality == "RTDOSE":
-                df_linked_struct = get_structures_linked_to_dose(self.working_directory, row)
+                df_linked_struct = get_structures_linked_to_dose(
+                    self.working_directory, row
+                )
 
                 if len(df_linked_struct) == 0:
-                    logger.warning("No linked structures found for dose: %s", row.sop_instance_uid)
+                    logger.warning(
+                        "No linked structures found for dose: %s", row.sop_instance_uid
+                    )
 
                 dose_path = Path(row.path)
                 dose_file = dose_path.joinpath("RTDOSE.nii.gz")
@@ -200,7 +230,8 @@ class VisualiseData:
                 for _, struct_row in df_linked_struct.iterrows():
                     # Find the linked image
                     df_linked_img = df_process[
-                        df_process["sop_instance_uid"] == struct_row.referenced_sop_instance_uid
+                        df_process["sop_instance_uid"]
+                        == struct_row.referenced_sop_instance_uid
                     ]
 
                     if len(df_linked_img) == 0:
@@ -215,13 +246,19 @@ class VisualiseData:
                         img_path = Path(img_row.path)
 
                         # save image inside dose directory
-                        vis_filename = dose_path.joinpath(f"vis_{struct_row.hashed_uid}.png")
+                        vis_filename = dose_path.joinpath(
+                            f"vis_{struct_row.hashed_uid}.png"
+                        )
 
                         if vis_filename.exists() and not force:
-                            logger.info("Visualisation already exists at %s", vis_filename)
+                            logger.info(
+                                "Visualisation already exists at %s", vis_filename
+                            )
                             continue
 
-                        img = sitk.ReadImage(str(img_path.joinpath(f"{img_row.modality}.nii.gz")))
+                        img = sitk.ReadImage(
+                            str(img_path.joinpath(f"{img_row.modality}.nii.gz"))
+                        )
                         dose_img = sitk.ReadImage(str(dose_file))
                         dose_img = sitk.Resample(dose_img, img)
 
@@ -241,7 +278,8 @@ class VisualiseData:
 
                         if len(masks) == 0:
                             logger.warning(
-                                "No contours found in structure directory: %s", {struct_dir}
+                                "No contours found in structure directory: %s",
+                                {struct_dir},
                             )
                             continue
 

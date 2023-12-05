@@ -19,6 +19,7 @@
 
     _examples/WorkingWithData
     _examples/WorkingWithStructures
+    _examples/ObjectGeneration
     _examples/Configuration
 
 .. toctree::
