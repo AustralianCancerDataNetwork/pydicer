@@ -16,7 +16,13 @@ from pydicer.visualise.data import VisualiseData
 from pydicer.dataset.preparation import PrepareDataset
 from pydicer.analyse.data import AnalyseData
 
-from pydicer.utils import read_converted_data, add_structure_name_mapping, copy_doc
+from pydicer.utils import (
+    read_converted_data,
+    add_structure_name_mapping,
+    get_structures_linked_to_dose,
+    copy_doc,
+)
+from pydicer.quarantine import read_quarantined_data
 
 from pydicer.generate.object import add_object, add_structure_object, add_dose_object
 from pydicer.generate.segmentation import (
@@ -42,7 +48,6 @@ class PyDicer:
     """
 
     def __init__(self, working_directory="."):
-
         self.working_directory = Path(working_directory)
         self.pydicer_directory = self.working_directory.joinpath(PYDICER_DIR_NAME)
 
@@ -111,14 +116,18 @@ class PyDicer:
             maxBytes=100 * 1024 * 1024,  # Max 100 MB per log file before rotating
             backupCount=100,  # Keep up to 100 log files in history
         )
-        file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        file_formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
         file_handler.setFormatter(file_formatter)
         file_handler.setLevel(logging.DEBUG)
         logger.addHandler(file_handler)
 
         if verbosity > 0:
             console_handler = logging.StreamHandler(sys.stdout)
-            console_formatter = logging.Formatter("%(name)s - %(levelname)s - %(message)s")
+            console_formatter = logging.Formatter(
+                "%(name)s - %(levelname)s - %(message)s"
+            )
             console_handler.setFormatter(console_formatter)
             console_handler.setLevel(verbosity)
             logger.addHandler(console_handler)
@@ -145,7 +154,9 @@ class PyDicer:
             self.dicom_directories.append(dicom_path)
             logger.debug("Added DICOM input path: %s", dicom_path)
         else:
-            raise ValueError("input_obj must be of type str, pathlib.Path or inherit InputBase")
+            raise ValueError(
+                "input_obj must be of type str, pathlib.Path or inherit InputBase"
+            )
 
     def preprocess(self, force=True):
         """Preprocess the DICOM data in preparation for conversion
@@ -156,7 +167,9 @@ class PyDicer:
         """
 
         if len(self.dicom_directories) == 0:
-            raise ValueError("No DICOM input locations set. Add one using the add_input function.")
+            raise ValueError(
+                "No DICOM input locations set. Add one using the add_input function."
+            )
 
         preprocess_data = PreprocessData(self.working_directory)
         preprocess_data.preprocess(self.dicom_directories, force=force)
@@ -182,62 +195,72 @@ class PyDicer:
         self.analyse.compute_radiomics(
             dataset_name=CONVERTED_DIR_NAME, patient=patient, force=force
         )
-        self.analyse.compute_dvh(dataset_name=CONVERTED_DIR_NAME, patient=patient, force=force)
+        self.analyse.compute_dvh(
+            dataset_name=CONVERTED_DIR_NAME, patient=patient, force=force
+        )
 
     @copy_doc(add_structure_name_mapping, remove_args=["working_directory"])
     def add_structure_name_mapping(  # pylint: disable=missing-function-docstring
         self, *args, **kwargs
     ) -> pd.DataFrame:
-
         return add_structure_name_mapping(
             *args, working_directory=self.working_directory, **kwargs
         )
+
+    @copy_doc(read_preprocessed_data, remove_args=["working_directory"])
+    def read_preprocessed_data(  # pylint: disable=missing-function-docstring
+        self,
+    ) -> pd.DataFrame:
+        return read_preprocessed_data(working_directory=self.working_directory)
 
     @copy_doc(read_converted_data, remove_args=["working_directory"])
     def read_converted_data(  # pylint: disable=missing-function-docstring
         self, *_, **kwargs
     ) -> pd.DataFrame:
-
         return read_converted_data(working_directory=self.working_directory, **kwargs)
+
+    @copy_doc(read_quarantined_data, remove_args=["working_directory"])
+    # pylint: disable=missing-function-docstring
+    def read_quarantined_data(self) -> pd.DataFrame:
+        return read_quarantined_data(working_directory=self.working_directory)
+
+    @copy_doc(read_quarantined_data, remove_args=["working_directory"])
+    # pylint: disable=missing-function-docstring
+    def get_structures_linked_to_dose(self, *args, **kwargs) -> pd.DataFrame:
+        return get_structures_linked_to_dose(self.working_directory, *args, **kwargs)
 
     @copy_doc(add_object, remove_args=["working_directory"])
     def add_object(  # pylint: disable=missing-function-docstring
         self, *args, **kwargs
     ) -> pd.DataFrame:
-
         return add_object(self.working_directory, *args, **kwargs)
 
     @copy_doc(add_structure_object, remove_args=["working_directory"])
     def add_structure_object(  # pylint: disable=missing-function-docstring
         self, *args, **kwargs
     ) -> pd.DataFrame:
-
         return add_structure_object(self.working_directory, *args, **kwargs)
 
     @copy_doc(add_dose_object, remove_args=["working_directory"])
     def add_dose_object(  # pylint: disable=missing-function-docstring
         self, *args, **kwargs
     ) -> pd.DataFrame:
-
         return add_dose_object(self.working_directory, *args, **kwargs)
 
     @copy_doc(read_all_segmentation_logs, remove_args=["working_directory"])
     def read_all_segmentation_logs(  # pylint: disable=missing-function-docstring
         self, *args, **kwargs
     ) -> pd.DataFrame:
-
         return read_all_segmentation_logs(self.working_directory, *args, **kwargs)
 
     @copy_doc(segment_image, remove_args=["working_directory"])
     def segment_image(  # pylint: disable=missing-function-docstring
         self, *args, **kwargs
     ) -> pd.DataFrame:
-
         return segment_image(self.working_directory, *args, **kwargs)
 
     @copy_doc(segment_dataset, remove_args=["working_directory"])
     def segment_dataset(  # pylint: disable=missing-function-docstring
         self, *args, **kwargs
     ) -> pd.DataFrame:
-
         return segment_dataset(self.working_directory, *args, **kwargs)

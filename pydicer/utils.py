@@ -382,7 +382,9 @@ def map_structure_name(struct_name, struct_map_dict):
         str: the mapped structure name
     """
     # Check if the structure name needs to be mapped
-    mapped_struct_name_set = {i for i in struct_map_dict if struct_name in struct_map_dict[i]}
+    mapped_struct_name_set = {
+        i for i in struct_map_dict if struct_name in struct_map_dict[i]
+    }
 
     # If not true, then either the structure name is already in mapped form, or the structure name
     # is not being captured in the specific mapping dictionary
@@ -392,7 +394,9 @@ def map_structure_name(struct_name, struct_map_dict):
     return struct_name
 
 
-def get_structures_linked_to_dose(working_directory: Path, dose_row: pd.Series) -> pd.DataFrame:
+def get_structures_linked_to_dose(
+    working_directory: Path, dose_row: pd.Series
+) -> pd.DataFrame:
     """Get the structure sets which are linked to a dose object.
 
     Args:
@@ -423,7 +427,8 @@ def get_structures_linked_to_dose(working_directory: Path, dose_row: pd.Series) 
 
     # Also link via Frame of Reference
     df_for_linked = df_converted[
-        (df_converted["modality"] == "RTSTRUCT") & (df_converted["for_uid"] == dose_row.for_uid)
+        (df_converted["modality"] == "RTSTRUCT")
+        & (df_converted["for_uid"] == dose_row.for_uid)
     ]
 
     if df_linked_struct is None:
@@ -475,7 +480,9 @@ def add_structure_name_mapping(
     if structure_set_row is not None:
         # Mapping for specific structure set
         logger.info(
-            "Adding mapping %s for structure set %s", mapping_id, structure_set_row.hashed_uid
+            "Adding mapping %s for structure set %s",
+            mapping_id,
+            structure_set_row.hashed_uid,
         )
 
         mapping_path_base = Path(structure_set_row.path)
@@ -576,7 +583,7 @@ def fetch_converted_test_data(working_directory=None, dataset="HNSCC"):
         zip_url = "https://zenodo.org/record/8237552/files/HNSCC_pydicer.zip"
         working_name = "testdata"
     elif dataset == "LCTSC":
-        zip_url = "https://zenodo.org/records/10005835/files/LCTSC_pydicer.zip"
+        zip_url = "https://zenodo.org/records/10254078/files/LCTSC_pydicer.zip"
         working_name = "LCTSC"
     else:
         raise ValueError(f"Unknown dataset {dataset}")
@@ -618,7 +625,11 @@ def copy_doc(copy_func, remove_args=None):
 
         for arg in remove_args:
             func.__doc__ = "\n".join(
-                [line for line in func.__doc__.split("\n") if not line.strip().startswith(arg)]
+                [
+                    line
+                    for line in func.__doc__.split("\n")
+                    if not line.strip().startswith(arg)
+                ]
             )
 
         return func

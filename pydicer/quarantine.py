@@ -20,11 +20,14 @@ def copy_file_to_quarantine(file, working_directory, error_msg):
 
     # Attempt to get some header information from the DICOM object to write into the summary
 
-    summary_dict = {"file": file, "error": error_msg, "quarantine_dttm": datetime.datetime.now()}
+    summary_dict = {
+        "file": file,
+        "error": error_msg,
+        "quarantine_dttm": datetime.datetime.now(),
+    }
 
     ds = pydicom.read_file(file, force=True)
     for k in QUARATINE_DICOM_KEYS:
-
         val = None
         if k in ds:
             val = ds[k].value
@@ -58,13 +61,20 @@ def copy_file_to_quarantine(file, working_directory, error_msg):
     df_summary.to_csv(summary_file)
 
 
-class TreatImages:
-    """
-    Class to treat the quarantined images and prepare it for further processing
+def read_quarantined_data(working_directory: Path):
+    """A function to read the data from the quarantine summary.
 
     Args:
-        quaran_directory (Path): path to the quarantine directory
+        working_directory (pathlib.Path): The PyDicer working directory
+
+    Returns:
+        pd.DataFrame: A DataFrame summarising the contents of the quarantine.
     """
 
-    def __init__(self, quaran_directory):
-        self.quaran_directory = quaran_directory
+    quarantine_dir = Path(working_directory).joinpath("quarantine")
+
+    summary_file = quarantine_dir.joinpath("summary.csv")
+
+    df_summary = pd.read_csv(summary_file, index_col=0)
+
+    return df_summary
