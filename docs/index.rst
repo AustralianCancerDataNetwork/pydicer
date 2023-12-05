@@ -13,6 +13,13 @@
     _examples/DatasetPreparation
 
 .. toctree::
+    :caption: Guides
+    :maxdepth: 2
+    :hidden:
+
+    _examples/WorkingWithData
+
+.. toctree::
     :caption: Developers
     :maxdepth: 2
     :hidden:
