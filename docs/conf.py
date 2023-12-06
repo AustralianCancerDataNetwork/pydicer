@@ -90,4 +90,5 @@ shutil.copy("../examples/WorkingWithData.ipynb", "_examples/WorkingWithData.ipyn
 shutil.copy("../examples/WorkingWithStructures.ipynb", "_examples/WorkingWithStructures.ipynb")
 shutil.copy("../examples/Configuration.ipynb", "_examples/Configuration.ipynb")
 shutil.copy("../examples/ObjectGeneration.ipynb", "_examples/ObjectGeneration.ipynb")
+shutil.copy("../examples/AutoSegmentation.ipynb", "_examples/AutoSegmentation.ipynb")
 shutil.copy("../examples/nnUNet.ipynb", "_examples/nnUNet.ipynb")

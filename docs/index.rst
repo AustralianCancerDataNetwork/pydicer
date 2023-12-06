@@ -11,6 +11,7 @@
     _examples/Radiomics
     _examples/DoseMetrics
     _examples/DatasetPreparation
+    _examples/AutoSegmentation
     _examples/nnUNet
 
 .. toctree::
@@ -45,4 +46,5 @@
    visualise
    dataset
    analyse
+   generate
    nnunet
