@@ -26,7 +26,7 @@ from pydicer.constants import (
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
     PET_IMAGE_STORAGE_UID,
-    MR_IMAGE_STORAGE_UID
+    MR_IMAGE_STORAGE_UID,
 )
 from pydicer.logger import PatientLogger
 
@@ -412,7 +412,7 @@ class ConvertData:
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                     self.add_entry(entry)
-                    
+
                 elif sop_class_uid == MR_IMAGE_STORAGE_UID:
                     # TODO Handle inconsistent slice spacing
                     if config.get_config("interp_missing_slices"):
