@@ -139,7 +139,7 @@ class VisualiseData:
                 patient_logger.eval_module_process("visualise", row.hashed_uid)
                 logger.debug("Created CT visualisation: %s", vis_filename)
 
-            if row.modality == "MR" or row.modality == "PT":
+            if row.modality in ("MR", "PT"):
                 img_path = Path(row.path)
                 vis_filename = img_path.joinpath(f"{row.modality}.png")
 
