@@ -16,7 +16,7 @@ from pydicer.convert.pt import convert_dicom_to_nifti_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.convert.headers import convert_dicom_headers
 from pydicer.utils import hash_uid, read_preprocessed_data, get_iterator
-from pydicer.quarantine.treat import copy_file_to_quarantine
+from pydicer.quarantine import copy_file_to_quarantine
 
 from pydicer.constants import (
     CONVERTED_DIR_NAME,
@@ -69,8 +69,8 @@ def get_object_type(sop_class_uid):
     return object_type
 
 
-def handle_missing_slice(files):
-    """Function to interpolate missing slices in an image
+def handle_missing_slice(files, ignore_duplicates=False):
+    """function to interpolate missing slices in an image
 
     Example usage:
 
@@ -118,7 +118,9 @@ def handle_missing_slice(files):
     df_duplicated = df_files[df_files["slice_location"].duplicated()]
     if len(df_duplicated) > 0:
         check_slice_location = df_duplicated.iloc[0].slice_location
-        df_check_duplicates = df_files[df_files["slice_location"] == check_slice_location]
+        df_check_duplicates = df_files[
+            df_files["slice_location"] == check_slice_location
+        ]
 
         pix_array = None
         for _, row in df_check_duplicates.iterrows():
@@ -127,7 +129,7 @@ def handle_missing_slice(files):
             if pix_array is None:
                 pix_array = this_pix_array
             else:
-                if not np.allclose(pix_array, this_pix_array):
+                if not np.allclose(pix_array, this_pix_array) and not ignore_duplicates:
                     raise (
                         ValueError(
                             f"{len(df_check_duplicates)} slices at location "
@@ -135,7 +137,7 @@ def handle_missing_slice(files):
                         )
                     )
 
-        logger.warning("Duplicate slices detected, pixel array the same so dropping duplicates")
+        logger.warning("Duplicate slices detected, dropping duplicates")
         df_files = df_files.drop_duplicates(subset=["slice_location"])
 
     temp_dir = Path(tempfile.mkdtemp())
@@ -147,7 +149,9 @@ def handle_missing_slice(files):
 
     # check to see if any slice thickness exceed 2% tolerance
     # this is conservative as missing slices would produce 100% differences
-    slice_thickness_variations = ~np.isclose(slice_location_diffs, expected_slice_diff, rtol=0.02)
+    slice_thickness_variations = ~np.isclose(
+        slice_location_diffs, expected_slice_diff, rtol=0.02
+    )
 
     if np.any(slice_thickness_variations):
         logger.warning("Missing DICOM slices found")
@@ -156,7 +160,9 @@ def handle_missing_slice(files):
         missing_indices = np.where(slice_thickness_variations)[0]
 
         for missing_index in missing_indices:
-            num_missing_slices = int(slice_location_diffs[missing_index] / expected_slice_diff) - 1
+            num_missing_slices = (
+                int(slice_location_diffs[missing_index] / expected_slice_diff) - 1
+            )
 
             # locate nearest DICOM files to the missing slices
             prior_dcm_file = df_files.iloc[missing_index]["file_path"]
@@ -180,12 +186,18 @@ def handle_missing_slice(files):
                 )
 
                 # write a copy to a temporary DICOM file
-                working_dcm.PixelData = interp_array.astype(prior_dcm.pixel_array.dtype).tobytes()
+                working_dcm.PixelData = interp_array.astype(
+                    prior_dcm.pixel_array.dtype
+                ).tobytes()
 
                 # compute spatial information
-                image_orientation = np.array(prior_dcm.ImageOrientationPatient, dtype=float)
+                image_orientation = np.array(
+                    prior_dcm.ImageOrientationPatient, dtype=float
+                )
 
-                image_plane_normal = np.cross(image_orientation[:3], image_orientation[3:])
+                image_plane_normal = np.cross(
+                    image_orientation[:3], image_orientation[3:]
+                )
 
                 image_position_patient = np.array(
                     np.array(prior_dcm.ImagePositionPatient)
@@ -237,8 +249,10 @@ def link_via_frame_of_reference(for_uid, df_preprocess):
 
     df_linked_series = df_linked_series[df_linked_series.modality.isin(modality_prefs)]
     df_linked_series.loc[:, "modality"] = df_linked_series.modality.astype("category")
-    df_linked_series.modality.cat.set_categories(modality_prefs, inplace=True)
-    df_linked_series.sort_values(["modality"])
+    df_linked_series.modality = df_linked_series.modality.cat.set_categories(
+        modality_prefs
+    )
+    df_linked_series.sort_values(["modality"], inplace=True)
 
     return df_linked_series
 
@@ -329,7 +343,9 @@ class ConvertData:
 
             patient_directory = self.output_directory.joinpath(patient_id)
 
-            patient_logger = PatientLogger(patient_id, self.output_directory, force=False)
+            patient_logger = PatientLogger(
+                patient_id, self.output_directory, force=False
+            )
 
             # Grab the sop_class_uid, modality and for_uid (should be the same for all files in
             # series)
@@ -363,7 +379,12 @@ class ConvertData:
                         # Only convert if it doesn't already exist or if force is True
 
                         if config.get_config("interp_missing_slices"):
-                            series_files = handle_missing_slice(df_files)
+                            series_files = handle_missing_slice(
+                                df_files,
+                                ignore_duplicates=config.get_config(
+                                    "ignore_duplicate_slices"
+                                ),
+                            )
                         else:
                             # TODO Handle inconsistent slice spacing
                             error_log = """Slice Locations are not evenly spaced. Set
@@ -439,14 +460,18 @@ class ConvertData:
                     # If not linked via referenced UID, then try to link via FOR
                     if len(df_linked_series) == 0:
                         for_uid = rt_struct_file.referenced_for_uid
-                        df_linked_series = link_via_frame_of_reference(for_uid, df_preprocess)
+                        df_linked_series = link_via_frame_of_reference(
+                            for_uid, df_preprocess
+                        )
 
                     # Check that the linked series is available
                     # TODO handle rendering the masks even if we don't have an image series it's
                     # linked to
                     if len(df_linked_series) == 0:
                         error_log = "Series Referenced by RTSTRUCT not found"
-                        patient_logger.log_module_error("convert", sop_instance_hash, error_log)
+                        patient_logger.log_module_error(
+                            "convert", sop_instance_hash, error_log
+                        )
 
                     if not output_dir.exists() or force:
                         # Only convert if it doesn't already exist or if force is True
@@ -473,11 +498,15 @@ class ConvertData:
 
                         if config.get_config("generate_nrrd"):
                             nrrd_file = output_dir.joinpath("STRUCTURE_SET.nrrd")
-                            logger.info("Saving structures in nrrd format: %s", nrrd_file)
+                            logger.info(
+                                "Saving structures in nrrd format: %s", nrrd_file
+                            )
                             write_nrrd_from_mask_directory(
                                 output_dir,
                                 nrrd_file,
-                                matplotlib.colormaps.get_cmap(config.get_config("nrrd_colormap")),
+                                matplotlib.colormaps.get_cmap(
+                                    config.get_config("nrrd_colormap")
+                                ),
                             )
 
                         # Save JSON
@@ -505,9 +534,8 @@ class ConvertData:
                 elif sop_class_uid == PET_IMAGE_STORAGE_UID:
                     if not output_dir.exists() or force:
                         # Only convert if it doesn't already exist or if force is True
-
-                        series_files = df_files.file_path.tolist()
-                        series_files = [str(f) for f in series_files]
+                        # TODO allow this interp to be turned off...
+                        series_files = handle_missing_slice(df_files)
 
                         output_dir.mkdir(exist_ok=True, parents=True)
                         nifti_file = output_dir.joinpath("PT.nii.gz")
@@ -515,7 +543,6 @@ class ConvertData:
                         convert_dicom_to_nifti_pt(
                             series_files,
                             nifti_file,
-                            default_patient_weight=config.get_config("default_patient_weight"),
                         )
 
                         json_file = output_dir.joinpath("metadata.json")
@@ -541,7 +568,9 @@ class ConvertData:
                         sop_instance_hash = hash_uid(rt_plan_file.sop_instance_uid)
 
                         # Update the output directory for this plan
-                        output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
+                        output_dir = patient_directory.joinpath(
+                            object_type, sop_instance_hash
+                        )
 
                         if not output_dir.exists() or force:
                             # Only convert if it doesn't already exist or if force is True
@@ -553,8 +582,12 @@ class ConvertData:
 
                         entry["sop_instance_uid"] = rt_plan_file.sop_instance_uid
                         entry["hashed_uid"] = sop_instance_hash
-                        entry["referenced_sop_instance_uid"] = rt_plan_file.referenced_uid
-                        entry["path"] = str(output_dir.relative_to(self.working_directory))
+                        entry[
+                            "referenced_sop_instance_uid"
+                        ] = rt_plan_file.referenced_uid
+                        entry["path"] = str(
+                            output_dir.relative_to(self.working_directory)
+                        )
 
                         self.add_entry(entry)
                         patient_logger.eval_module_process("convert", sop_instance_hash)
@@ -568,7 +601,9 @@ class ConvertData:
                         sop_instance_hash = hash_uid(rt_dose_file.sop_instance_uid)
 
                         # Update the output directory for this plan
-                        output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
+                        output_dir = patient_directory.joinpath(
+                            object_type, sop_instance_hash
+                        )
 
                         if not output_dir.exists() or force:
                             # Only convert if it doesn't already exist or if force is True
@@ -578,7 +613,9 @@ class ConvertData:
                             nifti_file.parent.mkdir(exist_ok=True, parents=True)
                             logger.debug("Writing RTDOSE to: %s", nifti_file)
                             convert_rtdose(
-                                rt_dose_file.file_path, force=True, dose_output_path=nifti_file
+                                rt_dose_file.file_path,
+                                force=True,
+                                dose_output_path=nifti_file,
                             )
 
                             json_file = output_dir.joinpath("metadata.json")
@@ -590,8 +627,12 @@ class ConvertData:
 
                         entry["sop_instance_uid"] = rt_dose_file.sop_instance_uid
                         entry["hashed_uid"] = sop_instance_hash
-                        entry["referenced_sop_instance_uid"] = rt_dose_file.referenced_uid
-                        entry["path"] = str(output_dir.relative_to(self.working_directory))
+                        entry[
+                            "referenced_sop_instance_uid"
+                        ] = rt_dose_file.referenced_uid
+                        entry["path"] = str(
+                            output_dir.relative_to(self.working_directory)
+                        )
 
                         self.add_entry(entry)
 
@@ -606,7 +647,9 @@ class ConvertData:
                 # Broad except ok here, since we will put these file into a
                 # quarantine location for further inspection.
                 logger.error(
-                    "Unable to convert series for patient: %s with UID: %s", patient_id, series_uid
+                    "Unable to convert series for patient: %s with UID: %s",
+                    patient_id,
+                    series_uid,
                 )
                 logger.exception(e)
 
@@ -616,7 +659,9 @@ class ConvertData:
 
                 for f in df_files.file_path.tolist():
                     logger.error(
-                        "Error parsing file %s: %s. Placing file into Quarantine folder...", f, e
+                        "Error parsing file %s: %s. Placing file into Quarantine folder...",
+                        f,
+                        e,
                     )
                     copy_file_to_quarantine(Path(f), self.working_directory, e)
                 patient_logger.log_module_error("convert", sop_instance_hash, e)

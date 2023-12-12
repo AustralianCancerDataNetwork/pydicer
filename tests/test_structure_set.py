@@ -1,3 +1,5 @@
+# pylint: disable=redefined-outer-name,missing-function-docstring
+
 import json
 
 import SimpleITK as sitk

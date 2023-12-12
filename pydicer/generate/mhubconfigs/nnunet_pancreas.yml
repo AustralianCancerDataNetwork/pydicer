@@ -1,0 +1,28 @@
+general:
+  data_base_dir: /app/data
+  version: 1.0.0
+  description: custom pipeline from nifti to nifti
+
+execute:
+  - FileStructureImporter
+  - NNUnetRunner
+  - DataOrganizer
+
+modules:
+  FileStructureImporter:
+    input_dir: "input_data"
+    structures:
+      - image.nii.gz@instance@nifti:mod=ct
+    import_id: _instance
+
+  NNUnetRunner:
+    input_data_type: nifti:mod=ct
+    nnunet_task: Task007_Pancreas
+    nnunet_model: 3d_lowres
+    export_prob_maps: False
+    roi: PANCREAS,PANCREAS+NEOPLASM_MALIGNANT_PRIMARY
+    prob_map_segments: [Background, Pancreas, Pancreatic_cancer]
+
+  DataOrganizer:
+    targets:
+      - nifti:mod=seg-->/app/data/output_data/[d:roi].nii.gz

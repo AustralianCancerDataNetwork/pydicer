@@ -14,9 +14,9 @@ from pydicer.constants import (
     RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
-    MR_IMAGE_STORAGE_UID
+    MR_IMAGE_STORAGE_UID,
 )
-from pydicer.quarantine.treat import copy_file_to_quarantine
+from pydicer.quarantine import copy_file_to_quarantine
 from pydicer.utils import read_preprocessed_data, get_iterator
 
 logger = logging.getLogger(__name__)
@@ -52,7 +52,6 @@ class PreprocessData:
         ds = pydicom.read_file(file, force=True)
 
         try:
-
             dicom_type_uid = ds.SOPClassUID
 
             res_dict = {
@@ -69,7 +68,6 @@ class PreprocessData:
                 res_dict["for_uid"] = ds.FrameOfReferenceUID
 
             if dicom_type_uid == RT_STRUCTURE_STORAGE_UID:
-
                 try:
                     referenced_series_uid = (
                         ds.ReferencedFrameOfReferenceSequence[0]
@@ -85,15 +83,16 @@ class PreprocessData:
                     # Check other tags for a linked DICOM
                     # e.g. ds.ReferencedFrameOfReferenceSequence[0].FrameOfReferenceUID
                     # Potentially, we should check each referenced
-                    referenced_frame_of_reference_uid = ds.ReferencedFrameOfReferenceSequence[
-                        0
-                    ].FrameOfReferenceUID
+                    referenced_frame_of_reference_uid = (
+                        ds.ReferencedFrameOfReferenceSequence[0].FrameOfReferenceUID
+                    )
                     res_dict["referenced_for_uid"] = referenced_frame_of_reference_uid
                 except AttributeError:
-                    logger.warning("Unable to determine Referenced Frame of Reference UID")
+                    logger.warning(
+                        "Unable to determine Referenced Frame of Reference UID"
+                    )
 
             elif dicom_type_uid == RT_PLAN_STORAGE_UID:
-
                 try:
                     referenced_sop_instance_uid = ds.ReferencedStructureSetSequence[
                         0
@@ -103,7 +102,6 @@ class PreprocessData:
                     logger.warning("Unable to determine Reference Series UID")
 
             elif dicom_type_uid == RT_DOSE_STORAGE_UID:
-
                 try:
                     referenced_sop_instance_uid = ds.ReferencedRTPlanSequence[
                         0
@@ -112,19 +110,26 @@ class PreprocessData:
                 except AttributeError:
                     logger.warning("Unable to determine Reference Series UID")
 
-            elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID, MR_IMAGE_STORAGE_UID):
-
+            elif dicom_type_uid in (
+                CT_IMAGE_STORAGE_UID,
+                PET_IMAGE_STORAGE_UID,
+                MR_IMAGE_STORAGE_UID,
+            ):
                 image_position = np.array(ds.ImagePositionPatient, dtype=float)
                 image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
 
-                image_plane_normal = np.cross(image_orientation[:3], image_orientation[3:])
+                image_plane_normal = np.cross(
+                    image_orientation[:3], image_orientation[3:]
+                )
 
                 slice_location = (image_position * image_plane_normal)[2]
 
                 res_dict["slice_location"] = slice_location
 
             else:
-                raise ValueError(f"Could not determine DICOM type {ds.Modality} {dicom_type_uid}.")
+                raise ValueError(
+                    f"Could not determine DICOM type {ds.Modality} {dicom_type_uid}."
+                )
 
             logger.debug(
                 "Successfully scanned DICOM file with SOP Instance UID: %s",
@@ -206,7 +211,6 @@ class PreprocessData:
         # If we don't want to force preprocess and preprocesses files already exists, filter these
         # out
         if not force and preprocessed_csv_path.exists():
-
             logger.info("Not forcing preprocessing, will only scan unindexed files")
 
             df = read_preprocessed_data(self.working_directory)
@@ -218,7 +222,6 @@ class PreprocessData:
             ds = pydicom.read_file(file, force=True)
 
             try:
-
                 dicom_type_uid = ds.SOPClassUID
 
                 res_dict = {
@@ -235,7 +238,6 @@ class PreprocessData:
                     res_dict["for_uid"] = ds.FrameOfReferenceUID
 
                 if dicom_type_uid == RT_STRUCTURE_STORAGE_UID:
-
                     try:
                         referenced_series_uid = (
                             ds.ReferencedFrameOfReferenceSequence[0]
@@ -251,15 +253,18 @@ class PreprocessData:
                         # Check other tags for a linked DICOM
                         # e.g. ds.ReferencedFrameOfReferenceSequence[0].FrameOfReferenceUID
                         # Potentially, we should check each referenced
-                        referenced_frame_of_reference_uid = ds.ReferencedFrameOfReferenceSequence[
-                            0
-                        ].FrameOfReferenceUID
-                        res_dict["referenced_for_uid"] = referenced_frame_of_reference_uid
+                        referenced_frame_of_reference_uid = (
+                            ds.ReferencedFrameOfReferenceSequence[0].FrameOfReferenceUID
+                        )
+                        res_dict[
+                            "referenced_for_uid"
+                        ] = referenced_frame_of_reference_uid
                     except AttributeError:
-                        logger.warning("Unable to determine Referenced Frame of Reference UID")
+                        logger.warning(
+                            "Unable to determine Referenced Frame of Reference UID"
+                        )
 
                 elif dicom_type_uid == RT_PLAN_STORAGE_UID:
-
                     try:
                         referenced_sop_instance_uid = ds.ReferencedStructureSetSequence[
                             0
@@ -269,7 +274,6 @@ class PreprocessData:
                         logger.warning("Unable to determine Reference Series UID")
 
                 elif dicom_type_uid == RT_DOSE_STORAGE_UID:
-
                     try:
                         referenced_sop_instance_uid = ds.ReferencedRTPlanSequence[
                             0
@@ -278,12 +282,19 @@ class PreprocessData:
                     except AttributeError:
                         logger.warning("Unable to determine Reference Series UID")
 
-                elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID, MR_IMAGE_STORAGE_UID):
-
+                elif dicom_type_uid in (
+                    CT_IMAGE_STORAGE_UID,
+                    PET_IMAGE_STORAGE_UID,
+                    MR_IMAGE_STORAGE_UID,
+                ):
                     image_position = np.array(ds.ImagePositionPatient, dtype=float)
-                    image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
+                    image_orientation = np.array(
+                        ds.ImageOrientationPatient, dtype=float
+                    )
 
-                    image_plane_normal = np.cross(image_orientation[:3], image_orientation[3:])
+                    image_plane_normal = np.cross(
+                        image_orientation[:3], image_orientation[3:]
+                    )
 
                     slice_location = (image_position * image_plane_normal)[2]
 

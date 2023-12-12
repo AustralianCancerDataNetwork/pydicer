@@ -47,7 +47,13 @@ class NNUNetDataset:
         image_modality: str = "CT",
         mapping_id=DEFAULT_MAPPING_ID,
     ):
-        """_summary_
+        """Prepare a dataset to train models using nnUNet.
+
+        Ensure that nnUNet is installed in your Python environment.
+        For details on nnUNet see: https://github.com/MIC-DKFZ/nnUNet
+
+        > Note: This class currently support nnUNet v1. Contributions welcome to add support for
+          nnUNet v2.
 
         Args:
             working_directory (Union[str, Path]): The PyDicer working directory
@@ -62,17 +68,17 @@ class NNUNetDataset:
               standardised name. Defaults to DEFAULT_MAPPING_ID.
 
         Raises:
-            SystemError: Raised if the nnUNet_raw environment variable is not set.
+            SystemError: Raised if the nnUNet_raw_data_base environment variable is not set.
         """
 
         # Check that the nnUNet_raw_data_base environment variable is set
-        if not "nnUNet_raw" in os.environ:
+        if not "nnUNet_raw_data_base" in os.environ:
             raise SystemError(
-                "'nnUNet_raw' environment variable not set. "
+                "'nnUNet_raw_data_base' environment variable not set. "
                 "Ensure nnUNet has been properly configured before continuing."
             )
 
-        self.nnunet_raw_path = Path(os.environ["nnUNet_raw"])
+        self.nnunet_raw_path = Path(os.environ["nnUNet_raw_data_base"])
 
         self.working_directory = working_directory
         self.nnunet_id = nnunet_id
@@ -247,10 +253,13 @@ class NNUNetDataset:
         # Check to see if we have any duplicate image spacing and sizes, if so inspect these
         # further
         duplicated_rows = df_img_stats.duplicated(subset=["spacing", "size"], keep=False)
-        df_duplicated = df_img_stats[duplicated_rows]
-        df_duplicated.loc[duplicated_rows, "voxel_sum"] = df_duplicated.img_path.apply(
-            lambda img_path: sitk.GetArrayFromImage(sitk.ReadImage(img_path)).sum()
+        df_img_stats["voxel_sum"] = df_img_stats.apply(
+            lambda row: sitk.GetArrayFromImage(sitk.ReadImage(row.img_path)).sum()
+            if row.name in duplicated_rows.index
+            else None,
+            axis=1,
         )
+        df_duplicated = df_img_stats[duplicated_rows]
 
         duplicates_found = False
         for _, df_group in df_duplicated.groupby("voxel_sum"):
@@ -284,6 +293,7 @@ class NNUNetDataset:
         """
 
         df = read_converted_data(self.working_directory, dataset_name=self.dataset_name)
+        df = df[df.patient_id.isin(self.testing_cases + self.training_cases)]
         df_structure_sets = df[df.modality == "RTSTRUCT"]
 
         # First get a set of all unique structure names available
@@ -360,6 +370,7 @@ class NNUNetDataset:
                 "overlapping structures."
             )
         df = read_converted_data(self.working_directory, dataset_name=self.dataset_name)
+        df = df[df.patient_id.isin(self.testing_cases + self.training_cases)]
         df_structure_sets = df[df.modality == "RTSTRUCT"]
 
         has_overlapping_structures = False
@@ -378,12 +389,14 @@ class NNUNetDataset:
                     if arr.max() > 1:
                         print(
                             f"{structure_name_i} overlaps with {structure_name_j} for patient "
-                            f"{row.patient_id} structure set {row.struct_hash}"
+                            f"{row.patient_id} structure set {row.hashed_uid}"
                         )
                         has_overlapping_structures = True
 
         if has_overlapping_structures:
             logger.warning("Overlapping structures were detected")
+        else:
+            logger.info("No overlapping structures detected")
 
     def prep_label_map_from_one_hot(
         self, image: sitk.Image, structure_set: StructureSet
@@ -443,7 +456,9 @@ class NNUNetDataset:
                 "correct before proceeding."
             )
 
-        nnunet_dir = self.nnunet_raw_path.joinpath(f"Task{self.nnunet_id}_{self.nnunet_name}")
+        nnunet_dir = self.nnunet_raw_path.joinpath(
+            "nnUNet_raw_data", f"Task{self.nnunet_id}_{self.nnunet_name}"
+        )
 
         image_tr_path = nnunet_dir.joinpath("imagesTr")
         image_tr_path.mkdir(exist_ok=True, parents=True)
@@ -475,6 +490,24 @@ class NNUNetDataset:
             structure_set = StructureSet(structure_set_row, self.mapping_id)
             pat_label_map = self.prep_label_map_from_one_hot(img, structure_set)
             target_label_path = label_tr_path.joinpath(f"{pat_id}.nii.gz")
+            sitk.WriteImage(pat_label_map, str(target_label_path))
+
+        for pat_id in self.testing_cases:
+            df_pat = df[df.patient_id == pat_id]
+            img_row = df_pat[df_pat.modality == self.image_modality].iloc[0]
+            img_dir = Path(img_row.path)
+            img_file = img_dir.joinpath(f"{self.image_modality}.nii.gz")
+            img = sitk.ReadImage(str(img_file))
+
+            target_img_path = image_ts_path.joinpath(f"{pat_id}_0000.nii.gz")
+
+            target_img_path.unlink(missing_ok=True)
+            target_img_path.symlink_to(img_file)
+
+            structure_set_row = df_pat[df_pat.modality == "RTSTRUCT"].iloc[0]
+            structure_set = StructureSet(structure_set_row, self.mapping_id)
+            pat_label_map = self.prep_label_map_from_one_hot(img, structure_set)
+            target_label_path = label_ts_path.joinpath(f"{pat_id}.nii.gz")
             sitk.WriteImage(pat_label_map, str(target_label_path))
 
         # write JSON file
@@ -555,10 +588,13 @@ class NNUNetDataset:
 
         # Write the contents to the script
         with open(script_path, "w", encoding="utf8") as f:
+            f.write("#!/bin/bash")
             f.write("\n")
 
             for l in script_header:
                 f.write(f"{l}\n")
+
+            f.write("\n")
 
             f.write(
                 f"nnUNet_plan_and_preprocess -t {self.nnunet_id} --verify_dataset_integrity;\n"

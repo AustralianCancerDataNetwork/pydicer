@@ -2,6 +2,10 @@ import os
 import hashlib
 import json
 import logging
+import tempfile
+import urllib
+import zipfile
+import shutil
 from datetime import datetime
 from pathlib import Path
 
@@ -66,13 +70,15 @@ def determine_dcm_datetime(ds, require_time=False):
     return None
 
 
-def load_object_metadata(row, keep_tags=None, remove_tags=None):
+def load_object_metadata(row: pd.Series, keep_tags=None, remove_tags=None):
     """Loads the object's metadata
 
     Args:
         row (pd.Series): The row of the converted DataFrame for which to load the metadata
-        keep_tags TODO
-        remove_tag TODO
+        keep_tags (str|list, optional): DICOM tag keywords keep when loading data. If set all other
+          tags will be removed. Defaults to None.
+        remove_tag (str|list, optional): DICOM tag keywords keep when loading data. If set all
+          other tags will be kept. Defaults to None.
 
     Returns:
         pydicom.Dataset: The dataset object containing the original DICOM metadata
@@ -376,7 +382,9 @@ def map_structure_name(struct_name, struct_map_dict):
         str: the mapped structure name
     """
     # Check if the structure name needs to be mapped
-    mapped_struct_name_set = {i for i in struct_map_dict if struct_name in struct_map_dict[i]}
+    mapped_struct_name_set = {
+        i for i in struct_map_dict if struct_name in struct_map_dict[i]
+    }
 
     # If not true, then either the structure name is already in mapped form, or the structure name
     # is not being captured in the specific mapping dictionary
@@ -386,7 +394,9 @@ def map_structure_name(struct_name, struct_map_dict):
     return struct_name
 
 
-def get_structures_linked_to_dose(working_directory: Path, dose_row: pd.Series) -> pd.DataFrame:
+def get_structures_linked_to_dose(
+    working_directory: Path, dose_row: pd.Series
+) -> pd.DataFrame:
     """Get the structure sets which are linked to a dose object.
 
     Args:
@@ -417,7 +427,8 @@ def get_structures_linked_to_dose(working_directory: Path, dose_row: pd.Series) 
 
     # Also link via Frame of Reference
     df_for_linked = df_converted[
-        (df_converted["modality"] == "RTSTRUCT") & (df_converted["for_uid"] == dose_row.for_uid)
+        (df_converted["modality"] == "RTSTRUCT")
+        & (df_converted["for_uid"] == dose_row.for_uid)
     ]
 
     if df_linked_struct is None:
@@ -458,9 +469,9 @@ def add_structure_name_mapping(
           this mapping belongs. Defaults to None.
 
     Raises:
-        SystemError: _description_
-        ValueError: _description_
-        ValueError: _description_
+        SystemError: Ensure working_directory or structure_set is provided.
+        ValueError: All keys in mapping dictionary must be of type `str`.
+        ValueError: All values in mapping dictionary must be a list of `str` entries.
     """
 
     mapping_path_base = None
@@ -469,7 +480,9 @@ def add_structure_name_mapping(
     if structure_set_row is not None:
         # Mapping for specific structure set
         logger.info(
-            "Adding mapping %s for structure set %s", mapping_id, structure_set_row.hashed_uid
+            "Adding mapping %s for structure set %s",
+            mapping_id,
+            structure_set_row.hashed_uid,
         )
 
         mapping_path_base = Path(structure_set_row.path)
@@ -519,3 +532,106 @@ def add_structure_name_mapping(
         mapping_path.joinpath(f"{mapping_id}.json"), "w", encoding="utf8"
     ) as structures_map_file:
         json.dump(mapping_dict, structures_map_file, ensure_ascii=False, indent=4)
+
+
+def download_and_extract_zip_file(zip_url, output_directory):
+    """Downloads a zip file from the URL specified and extracts the contents to the output
+    directory.
+
+    Args:
+        zip_url (str): The URL of the zip file.
+        output_directory (str|pathlib.Path): The path in which to extract the contents.
+    """
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = Path(temp_dir)
+        temp_file = temp_dir.joinpath("tmp.zip")
+
+        with urllib.request.urlopen(zip_url) as dl_file:
+            with open(temp_file, "wb") as out_file:
+                out_file.write(dl_file.read())
+
+        with zipfile.ZipFile(temp_file, "r") as zip_ref:
+            zip_ref.extractall(output_directory)
+
+
+def fetch_converted_test_data(working_directory=None, dataset="HNSCC"):
+    """Fetch some public data which has already been converted using PyDicer.
+    Useful for unit testing as well as examples.
+
+    Args:
+        working_directory (str|pathlib.Path, optional): The working directory in which to
+          place the test data. Defaults to None.
+        dataset (str, optional): The name of the dataset to fetch, either HNSCC or LCTSC.
+          Defaults to "HNSCC".
+
+    Returns:
+        pathlib.Path: The path to the working directory.
+    """
+
+    if working_directory is None:
+        working_directory = Path(".")
+        working_directory.joinpath(dataset)
+
+    working_directory = Path(working_directory)
+
+    if working_directory.exists():
+        logger.warning("Working directory %s aready exists, won't download test data.")
+        return working_directory
+
+    if dataset == "HNSCC":
+        zip_url = "https://zenodo.org/record/8237552/files/HNSCC_pydicer.zip"
+        working_name = "testdata"
+    elif dataset == "LCTSC":
+        zip_url = "https://zenodo.org/records/10254078/files/LCTSC_pydicer.zip"
+        working_name = "LCTSC"
+    else:
+        raise ValueError(f"Unknown dataset {dataset}")
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        output_directory = Path(temp_dir).joinpath("output")
+        download_and_extract_zip_file(zip_url, output_directory)
+        shutil.copytree(output_directory.joinpath(working_name), working_directory)
+
+    return working_directory
+
+
+def copy_doc(copy_func, remove_args=None):
+    """Copies the doc string of the given function to another.
+    This function is intended to be used as a decorator.
+
+    Remove args listed in `remove_args` from the docstring.
+
+    This function was adapted from:
+    https://stackoverflow.com/questions/68901049/copying-the-docstring-of-function-onto-another-function-by-name
+
+    .. code-block:: python3
+
+        def foo():
+            '''This is a foo doc string'''
+            ...
+
+        @copy_doc(foo)
+        def bar():
+            ...
+
+    """
+
+    if remove_args is None:
+        remove_args = []
+
+    def wrapped(func):
+        func.__doc__ = copy_func.__doc__
+
+        for arg in remove_args:
+            func.__doc__ = "\n".join(
+                [
+                    line
+                    for line in func.__doc__.split("\n")
+                    if not line.strip().startswith(arg)
+                ]
+            )
+
+        return func
+
+    return wrapped

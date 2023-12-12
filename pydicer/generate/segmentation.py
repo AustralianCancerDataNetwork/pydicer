@@ -113,12 +113,16 @@ def write_autoseg_log(
 
 
 def read_all_segmentation_logs(
-    working_directory: Path, dataset_name: str, segment_id: str = None, modality: str = None
+    working_directory: Path,
+    dataset_name: str = CONVERTED_DIR_NAME,
+    segment_id: str = None,
+    modality: str = None,
 ):
     """Read all auto-segmentation logs in a dataset.
     Args:
         dataset_name (str): The name of the dataset to read for.
         segment_id (str): The ID of the auto-segmentation run.
+        modality (str): The modality of the images to read logs for.
 
     Returns:
         pd.DataFrame: The pandas DataFrame object with all logs for the dataset.
@@ -135,6 +139,10 @@ def read_all_segmentation_logs(
         df_log = read_segmentation_log(row)
 
         df_logs = pd.concat([df_logs, df_log])
+
+    # Reading logs like this can result in duplicates... not ideal, but just drop duplicates for
+    # now
+    df_logs = df_logs.drop_duplicates()
 
     df_logs = df_logs.reset_index(drop=True)
 

@@ -1,35 +1,9 @@
-import zipfile
-import urllib.request
-import tempfile
 import logging
 
-from pathlib import Path
-
 from pydicer.input.base import InputBase
+from pydicer.utils import download_and_extract_zip_file
 
 logger = logging.getLogger(__name__)
-
-
-def download_and_extract_zip_file(zip_url, output_directory):
-    """Downloads a zip file from the URL specified and extracts the contents to the output
-    directory.
-
-    Args:
-        zip_url (str): The URL of the zip file.
-        output_directory (str|pathlib.Path): The path in which to extract the contents.
-    """
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_file = Path(temp_dir).joinpath("tmp.zip")
-
-        with urllib.request.urlopen(zip_url) as dl_file:
-
-            with open(temp_file, "wb") as out_file:
-
-                out_file.write(dl_file.read())
-
-        with zipfile.ZipFile(temp_file, "r") as zip_ref:
-            zip_ref.extractall(output_directory)
 
 
 class WebInput(InputBase):
