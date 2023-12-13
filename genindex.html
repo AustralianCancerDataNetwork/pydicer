@@ -161,10 +161,15 @@
 <li class="toctree-l1"><a class="reference internal" href="_examples/Radiomics.html">Compute Radiomics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_examples/DoseMetrics.html">Dose Metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_examples/DatasetPreparation.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/AutoSegmentation.html">Auto-segmentation Inference &amp; Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/nnUNet.html">nnUNet Data Preparation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithData.html">Working with Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithStructures.html">Working with Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/ObjectGeneration.html">Generating Data Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/Configuration.html">Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -176,11 +181,13 @@
 <li class="toctree-l1"><a class="reference internal" href="tool.html">PyDicer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input.html">Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="convert.html">Conversion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualise.html">Visualisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Dataset Preparation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">Generation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nnunet.html">nnUNet</a></li>
 </ul>
 
@@ -218,7 +225,7 @@
           
 <section class="genindex-section">
   <h1 id="index">Index</h1>
-  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
 </section>
 <section id="A" class="genindex-section">
   <h2>A</h2>
@@ -226,22 +233,44 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="input.html#pydicer.input.orthanc.adapt_dataset_from_bytes">adapt_dataset_from_bytes() (in module pydicer.input.orthanc)</a>
 </li>
-        <li><a href="tool.html#pydicer.tool.PyDicer.add_dose_object">add_dose_object() (pydicer.tool.PyDicer method)</a>
+        <li><a href="generate.html#pydicer.generate.object.add_dose_object">add_dose_object() (in module pydicer.generate.object)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.add_dose_object">(pydicer.tool.PyDicer method)</a>
 </li>
+        </ul></li>
         <li><a href="convert.html#pydicer.convert.data.ConvertData.add_entry">add_entry() (pydicer.convert.data.ConvertData method)</a>
 </li>
+        <li><a href="generate.html#pydicer.generate.object.add_image_object">add_image_object() (in module pydicer.generate.object)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.add_image_object">(pydicer.tool.PyDicer method)</a>
+</li>
+        </ul></li>
         <li><a href="tool.html#pydicer.tool.PyDicer.add_input">add_input() (pydicer.tool.PyDicer method)</a>
 </li>
-        <li><a href="tool.html#pydicer.tool.PyDicer.add_object">add_object() (pydicer.tool.PyDicer method)</a>
+        <li><a href="generate.html#pydicer.generate.object.add_object">add_object() (in module pydicer.generate.object)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.add_object">(pydicer.tool.PyDicer method)</a>
 </li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="dataset.html#pydicer.dataset.preparation.PrepareDataset.add_object_to_dataset">add_object_to_dataset() (pydicer.dataset.preparation.PrepareDataset method)</a>
 </li>
-        <li><a href="tool.html#pydicer.tool.PyDicer.add_structure_name_mapping">add_structure_name_mapping() (pydicer.tool.PyDicer method)</a>
+        <li><a href="utils.html#pydicer.utils.add_structure_name_mapping">add_structure_name_mapping() (in module pydicer.utils)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.add_structure_name_mapping">(pydicer.tool.PyDicer method)</a>
 </li>
-        <li><a href="tool.html#pydicer.tool.PyDicer.add_structure_object">add_structure_object() (pydicer.tool.PyDicer method)</a>
+        </ul></li>
+        <li><a href="generate.html#pydicer.generate.object.add_structure_object">add_structure_object() (in module pydicer.generate.object)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.add_structure_object">(pydicer.tool.PyDicer method)</a>
 </li>
+        </ul></li>
         <li><a href="nnunet.html#pydicer.dataset.nnunet.NNUNetDataset.add_testing_cases">add_testing_cases() (pydicer.dataset.nnunet.NNUNetDataset method)</a>
 </li>
         <li><a href="analyse.html#pydicer.analyse.data.AnalyseData">AnalyseData (class in pydicer.analyse.data)</a>
@@ -280,6 +309,8 @@
 </li>
         <li><a href="convert.html#pydicer.convert.data.ConvertData">ConvertData (class in pydicer.convert.data)</a>
 </li>
+        <li><a href="utils.html#pydicer.utils.copy_doc">copy_doc() (in module pydicer.utils)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -288,7 +319,13 @@
   <h2>D</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="utils.html#pydicer.utils.determine_dcm_datetime">determine_dcm_datetime() (in module pydicer.utils)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="input.html#pydicer.input.pacs.DICOMPACSInput">DICOMPACSInput (class in pydicer.input.pacs)</a>
+</li>
+        <li><a href="utils.html#pydicer.utils.download_and_extract_zip_file">download_and_extract_zip_file() (in module pydicer.utils)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -298,6 +335,8 @@
   <h2>F</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="utils.html#pydicer.utils.fetch_converted_test_data">fetch_converted_test_data() (in module pydicer.utils)</a>
+</li>
         <li><a href="input.html#pydicer.input.orthanc.OrthancInput.fetch_data">fetch_data() (pydicer.input.orthanc.OrthancInput method)</a>
 
         <ul>
@@ -326,7 +365,17 @@
 </li>
         <li><a href="analyse.html#pydicer.analyse.data.AnalyseData.get_all_dvhs_for_dataset">get_all_dvhs_for_dataset() (pydicer.analyse.data.AnalyseData method)</a>
 </li>
+        <li><a href="generate.html#pydicer.generate.models.get_available_mhub_models">get_available_mhub_models() (in module pydicer.generate.models)</a>
+</li>
         <li><a href="config.html#pydicer.config.PyDicerConfig.get_config">get_config() (pydicer.config.PyDicerConfig method)</a>
+</li>
+        <li><a href="utils.html#pydicer.utils.get_iterator">get_iterator() (in module pydicer.utils)</a>
+</li>
+        <li><a href="generate.html#pydicer.generate.object.get_linked_for_and_ref_uid">get_linked_for_and_ref_uid() (in module pydicer.generate.object)</a>
+</li>
+        <li><a href="dataset.html#pydicer.dataset.structureset.StructureSet.get_mapped_structure_name">get_mapped_structure_name() (pydicer.dataset.structureset.StructureSet method)</a>
+</li>
+        <li><a href="dataset.html#pydicer.dataset.structureset.get_mapping_for_structure_set">get_mapping_for_structure_set() (in module pydicer.dataset.structureset)</a>
 </li>
         <li><a href="convert.html#pydicer.convert.data.get_object_type">get_object_type() (in module pydicer.convert.data)</a>
 </li>
@@ -334,13 +383,23 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="convert.html#pydicer.convert.pt.get_physical_values_pt">get_physical_values_pt() (in module pydicer.convert.pt)</a>
 </li>
+        <li><a href="generate.html#pydicer.generate.segmentation.get_segmentation_log_path">get_segmentation_log_path() (in module pydicer.generate.segmentation)</a>
+</li>
         <li><a href="convert.html#pydicer.convert.pt.get_sitk_volume_from_np">get_sitk_volume_from_np() (in module pydicer.convert.pt)</a>
 </li>
-        <li><a href="tool.html#pydicer.tool.PyDicer.get_structures_linked_to_dose">get_structures_linked_to_dose() (pydicer.tool.PyDicer method)</a>
+        <li><a href="dataset.html#pydicer.dataset.structureset.StructureSet.get_standardised_structure_name">get_standardised_structure_name() (pydicer.dataset.structureset.StructureSet method)</a>
 </li>
+        <li><a href="utils.html#pydicer.utils.get_structures_linked_to_dose">get_structures_linked_to_dose() (in module pydicer.utils)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.get_structures_linked_to_dose">(pydicer.tool.PyDicer method)</a>
+</li>
+        </ul></li>
         <li><a href="convert.html#pydicer.convert.pt.get_suv_from_bqml">get_suv_from_bqml() (in module pydicer.convert.pt)</a>
 </li>
         <li><a href="convert.html#pydicer.convert.pt.get_suv_philips">get_suv_philips() (in module pydicer.convert.pt)</a>
+</li>
+        <li><a href="dataset.html#pydicer.dataset.structureset.StructureSet.get_unmapped_structures">get_unmapped_structures() (pydicer.dataset.structureset.StructureSet method)</a>
 </li>
         <li><a href="config.html#pydicer.config.PyDicerConfig.get_working_dir">get_working_dir() (pydicer.config.PyDicerConfig method)</a>
 </li>
@@ -355,6 +414,10 @@
         <li><a href="convert.html#pydicer.convert.data.handle_missing_slice">handle_missing_slice() (in module pydicer.convert.data)</a>
 </li>
     </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="utils.html#pydicer.utils.hash_uid">hash_uid() (in module pydicer.utils)</a>
+</li>
+    </ul></td>
   </tr></table>
 </section>
 
@@ -363,6 +426,20 @@
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="convert.html#pydicer.convert.pt.is_approx_equal">is_approx_equal() (in module pydicer.convert.pt)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="dataset.html#pydicer.dataset.structureset.StructureSet.items">items() (pydicer.dataset.structureset.StructureSet method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="K" class="genindex-section">
+  <h2>K</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="dataset.html#pydicer.dataset.structureset.StructureSet.keys">keys() (pydicer.dataset.structureset.StructureSet method)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -374,6 +451,14 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="convert.html#pydicer.convert.data.link_via_frame_of_reference">link_via_frame_of_reference() (in module pydicer.convert.data)</a>
 </li>
+        <li><a href="utils.html#pydicer.utils.load_dvh">load_dvh() (in module pydicer.utils)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="utils.html#pydicer.utils.load_object_metadata">load_object_metadata() (in module pydicer.utils)</a>
+</li>
+        <li><a href="generate.html#pydicer.generate.models.load_output_nifti">load_output_nifti() (in module pydicer.generate.models)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -382,6 +467,8 @@
   <h2>M</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="utils.html#pydicer.utils.map_structure_name">map_structure_name() (in module pydicer.utils)</a>
+</li>
         <li>
     module
 
@@ -400,6 +487,14 @@
 </li>
           <li><a href="dataset.html#module-pydicer.dataset.preparation">pydicer.dataset.preparation</a>
 </li>
+          <li><a href="dataset.html#module-pydicer.dataset.structureset">pydicer.dataset.structureset</a>
+</li>
+          <li><a href="generate.html#module-pydicer.generate.models">pydicer.generate.models</a>
+</li>
+          <li><a href="generate.html#module-pydicer.generate.object">pydicer.generate.object</a>
+</li>
+          <li><a href="generate.html#module-pydicer.generate.segmentation">pydicer.generate.segmentation</a>
+</li>
           <li><a href="input.html#module-pydicer.input.filesystem">pydicer.input.filesystem</a>
 </li>
           <li><a href="input.html#module-pydicer.input.orthanc">pydicer.input.orthanc</a>
@@ -413,6 +508,8 @@
           <li><a href="input.html#module-pydicer.input.web">pydicer.input.web</a>
 </li>
           <li><a href="preprocess.html#module-pydicer.preprocess.data">pydicer.preprocess.data</a>
+</li>
+          <li><a href="utils.html#module-pydicer.utils">pydicer.utils</a>
 </li>
           <li><a href="visualise.html#module-pydicer.visualise.data">pydicer.visualise.data</a>
 </li>
@@ -445,6 +542,8 @@
   <h2>P</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="utils.html#pydicer.utils.parse_patient_kwarg">parse_patient_kwarg() (in module pydicer.utils)</a>
+</li>
         <li><a href="nnunet.html#pydicer.dataset.nnunet.NNUNetDataset.prep_label_map_from_one_hot">prep_label_map_from_one_hot() (pydicer.dataset.nnunet.NNUNetDataset method)</a>
 </li>
         <li><a href="dataset.html#pydicer.dataset.preparation.PrepareDataset.prepare">prepare() (pydicer.dataset.preparation.PrepareDataset method)</a>
@@ -507,13 +606,41 @@
           <li><a href="dataset.html#module-pydicer.dataset.functions">module</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     pydicer.dataset.preparation
 
         <ul>
           <li><a href="dataset.html#module-pydicer.dataset.preparation">module</a>
+</li>
+        </ul></li>
+        <li>
+    pydicer.dataset.structureset
+
+        <ul>
+          <li><a href="dataset.html#module-pydicer.dataset.structureset">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    pydicer.generate.models
+
+        <ul>
+          <li><a href="generate.html#module-pydicer.generate.models">module</a>
+</li>
+        </ul></li>
+        <li>
+    pydicer.generate.object
+
+        <ul>
+          <li><a href="generate.html#module-pydicer.generate.object">module</a>
+</li>
+        </ul></li>
+        <li>
+    pydicer.generate.segmentation
+
+        <ul>
+          <li><a href="generate.html#module-pydicer.generate.segmentation">module</a>
 </li>
         </ul></li>
         <li>
@@ -566,6 +693,13 @@
 </li>
         </ul></li>
         <li>
+    pydicer.utils
+
+        <ul>
+          <li><a href="utils.html#module-pydicer.utils">module</a>
+</li>
+        </ul></li>
+        <li>
     pydicer.visualise.data
 
         <ul>
@@ -582,21 +716,41 @@
   <h2>R</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="tool.html#pydicer.tool.PyDicer.read_all_segmentation_logs">read_all_segmentation_logs() (pydicer.tool.PyDicer method)</a>
+        <li><a href="generate.html#pydicer.generate.segmentation.read_all_segmentation_logs">read_all_segmentation_logs() (in module pydicer.generate.segmentation)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.read_all_segmentation_logs">(pydicer.tool.PyDicer method)</a>
 </li>
-        <li><a href="tool.html#pydicer.tool.PyDicer.read_converted_data">read_converted_data() (pydicer.tool.PyDicer method)</a>
+        </ul></li>
+        <li><a href="utils.html#pydicer.utils.read_converted_data">read_converted_data() (in module pydicer.utils)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.read_converted_data">(pydicer.tool.PyDicer method)</a>
 </li>
-        <li><a href="tool.html#pydicer.tool.PyDicer.read_preprocessed_data">read_preprocessed_data() (pydicer.tool.PyDicer method)</a>
+        </ul></li>
+        <li><a href="utils.html#pydicer.utils.read_preprocessed_data">read_preprocessed_data() (in module pydicer.utils)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.read_preprocessed_data">(pydicer.tool.PyDicer method)</a>
+</li>
+        </ul></li>
+        <li><a href="tool.html#pydicer.tool.PyDicer.read_quarantined_data">read_quarantined_data() (pydicer.tool.PyDicer method)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="tool.html#pydicer.tool.PyDicer.read_quarantined_data">read_quarantined_data() (pydicer.tool.PyDicer method)</a>
+        <li><a href="generate.html#pydicer.generate.segmentation.read_segmentation_log">read_segmentation_log() (in module pydicer.generate.segmentation)</a>
+</li>
+        <li><a href="utils.html#pydicer.utils.read_simple_itk_image">read_simple_itk_image() (in module pydicer.utils)</a>
 </li>
         <li><a href="dataset.html#pydicer.dataset.functions.rt_latest_dose">rt_latest_dose() (in module pydicer.dataset.functions)</a>
 </li>
         <li><a href="dataset.html#pydicer.dataset.functions.rt_latest_struct">rt_latest_struct() (in module pydicer.dataset.functions)</a>
 </li>
+        <li><a href="generate.html#pydicer.generate.models.run_mhub_model">run_mhub_model() (in module pydicer.generate.models)</a>
+</li>
         <li><a href="tool.html#pydicer.tool.PyDicer.run_pipeline">run_pipeline() (pydicer.tool.PyDicer method)</a>
+</li>
+        <li><a href="generate.html#pydicer.generate.models.run_total_segmentator">run_total_segmentator() (in module pydicer.generate.models)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -610,17 +764,27 @@
 </li>
         <li><a href="preprocess.html#pydicer.preprocess.data.PreprocessData.scan_file">scan_file() (pydicer.preprocess.data.PreprocessData method)</a>
 </li>
-        <li><a href="tool.html#pydicer.tool.PyDicer.segment_dataset">segment_dataset() (pydicer.tool.PyDicer method)</a>
+        <li><a href="generate.html#pydicer.generate.segmentation.segment_dataset">segment_dataset() (in module pydicer.generate.segmentation)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.segment_dataset">(pydicer.tool.PyDicer method)</a>
 </li>
+        </ul></li>
+        <li><a href="generate.html#pydicer.generate.segmentation.segment_image">segment_image() (in module pydicer.generate.segmentation)</a>
+
+        <ul>
+          <li><a href="tool.html#pydicer.tool.PyDicer.segment_image">(pydicer.tool.PyDicer method)</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="tool.html#pydicer.tool.PyDicer.segment_image">segment_image() (pydicer.tool.PyDicer method)</a>
-</li>
         <li><a href="config.html#pydicer.config.PyDicerConfig.set_config">set_config() (pydicer.config.PyDicerConfig method)</a>
 </li>
         <li><a href="tool.html#pydicer.tool.PyDicer.set_verbosity">set_verbosity() (pydicer.tool.PyDicer method)</a>
 </li>
         <li><a href="nnunet.html#pydicer.dataset.nnunet.NNUNetDataset.split_dataset">split_dataset() (pydicer.dataset.nnunet.NNUNetDataset method)</a>
+</li>
+        <li><a href="dataset.html#pydicer.dataset.structureset.StructureSet">StructureSet (class in pydicer.dataset.structureset)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -656,10 +820,12 @@
   <h2>V</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="visualise.html#pydicer.visualise.data.VisualiseData.visualise">visualise() (pydicer.visualise.data.VisualiseData method)</a>
+        <li><a href="dataset.html#pydicer.dataset.structureset.StructureSet.values">values() (pydicer.dataset.structureset.StructureSet method)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="visualise.html#pydicer.visualise.data.VisualiseData.visualise">visualise() (pydicer.visualise.data.VisualiseData method)</a>
+</li>
         <li><a href="visualise.html#pydicer.visualise.data.VisualiseData">VisualiseData (class in pydicer.visualise.data)</a>
 </li>
     </ul></td>
@@ -674,6 +840,8 @@
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="generate.html#pydicer.generate.segmentation.write_autoseg_log">write_autoseg_log() (in module pydicer.generate.segmentation)</a>
+</li>
         <li><a href="convert.html#pydicer.convert.rtstruct.write_nrrd_from_mask_directory">write_nrrd_from_mask_directory() (in module pydicer.convert.rtstruct)</a>
 </li>
     </ul></td>

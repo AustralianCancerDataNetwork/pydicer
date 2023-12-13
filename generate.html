@@ -1,0 +1,741 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="nnUNet" href="nnunet.html" /><link rel="prev" title="Analyse" href="analyse.html" />
+
+    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+        <title>Generation - PyDicer 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_examples/GettingStarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/ConvertingData.html">Converting Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/VisualiseData.html">Visualise Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/Radiomics.html">Compute Radiomics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/DoseMetrics.html">Dose Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/DatasetPreparation.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/AutoSegmentation.html">Auto-segmentation Inference &amp; Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/nnUNet.html">nnUNet Data Preparation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithData.html">Working with Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithStructures.html">Working with Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/ObjectGeneration.html">Generating Data Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/Configuration.html">Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_of_conduct.html">Code of Conduct</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tool.html">PyDicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input.html">Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convert.html">Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualise.html">Visualisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataset.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyse.html">Analyse</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nnunet.html">nnUNet</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="generation">
+<h1>Generation<a class="headerlink" href="#generation" title="Permalink to this heading">#</a></h1>
+<section id="module-pydicer.generate.object">
+<span id="objects"></span><h2>Objects<a class="headerlink" href="#module-pydicer.generate.object" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.object.add_dose_object">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.object.</span></span><span class="sig-name descname"><span class="pre">add_dose_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dose_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linked_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_uid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.generate.object.add_dose_object" title="Permalink to this definition">#</a></dt>
+<dd><p>Add a generated dose object to the project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_directory</strong> (<em>pathlib.Path</em>) – The project working directory.</p></li>
+<li><p><strong>dose</strong> (<em>sitk.Image</em>) – A SimpleITK.Image of the dose volume to add.</p></li>
+<li><p><strong>dose_id</strong> (<em>str</em>) – The unique ID of the new dose object.</p></li>
+<li><p><strong>patient_id</strong> (<em>str</em>) – The ID of the patient of this object.</p></li>
+<li><p><strong>linked_plan</strong> (<em>str</em><em>|</em><em>pd.Series</em><em>, </em><em>optional</em>) – The hashed_uid or the Pandas DataFrame row of the
+RTPLAN object to link to. If None the new object won’t be linked. Defaults to None.</p></li>
+<li><p><strong>for_uid</strong> (<em>str</em><em>, </em><em>optional</em>) – Frame Of Reference UID for new data object. If not provided it
+will be extracted from the linked plan (if available). Defaults to None.</p></li>
+<li><p><strong>datasets</strong> (<em>list</em><em>|</em><em>str</em><em>, </em><em>optional</em>) – The name(s) of the dataset(s) to add the object to. Defaults
+to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – Raised then the patient ID does not exist</p></li>
+<li><p><strong>SystemError</strong> – Raised when a linked_plan is provided but can’t be found for this patient.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.object.add_image_object">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.object.</span></span><span class="sig-name descname"><span class="pre">add_image_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linked_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_uid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.generate.object.add_image_object" title="Permalink to this definition">#</a></dt>
+<dd><p>Add a generated image object to the project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_directory</strong> (<em>pathlib.Path</em>) – The project working directory.</p></li>
+<li><p><strong>image</strong> (<em>sitk.Image</em>) – The SimpleITK.Image object to save.</p></li>
+<li><p><strong>image_id</strong> (<em>str</em>) – The unique ID of the new image object.</p></li>
+<li><p><strong>modality</strong> (<em>str</em>) – The modality of the image being saved.</p></li>
+<li><p><strong>patient_id</strong> (<em>str</em>) – The ID of the patient of this object.</p></li>
+<li><p><strong>linked_image</strong> (<em>str</em><em>|</em><em>pd.Series</em><em>, </em><em>optional</em>) – The hashed_uid or the Pandas DataFrame row of the
+image object to link to. If None the new object won’t be linked. Defaults to None.</p></li>
+<li><p><strong>for_uid</strong> (<em>str</em><em>, </em><em>optional</em>) – Frame Of Reference UID for new data object. If not provided it
+will be extracted from the linked image (if available). Defaults to None.</p></li>
+<li><p><strong>datasets</strong> (<em>list</em><em>|</em><em>str</em><em>, </em><em>optional</em>) – The name(s) of the dataset(s) to add the object to. Defaults
+to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – Raised then the patient ID does not exist</p></li>
+<li><p><strong>SystemError</strong> – Raised when a linked_image is provided but can’t be found for this patient.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.object.add_object">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.object.</span></span><span class="sig-name descname"><span class="pre">add_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_uid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">referenced_sop_instance_uid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.generate.object.add_object" title="Permalink to this definition">#</a></dt>
+<dd><p>Add a generated object to the project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_directory</strong> (<em>pathlib.Path</em>) – The working directory of the project.</p></li>
+<li><p><strong>object_id</strong> (<em>str</em>) – The unique ID of the new object.</p></li>
+<li><p><strong>patient_id</strong> (<em>str</em>) – The ID of the patient for which the object is being added.</p></li>
+<li><p><strong>object_type</strong> (<em>str</em>) – The type of object, must be one of “image”, “structure”, “plan” or
+“dose”.</p></li>
+<li><p><strong>modality</strong> (<em>str</em>) – The modality of the object (as per the DICOM standard)</p></li>
+<li><p><strong>for_uid</strong> (<em>str</em><em>, </em><em>optional</em>) – The Frame of Reference UID. Defaults to None.</p></li>
+<li><p><strong>referenced_sop_instance_uid</strong> (<em>str</em><em>, </em><em>optional</em>) – The SOP Instance UID of the object referenced
+by the generated object. Defaults to None.</p></li>
+<li><p><strong>datasets</strong> (<em>list</em><em>|</em><em>str</em><em>, </em><em>optional</em>) – The name(s) of the dataset(s) to add the object to. Defaults
+to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – Raised in object_type is not “image”, “structure”, “plan” or “dose”.</p></li>
+<li><p><strong>ValueError</strong> – Raised if the patient does not exist in the project.</p></li>
+<li><p><strong>SystemError</strong> – Raised if the generated object does not yet exist on the file system.</p></li>
+<li><p><strong>SystemError</strong> – Raised if an object with this ID has already exists in the project.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.object.add_structure_object">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.object.</span></span><span class="sig-name descname"><span class="pre">add_structure_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linked_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_uid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.generate.object.add_structure_object" title="Permalink to this definition">#</a></dt>
+<dd><p>Add a generated structure object to the project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_directory</strong> (<em>pathlib.Path</em>) – The project working directory.</p></li>
+<li><p><strong>structures</strong> (<em>dict</em>) – A dict object container structure names as key and SimpleITK.Image of
+the corresponding structure mask as value.</p></li>
+<li><p><strong>structure_id</strong> (<em>str</em>) – The unique ID of the new structure object.</p></li>
+<li><p><strong>patient_id</strong> (<em>str</em>) – The ID of the patient of this object.</p></li>
+<li><p><strong>linked_image</strong> (<em>str</em><em>|</em><em>pd.Series</em><em>, </em><em>optional</em>) – The hashed_uid or the Pandas DataFrame row of the
+image object to link to. If None the new object won’t be linked. Defaults to None.</p></li>
+<li><p><strong>for_uid</strong> (<em>str</em><em>, </em><em>optional</em>) – Frame Of Reference UID for new data object. If not provided it
+will be extracted from the linked image (if available). Defaults to None.</p></li>
+<li><p><strong>datasets</strong> (<em>list</em><em>|</em><em>str</em><em>, </em><em>optional</em>) – The name(s) of the dataset(s) to add the object to. Defaults
+to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – Raised then the patient ID does not exist</p></li>
+<li><p><strong>SystemError</strong> – Raised when a linked_image is provided but can’t be found for this patient.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.object.get_linked_for_and_ref_uid">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.object.</span></span><span class="sig-name descname"><span class="pre">get_linked_for_and_ref_uid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linked_obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.generate.object.get_linked_for_and_ref_uid" title="Permalink to this definition">#</a></dt>
+<dd><p>Determine the linked frame of reference UID and SOP instance UID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_directory</strong> (<em>pathlib.Path</em>) – The project working directory.</p></li>
+<li><p><strong>patient_id</strong> (<em>str</em>) – The ID of the patient containing the objects.</p></li>
+<li><p><strong>str</strong><strong>|</strong><strong>pd.Series</strong> (<em>linked_obj</em>) – The hashed_uid or the Pandas DataFrame row of the
+object to link to. If None the new object won’t be linked.</p></li>
+<li><p><strong>optional</strong><strong>)</strong> – The hashed_uid or the Pandas DataFrame row of the
+object to link to. If None the new object won’t be linked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemError</strong> – Raised when no link is found.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing he frame of reference UID and the referenced SOP instance UID.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pydicer.generate.segmentation">
+<span id="auto-segmentation"></span><h2>Auto-segmentation<a class="headerlink" href="#module-pydicer.generate.segmentation" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.segmentation.get_segmentation_log_path">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.segmentation.</span></span><span class="sig-name descname"><span class="pre">get_segmentation_log_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#pydicer.generate.segmentation.get_segmentation_log_path" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the auto-segmentation log path given an image entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image_row</strong> (<em>pd.Series</em>) – A row of an image of a converted data frame.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Path to the relavant patient’s auto-segmentation log.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pathlib.Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.segmentation.read_all_segmentation_logs">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.segmentation.</span></span><span class="sig-name descname"><span class="pre">read_all_segmentation_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.generate.segmentation.read_all_segmentation_logs" title="Permalink to this definition">#</a></dt>
+<dd><p>Read all auto-segmentation logs in a dataset.
+:param dataset_name: The name of the dataset to read for.
+:type dataset_name: str
+:param segment_id: The ID of the auto-segmentation run.
+:type segment_id: str
+:param modality: The modality of the images to read logs for.
+:type modality: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The pandas DataFrame object with all logs for the dataset.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.segmentation.read_segmentation_log">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.segmentation.</span></span><span class="sig-name descname"><span class="pre">read_segmentation_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.generate.segmentation.read_segmentation_log" title="Permalink to this definition">#</a></dt>
+<dd><p>Read the auto-segmentation log given an image entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image_row</strong> (<em>pd.Series</em>) – A row of an image of a converted data frame.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The pandas DataFrame object describing the log.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.segmentation.segment_dataset">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.segmentation.</span></span><span class="sig-name descname"><span class="pre">segment_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'CT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="k"><span class="pre">False</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.generate.segmentation.segment_dataset" title="Permalink to this definition">#</a></dt>
+<dd><p>Run an auto-segmentation function across all images of a given modality in a dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_directory</strong> (<em>Path</em>) – The PyDicer working directory.</p></li>
+<li><p><strong>segment_id</strong> (<em>str</em>) – The ID to be given to track the results of this segmentation.</p></li>
+<li><p><strong>segmentation_function</strong> (<em>Callable</em>) – The function to call to run the segemtantion. Excepts a
+SimpleITK.Image as input and returns a dict object with structure names as keys and
+SimpleITK.Image masks as values.</p></li>
+<li><p><strong>dataset_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the dataset to run auto-segmentation on. Defaults
+to CONVERTED_DIR_NAME which run across all images available.</p></li>
+<li><p><strong>modality</strong> (<em>str</em><em>, </em><em>optional</em>) – The modality of the image to run on. Defaults to “CT”.</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the segmetation will be re-run for each image even if it
+was already previously run. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.segmentation.segment_image">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.segmentation.</span></span><span class="sig-name descname"><span class="pre">segment_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.generate.segmentation.segment_image" title="Permalink to this definition">#</a></dt>
+<dd><p>Run an auto-segmentation function on an image. Provide the image row of the converted
+DataFrame to auto-segment, segmentation results will be save as a new object within the
+patient’s data.</p>
+<p>The <cite>segment_function</cite> provided should accept a SimpleITK image as input and return a <cite>dict</cite>
+with structure names as keys and SimpleITK images as value.</p>
+<p>If you segmentation algorithm requires further customisation, consider wrapping it in a
+function to match this notation. For example, to run the TotalSegmentator, you can define
+a warpper function like:</p>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
+import tempfile
+from pathlib import Path
+import SimpleITK as sitk</p>
+<p>def run_total_segmentator(input_image: sitk.Image) -&gt; dict:</p>
+<dl>
+<dt># Import within function since this is an optional dependency</dt><dd><dl class="simple">
+<dt>from totalsegmentator.python_api import (</dt><dd><p>totalsegmentator,  # pylint: disable=import-outside-toplevel</p>
+</dd>
+</dl>
+<p>)</p>
+<p>results = {}</p>
+<dl>
+<dt>with tempfile.TemporaryDirectory() as working_dir:</dt><dd><p>working_dir = Path(working_dir)</p>
+<p># Save the temporary image file for total segmentator to find
+input_dir = working_dir.joinpath(“input”)
+input_dir.mkdir()
+input_file = input_dir.joinpath(“img.nii.gz”)
+sitk.WriteImage(input_image, str(input_file))</p>
+<p># Prepare a temporary folder for total segmentator to store the output
+output_dir = working_dir.joinpath(“output”)
+output_dir.mkdir()</p>
+<p># Run total segmentator
+totalsegmentator(input_dir, output_dir)</p>
+<p># Load the output masks into a dict to return
+for mask_file in output_dir.glob(”<a href="#id5"><span class="problematic" id="id6">*</span></a>.nii.gz”):</p>
+<blockquote>
+<div><p>mask = sitk.ReadImage(str(mask_file))</p>
+<p># Check if the mask is empty, total segmentator stores empty mask files for
+# structures that aren’t within FOV
+if sitk.GetArrayFromImage(mask).sum() == 0:</p>
+<blockquote>
+<div><p>continue</p>
+</div></blockquote>
+<p>structure_name = mask_file.name.replace(“.nii.gz”)</p>
+<p>results[structure_name] = mask</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>return results</p>
+</dd>
+</dl>
+<p><a href="#id7"><span class="problematic" id="id8">``</span></a><a href="#id9"><span class="problematic" id="id10">`</span></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_directory</strong> (<em>Path</em>) – The PyDicer working directory.</p></li>
+<li><p><strong>image_row</strong> (<em>pd.Series</em>) – The image row of the converted DataFrame to use for segmentation.</p></li>
+<li><p><strong>segment_id</strong> (<em>str</em>) – The ID to be given to track the results of this segmentation.</p></li>
+<li><p><strong>segmentation_function</strong> (<em>Callable</em>) – The function to call to run the segemtantion. Excepts a
+SimpleITK.Image as input and returns a dict object with structure names as keys and
+SimpleITK.Image masks as values.</p></li>
+<li><p><strong>dataset_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the dataset to add the segmented structure set
+to. Defaults to None.</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the segmetation will be re-run. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> – The segmentation function returned the wrong type (requies a dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.segmentation.write_autoseg_log">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.segmentation.</span></span><span class="sig-name descname"><span class="pre">write_autoseg_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_row:</span> <span class="pre">~pandas.core.series.Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_id:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time:</span> <span class="pre">&lt;module</span> <span class="pre">'datetime'</span> <span class="pre">from</span> <span class="pre">'/opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/datetime.py'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time:</span> <span class="pre">&lt;module</span> <span class="pre">'datetime'</span> <span class="pre">from</span> <span class="pre">'/opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/datetime.py'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success:</span> <span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_msg:</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.generate.segmentation.write_autoseg_log" title="Permalink to this definition">#</a></dt>
+<dd><p>Writes the auto-segmentation log for an auto-segmentation run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_row</strong> (<em>pd.Series</em>) – The row of an image of a converted data frame on which the
+auto-segmentation was run.</p></li>
+<li><p><strong>segment_id</strong> (<em>str</em>) – The ID of the auto-segmentation run.</p></li>
+<li><p><strong>start_time</strong> (<em>datetime</em>) – The date/time the run started.</p></li>
+<li><p><strong>end_time</strong> (<em>datetime</em>) – The date/time the run ended.</p></li>
+<li><p><strong>success</strong> (<em>bool</em>) – Boolean flag inicated if the auto-segmentation was run successfully or not.</p></li>
+<li><p><strong>error_msg</strong> (<em>str</em>) – A string indicating the error message if there was an error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pydicer.generate.models">
+<span id="models"></span><h2>Models<a class="headerlink" href="#module-pydicer.generate.models" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.models.get_available_mhub_models">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.models.</span></span><span class="sig-name descname"><span class="pre">get_available_mhub_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydicer.generate.models.get_available_mhub_models" title="Permalink to this definition">#</a></dt>
+<dd><p>Determine which mHub models have been configured for use in PyDicer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary with mhub model id as key and the path to the config file as value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.models.load_output_nifti">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.models.</span></span><span class="sig-name descname"><span class="pre">load_output_nifti</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydicer.generate.models.load_output_nifti" title="Permalink to this definition">#</a></dt>
+<dd><p>Loads segmentation masks saved as Nifti’s in an output directory into a dictionary for use
+in PyDicer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output_dir</strong> (<em>Path</em>) – The output directory of a segmentation model.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary of segmentation masks with the structure name as key and sitk.Image mask</dt><dd><p>as value.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.models.run_mhub_model">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.models.</span></span><span class="sig-name descname"><span class="pre">run_mhub_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mhub_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mhub_config_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydicer.generate.models.run_mhub_model" title="Permalink to this definition">#</a></dt>
+<dd><p>Use Docker to run a model made available through mHub: <a class="reference external" href="https://mhub.ai/">https://mhub.ai/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_image</strong> (<em>sitk.Image</em>) – The SimpleITK image to segment.</p></li>
+<li><p><strong>mhub_model</strong> (<em>str</em>) – The name of the model to run. Must be configured
+(check <cite>get_available_mhub_models</cite>) or a custom mhub_config_file should be provided.</p></li>
+<li><p><strong>mhub_config_file</strong> (<em>Path</em><em>, </em><em>optional</em>) – Path to a custom config file to use. Defaults to None.</p></li>
+<li><p><strong>gpu</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, all gpus will be requested when running the Docker image.
+Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ImportError</strong> – Raised if the Python Docker SDK is not installed.</p></li>
+<li><p><strong>ValueError</strong> – Raised if an mHub model which has not been configured for use in PyDicer is
+    requested. Use the <cite>get_available_mhub_models</cite> function to determine available models.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary of segmentations with structure name as key and sitk.Image mask as value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.generate.models.run_total_segmentator">
+<span class="sig-prename descclassname"><span class="pre">pydicer.generate.models.</span></span><span class="sig-name descname"><span class="pre">run_total_segmentator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydicer.generate.models.run_total_segmentator" title="Permalink to this definition">#</a></dt>
+<dd><p>Run Total Segmentator on a given input image. Ensure the Total Segmentator is installed:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">pip</span> <span class="pre">install</span> <span class="pre">TotalSegmentator</span>
+<span class="pre">`</span></code></p>
+<p>See <a class="reference external" href="https://github.com/wasserth/TotalSegmentator">https://github.com/wasserth/TotalSegmentator</a> for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_image</strong> (<em>sitk.Image</em>) – Input image (should be CT) to segment.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of segmentations with structure name as key and sitk.Image mask as value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="nnunet.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">nnUNet</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="analyse.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Analyse</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Ingham Medical Physics
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Generation</a><ul>
+<li><a class="reference internal" href="#module-pydicer.generate.object">Objects</a><ul>
+<li><a class="reference internal" href="#pydicer.generate.object.add_dose_object"><code class="docutils literal notranslate"><span class="pre">add_dose_object()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.object.add_image_object"><code class="docutils literal notranslate"><span class="pre">add_image_object()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.object.add_object"><code class="docutils literal notranslate"><span class="pre">add_object()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.object.add_structure_object"><code class="docutils literal notranslate"><span class="pre">add_structure_object()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.object.get_linked_for_and_ref_uid"><code class="docutils literal notranslate"><span class="pre">get_linked_for_and_ref_uid()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pydicer.generate.segmentation">Auto-segmentation</a><ul>
+<li><a class="reference internal" href="#pydicer.generate.segmentation.get_segmentation_log_path"><code class="docutils literal notranslate"><span class="pre">get_segmentation_log_path()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.segmentation.read_all_segmentation_logs"><code class="docutils literal notranslate"><span class="pre">read_all_segmentation_logs()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.segmentation.read_segmentation_log"><code class="docutils literal notranslate"><span class="pre">read_segmentation_log()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.segmentation.segment_dataset"><code class="docutils literal notranslate"><span class="pre">segment_dataset()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.segmentation.segment_image"><code class="docutils literal notranslate"><span class="pre">segment_image()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.segmentation.write_autoseg_log"><code class="docutils literal notranslate"><span class="pre">write_autoseg_log()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pydicer.generate.models">Models</a><ul>
+<li><a class="reference internal" href="#pydicer.generate.models.get_available_mhub_models"><code class="docutils literal notranslate"><span class="pre">get_available_mhub_models()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.models.load_output_nifti"><code class="docutils literal notranslate"><span class="pre">load_output_nifti()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.models.run_mhub_model"><code class="docutils literal notranslate"><span class="pre">run_mhub_model()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.generate.models.run_total_segmentator"><code class="docutils literal notranslate"><span class="pre">run_total_segmentator()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>

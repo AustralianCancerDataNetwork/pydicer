@@ -163,10 +163,15 @@
 <li class="toctree-l1"><a class="reference internal" href="_examples/Radiomics.html">Compute Radiomics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_examples/DoseMetrics.html">Dose Metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_examples/DatasetPreparation.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/AutoSegmentation.html">Auto-segmentation Inference &amp; Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/nnUNet.html">nnUNet Data Preparation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithData.html">Working with Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithStructures.html">Working with Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/ObjectGeneration.html">Generating Data Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/Configuration.html">Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -178,11 +183,13 @@
 <li class="toctree-l1"><a class="reference internal" href="tool.html">PyDicer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input.html">Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="convert.html">Conversion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualise.html">Visualisation</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Dataset Preparation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">Generation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nnunet.html">nnUNet</a></li>
 </ul>
 
@@ -344,6 +351,106 @@ to these, one of which should match to select that series.</p>
 </dd></dl>
 
 </section>
+<section id="module-pydicer.dataset.structureset">
+<span id="structure-sets"></span><h2>Structure Sets<a class="headerlink" href="#module-pydicer.dataset.structureset" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydicer.dataset.structureset.StructureSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicer.dataset.structureset.</span></span><span class="sig-name descname"><span class="pre">StructureSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_set_row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.dataset.structureset.StructureSet" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pydicer.dataset.structureset.StructureSet.get_mapped_structure_name">
+<span class="sig-name descname"><span class="pre">get_mapped_structure_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.dataset.structureset.StructureSet.get_mapped_structure_name" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the structure set specific name for a structure that may have been mapped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>item</strong> (<em>str</em>) – The standardised name to look up.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The structure set specific name if it could be mapped (returns the original name</dt><dd><p>otherwise).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.dataset.structureset.StructureSet.get_standardised_structure_name">
+<span class="sig-name descname"><span class="pre">get_standardised_structure_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.dataset.structureset.StructureSet.get_standardised_structure_name" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the standardised name for a structure that is present in this structure set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>item</strong> (<em>str</em>) – The name of the structure in this structure set.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The standardised name if it could be mapped (returns the original name</dt><dd><p>otherwise).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.dataset.structureset.StructureSet.get_unmapped_structures">
+<span class="sig-name descname"><span class="pre">get_unmapped_structures</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.dataset.structureset.StructureSet.get_unmapped_structures" title="Permalink to this definition">#</a></dt>
+<dd><p>Get a list of structures for which no structure was found based on the mapping. If no
+mapping is being used this will always be empty.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Names of structures that can’t be found using a mapping</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.dataset.structureset.StructureSet.items">
+<span class="sig-name descname"><span class="pre">items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">a</span> <span class="pre">set-like</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">items</span></span></span><a class="headerlink" href="#pydicer.dataset.structureset.StructureSet.items" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.dataset.structureset.StructureSet.keys">
+<span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">a</span> <span class="pre">set-like</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">keys</span></span></span><a class="headerlink" href="#pydicer.dataset.structureset.StructureSet.keys" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.dataset.structureset.StructureSet.values">
+<span class="sig-name descname"><span class="pre">values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">an</span> <span class="pre">object</span> <span class="pre">providing</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">on</span> <span class="pre">D's</span> <span class="pre">values</span></span></span><a class="headerlink" href="#pydicer.dataset.structureset.StructureSet.values" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.dataset.structureset.get_mapping_for_structure_set">
+<span class="sig-prename descclassname"><span class="pre">pydicer.dataset.structureset.</span></span><span class="sig-name descname"><span class="pre">get_mapping_for_structure_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_set_row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.dataset.structureset.get_mapping_for_structure_set" title="Permalink to this definition">#</a></dt>
+<dd><p>Searches the folder hierarchy to find a structure name mapping file with the given ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure_set_row</strong> (<em>pd.Series</em>) – The converted dataframe row entry for the structure set.</p></li>
+<li><p><strong>mapping_id</strong> (<em>str</em>) – The ID of the mapping to find.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The structure name mapping</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 
         </article>
@@ -413,6 +520,19 @@ to these, one of which should match to select that series.</p>
 <li><a class="reference internal" href="#module-pydicer.dataset.functions">Preparation Functions</a><ul>
 <li><a class="reference internal" href="#pydicer.dataset.functions.rt_latest_dose"><code class="docutils literal notranslate"><span class="pre">rt_latest_dose()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.dataset.functions.rt_latest_struct"><code class="docutils literal notranslate"><span class="pre">rt_latest_struct()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pydicer.dataset.structureset">Structure Sets</a><ul>
+<li><a class="reference internal" href="#pydicer.dataset.structureset.StructureSet"><code class="docutils literal notranslate"><span class="pre">StructureSet</span></code></a><ul>
+<li><a class="reference internal" href="#pydicer.dataset.structureset.StructureSet.get_mapped_structure_name"><code class="docutils literal notranslate"><span class="pre">StructureSet.get_mapped_structure_name()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.dataset.structureset.StructureSet.get_standardised_structure_name"><code class="docutils literal notranslate"><span class="pre">StructureSet.get_standardised_structure_name()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.dataset.structureset.StructureSet.get_unmapped_structures"><code class="docutils literal notranslate"><span class="pre">StructureSet.get_unmapped_structures()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.dataset.structureset.StructureSet.items"><code class="docutils literal notranslate"><span class="pre">StructureSet.items()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.dataset.structureset.StructureSet.keys"><code class="docutils literal notranslate"><span class="pre">StructureSet.keys()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.dataset.structureset.StructureSet.values"><code class="docutils literal notranslate"><span class="pre">StructureSet.values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pydicer.dataset.structureset.get_mapping_for_structure_set"><code class="docutils literal notranslate"><span class="pre">get_mapping_for_structure_set()</span></code></a></li>
 </ul>
 </li>
 </ul>

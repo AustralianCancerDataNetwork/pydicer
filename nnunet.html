@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Analyse" href="analyse.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Generation" href="generate.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>nnUNet - PyDicer 0.1.0 documentation</title>
@@ -163,10 +163,15 @@
 <li class="toctree-l1"><a class="reference internal" href="_examples/Radiomics.html">Compute Radiomics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_examples/DoseMetrics.html">Dose Metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_examples/DatasetPreparation.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/AutoSegmentation.html">Auto-segmentation Inference &amp; Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/nnUNet.html">nnUNet Data Preparation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithData.html">Working with Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithStructures.html">Working with Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/ObjectGeneration.html">Generating Data Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/Configuration.html">Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -178,11 +183,13 @@
 <li class="toctree-l1"><a class="reference internal" href="tool.html">PyDicer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input.html">Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="convert.html">Conversion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualise.html">Visualisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Dataset Preparation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">Generation</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">nnUNet</a></li>
 </ul>
 
@@ -312,7 +319,7 @@ environment containing nnUNet prior to training. Defaults to None.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydicer.dataset.nnunet.NNUNetDataset.prep_label_map_from_one_hot">
-<span class="sig-name descname"><span class="pre">prep_label_map_from_one_hot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">StructureSet</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Image</span></span></span><a class="headerlink" href="#pydicer.dataset.nnunet.NNUNetDataset.prep_label_map_from_one_hot" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">prep_label_map_from_one_hot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dataset.html#pydicer.dataset.structureset.StructureSet" title="pydicer.dataset.structureset.StructureSet"><span class="pre">StructureSet</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Image</span></span></span><a class="headerlink" href="#pydicer.dataset.nnunet.NNUNetDataset.prep_label_map_from_one_hot" title="Permalink to this definition">#</a></dt>
 <dd><p>Prepare a label map from a structure set. Since overlapping structures aren’t supported
 in a label map, voxels will be assigned to the larger structure if
 <cite>assign_overlap_to_largest</cite> is True or the smaller structure if <cite>assign_overlap_to_largest</cite>
@@ -321,7 +328,7 @@ is False.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>image</strong> (<em>sitk.Image</em>) – The image corresponding to the structure set.</p></li>
-<li><p><strong>structure_set</strong> (<em>StructureSet</em>) – The structure set from which to create the label map.</p></li>
+<li><p><strong>structure_set</strong> (<a class="reference internal" href="dataset.html#pydicer.dataset.structureset.StructureSet" title="pydicer.dataset.structureset.StructureSet"><em>StructureSet</em></a>) – The structure set from which to create the label map.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -414,14 +421,14 @@ to True.</p></li>
         
         <div class="related-pages">
           
-          <a class="prev-page" href="analyse.html">
+          <a class="prev-page" href="generate.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Analyse</div>
+                <div class="title">Generation</div>
                 
               </div>
             </a>

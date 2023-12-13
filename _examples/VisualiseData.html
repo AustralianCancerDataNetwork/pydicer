@@ -163,10 +163,15 @@
 <li class="toctree-l1"><a class="reference internal" href="Radiomics.html">Compute Radiomics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DoseMetrics.html">Dose Metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DatasetPreparation.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AutoSegmentation.html">Auto-segmentation Inference &amp; Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nnUNet.html">nnUNet Data Preparation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="WorkingWithData.html">Working with Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorkingWithStructures.html">Working with Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ObjectGeneration.html">Generating Data Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration.html">Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -178,11 +183,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../tool.html">PyDicer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../input.html">Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../preprocess.html">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../convert.html">Conversion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../visualise.html">Visualisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html">Dataset Preparation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generate.html">Generation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nnunet.html">nnUNet</a></li>
 </ul>
 
@@ -534,7 +541,19 @@ Working directory %s aready exists, won&#39;t download test data.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 14/14 [01:18&lt;00:00,  5.60s/objects, visualise]
+ 17%|█▋        | 5/30 [00:39&lt;03:04,  7.37s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+  warnings.warn(msg)
+ 67%|██████▋   | 20/30 [01:40&lt;00:24,  2.47s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+  warnings.warn(msg)
+ 70%|███████   | 21/30 [01:40&lt;00:16,  1.83s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+  warnings.warn(msg)
+ 73%|███████▎  | 22/30 [01:40&lt;00:10,  1.36s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+  warnings.warn(msg)
+ 77%|███████▋  | 23/30 [01:41&lt;00:07,  1.03s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+  warnings.warn(msg)
+ 97%|█████████▋| 29/30 [02:07&lt;00:04,  4.19s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+  warnings.warn(msg)
+100%|██████████| 30/30 [02:08&lt;00:00,  4.27s/objects, visualise]
 </pre></div></div>
 </div>
 <section id="Run-for-a-single-patient">
@@ -553,7 +572,9 @@ Working directory %s aready exists, won&#39;t download test data.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 3/3 [00:24&lt;00:00,  8.07s/objects, visualise]
+ 83%|████████▎ | 5/6 [00:39&lt;00:07,  7.40s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+  warnings.warn(msg)
+100%|██████████| 6/6 [00:40&lt;00:00,  6.69s/objects, visualise]
 </pre></div></div>
 </div>
 </section>
@@ -573,7 +594,7 @@ Working directory %s aready exists, won&#39;t download test data.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 14/14 [00:00&lt;00:00, 378.49objects/s, visualise]
+100%|██████████| 30/30 [00:00&lt;00:00, 390.57objects/s, visualise]
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">

@@ -163,10 +163,15 @@
 <li class="toctree-l1"><a class="reference internal" href="Radiomics.html">Compute Radiomics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DoseMetrics.html">Dose Metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DatasetPreparation.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AutoSegmentation.html">Auto-segmentation Inference &amp; Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nnUNet.html">nnUNet Data Preparation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="WorkingWithData.html">Working with Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorkingWithStructures.html">Working with Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ObjectGeneration.html">Generating Data Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration.html">Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -178,11 +183,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../tool.html">PyDicer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../input.html">Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../preprocess.html">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../convert.html">Conversion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../visualise.html">Visualisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html">Dataset Preparation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generate.html">Generation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nnunet.html">nnUNet</a></li>
 </ul>
 
@@ -555,11 +562,11 @@ alongside converted dose data)</p>
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 1309/1309 [00:04&lt;00:00, 326.58files/s, preprocess]
-100%|██████████| 4/4 [00:50&lt;00:00, 12.68s/objects, convert]
-100%|██████████| 3/3 [00:15&lt;00:00,  5.23s/objects, visualise]
+100%|██████████| 1309/1309 [00:03&lt;00:00, 405.23files/s, preprocess]
+100%|██████████| 4/4 [00:50&lt;00:00, 12.69s/objects, convert]
+100%|██████████| 3/3 [00:15&lt;00:00,  5.18s/objects, visualise]
 100%|██████████| 1/1 [00:18&lt;00:00, 18.17s/objects, Compute Radiomics]
-100%|██████████| 1/1 [00:09&lt;00:00,  9.73s/objects, Compute DVH]
+100%|██████████| 1/1 [00:10&lt;00:00, 10.01s/objects, Compute DVH]
 </pre></div></div>
 </div>
 </section>
@@ -637,7 +644,7 @@ alongside converted dose data)</p>
   </thead>
   <tbody>
     <tr>
-      <th>13</th>
+      <th>21</th>
       <td>+1</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -661,7 +668,7 @@ alongside converted dose data)</p>
       <td>302955.835075</td>
     </tr>
     <tr>
-      <th>3</th>
+      <th>26</th>
       <td>-.3</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -685,7 +692,7 @@ alongside converted dose data)</p>
       <td>148482.826970</td>
     </tr>
     <tr>
-      <th>7</th>
+      <th>5</th>
       <td>Brain</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -709,7 +716,7 @@ alongside converted dose data)</p>
       <td>1283.403884</td>
     </tr>
     <tr>
-      <th>12</th>
+      <th>22</th>
       <td>Brainstem</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -733,7 +740,7 @@ alongside converted dose data)</p>
       <td>190.937232</td>
     </tr>
     <tr>
-      <th>25</th>
+      <th>10</th>
       <td>CTV63</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -757,7 +764,7 @@ alongside converted dose data)</p>
       <td>78938.289561</td>
     </tr>
     <tr>
-      <th>9</th>
+      <th>16</th>
       <td>CTV63_Sep</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -781,7 +788,7 @@ alongside converted dose data)</p>
       <td>165046.562407</td>
     </tr>
     <tr>
-      <th>14</th>
+      <th>25</th>
       <td>CTV70</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -805,7 +812,7 @@ alongside converted dose data)</p>
       <td>39966.337967</td>
     </tr>
     <tr>
-      <th>1</th>
+      <th>27</th>
       <td>Cord</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -829,7 +836,7 @@ alongside converted dose data)</p>
       <td>2656.829157</td>
     </tr>
     <tr>
-      <th>28</th>
+      <th>17</th>
       <td>Cord_EXPANDED</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -853,7 +860,7 @@ alongside converted dose data)</p>
       <td>97873.824272</td>
     </tr>
     <tr>
-      <th>22</th>
+      <th>13</th>
       <td>External</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -877,7 +884,7 @@ alongside converted dose data)</p>
       <td>137265.474901</td>
     </tr>
     <tr>
-      <th>23</th>
+      <th>18</th>
       <td>GTV1</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -901,7 +908,7 @@ alongside converted dose data)</p>
       <td>5560.934010</td>
     </tr>
     <tr>
-      <th>5</th>
+      <th>20</th>
       <td>LT_Parotid</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -925,7 +932,7 @@ alongside converted dose data)</p>
       <td>1667.158645</td>
     </tr>
     <tr>
-      <th>26</th>
+      <th>7</th>
       <td>Lt_Deep_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -949,7 +956,7 @@ alongside converted dose data)</p>
       <td>1949.874234</td>
     </tr>
     <tr>
-      <th>6</th>
+      <th>8</th>
       <td>Lt_Sup_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -973,7 +980,7 @@ alongside converted dose data)</p>
       <td>1220.955994</td>
     </tr>
     <tr>
-      <th>16</th>
+      <th>19</th>
       <td>Mandible</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -997,7 +1004,7 @@ alongside converted dose data)</p>
       <td>213150.151566</td>
     </tr>
     <tr>
-      <th>18</th>
+      <th>1</th>
       <td>Optic_Nerve</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1021,7 +1028,7 @@ alongside converted dose data)</p>
       <td>11370.238228</td>
     </tr>
     <tr>
-      <th>29</th>
+      <th>6</th>
       <td>Oral_Avoid</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1045,7 +1052,7 @@ alongside converted dose data)</p>
       <td>294221.363063</td>
     </tr>
     <tr>
-      <th>15</th>
+      <th>2</th>
       <td>PTV57</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1069,7 +1076,7 @@ alongside converted dose data)</p>
       <td>41822.111014</td>
     </tr>
     <tr>
-      <th>2</th>
+      <th>28</th>
       <td>PTV63</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1093,7 +1100,7 @@ alongside converted dose data)</p>
       <td>146160.163747</td>
     </tr>
     <tr>
-      <th>19</th>
+      <th>9</th>
       <td>PTV70</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1117,7 +1124,7 @@ alongside converted dose data)</p>
       <td>87418.493331</td>
     </tr>
     <tr>
-      <th>21</th>
+      <th>14</th>
       <td>Post_Neck</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1141,7 +1148,7 @@ alongside converted dose data)</p>
       <td>51927.617163</td>
     </tr>
     <tr>
-      <th>30</th>
+      <th>11</th>
       <td>RT_Parotid</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1165,7 +1172,7 @@ alongside converted dose data)</p>
       <td>3975.769687</td>
     </tr>
     <tr>
-      <th>0</th>
+      <th>30</th>
       <td>Ring</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1189,7 +1196,7 @@ alongside converted dose data)</p>
       <td>302955.835075</td>
     </tr>
     <tr>
-      <th>11</th>
+      <th>15</th>
       <td>Rt_Deep_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1213,7 +1220,7 @@ alongside converted dose data)</p>
       <td>8531.391337</td>
     </tr>
     <tr>
-      <th>27</th>
+      <th>3</th>
       <td>Rt_Sup_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1237,7 +1244,7 @@ alongside converted dose data)</p>
       <td>2927.633827</td>
     </tr>
     <tr>
-      <th>10</th>
+      <th>0</th>
       <td>chiasm</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1261,7 +1268,7 @@ alongside converted dose data)</p>
       <td>5285.781869</td>
     </tr>
     <tr>
-      <th>24</th>
+      <th>4</th>
       <td>cold</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1285,7 +1292,7 @@ alongside converted dose data)</p>
       <td>12220.107157</td>
     </tr>
     <tr>
-      <th>8</th>
+      <th>24</th>
       <td>cool_off</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1309,7 +1316,7 @@ alongside converted dose data)</p>
       <td>2713.685499</td>
     </tr>
     <tr>
-      <th>4</th>
+      <th>29</th>
       <td>ctv_57</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1333,7 +1340,7 @@ alongside converted dose data)</p>
       <td>29437.802764</td>
     </tr>
     <tr>
-      <th>20</th>
+      <th>12</th>
       <td>hotspot</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1357,7 +1364,7 @@ alongside converted dose data)</p>
       <td>295022.446264</td>
     </tr>
     <tr>
-      <th>17</th>
+      <th>23</th>
       <td>larynx_avoidance</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>

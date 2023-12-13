@@ -11,6 +11,8 @@
     _examples/Radiomics
     _examples/DoseMetrics
     _examples/DatasetPreparation
+    _examples/AutoSegmentation
+    _examples/nnUNet
 
 .. toctree::
     :caption: Guides
@@ -18,6 +20,9 @@
     :hidden:
 
     _examples/WorkingWithData
+    _examples/WorkingWithStructures
+    _examples/ObjectGeneration
+    _examples/Configuration
 
 .. toctree::
     :caption: Developers
@@ -35,9 +40,11 @@
    tool
    input
    config
+   utils
    preprocess
    convert
    visualise
    dataset
    analyse
+   generate
    nnunet

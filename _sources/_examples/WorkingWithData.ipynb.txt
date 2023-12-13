@@ -27,11 +27,12 @@
     "\n",
     "from pathlib import Path\n",
     "\n",
-    "import SimpleITK as sitk\n",
-    "\n",
-    "from pydicer.utils import fetch_converted_test_data\n",
-    "\n",
-    "from pydicer.utils import load_object_metadata, determine_dcm_datetime"
+    "from pydicer.utils import (\n",
+    "    fetch_converted_test_data,\n",
+    "    load_object_metadata,\n",
+    "    determine_dcm_datetime,\n",
+    "    read_simple_itk_image\n",
+    ")"
    ]
   },
   {
@@ -95,8 +96,7 @@
     "\n",
     "    print(f\"Loading image with hashed UID: {ct_row.hashed_uid}...\", end=\"\")\n",
     "\n",
-    "    img_path = Path(ct_row.path).joinpath(\"CT.nii.gz\")\n",
-    "    img = sitk.ReadImage(str(img_path))\n",
+    "    img = read_simple_itk_image(ct_row)\n",
     "\n",
     "    print(\" Complete\")"
    ]

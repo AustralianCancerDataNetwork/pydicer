@@ -1,0 +1,906 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Generating Data Objects" href="ObjectGeneration.html" /><link rel="prev" title="Working with Data" href="WorkingWithData.html" />
+
+    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+        <title>Working with Structures - PyDicer 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="GettingStarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConvertingData.html">Converting Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="VisualiseData.html">Visualise Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Radiomics.html">Compute Radiomics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DoseMetrics.html">Dose Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DatasetPreparation.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AutoSegmentation.html">Auto-segmentation Inference &amp; Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nnUNet.html">nnUNet Data Preparation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="WorkingWithData.html">Working with Data</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Working with Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ObjectGeneration.html">Generating Data Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration.html">Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_of_conduct.html">Code of Conduct</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tool.html">PyDicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input.html">Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../preprocess.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../convert.html">Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualise.html">Visualisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generate.html">Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nnunet.html">nnUNet</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars and line breaks on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+    white-space: pre;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Working-with-Structures">
+<h1>Working with Structures<a class="headerlink" href="#Working-with-Structures" title="Permalink to this heading">#</a></h1>
+<p>In PyDicer, structure sets which have been converted from the DICOM <code class="docutils literal notranslate"><span class="pre">RTSTRUCT</span></code> modality are stored within the directory structure. One common issue when working with real world datasets is that structure names are often inconsistent requiring standardisation of names prior to analysing data.</p>
+<p>In PyDicer, structure name standardisation is achieved by defining structure mapping dictionaries which can be stored globally (applied to all structure sets) or locally (specific mapping per structure set or per patient).</p>
+<p>In this guide we present some examples on how to define such structure name mappings and will introduce the <code class="docutils literal notranslate"><span class="pre">StructureSet</span></code> class which simplifies loading and working with structure objects.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pydicer</span> <span class="kn">import</span> <span class="n">PyDicer</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>pydicer
+    <span class="kn">from</span> <span class="nn">pydicer</span> <span class="kn">import</span> <span class="n">PyDicer</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">SimpleITK</span> <span class="k">as</span> <span class="nn">sitk</span>
+
+<span class="kn">from</span> <span class="nn">pydicer.utils</span> <span class="kn">import</span> <span class="n">fetch_converted_test_data</span><span class="p">,</span> <span class="n">add_structure_name_mapping</span>
+<span class="kn">from</span> <span class="nn">pydicer.dataset.structureset</span> <span class="kn">import</span> <span class="n">StructureSet</span>
+</pre></div>
+</div>
+</div>
+<section id="Setup-PyDicer">
+<h2>Setup PyDicer<a class="headerlink" href="#Setup-PyDicer" title="Permalink to this heading">#</a></h2>
+<p>Here we load the LCTSC data which has already been converted. This is downloaded into the <code class="docutils literal notranslate"><span class="pre">testdata_lctsc</span></code> directory. We also initialise a <code class="docutils literal notranslate"><span class="pre">PyDicer</span></code> object.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">working_directory</span> <span class="o">=</span> <span class="n">fetch_converted_test_data</span><span class="p">(</span><span class="s2">&quot;./testdata_lctsc&quot;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;LCTSC&quot;</span><span class="p">)</span>
+
+<span class="n">pydicer</span> <span class="o">=</span> <span class="n">PyDicer</span><span class="p">(</span><span class="n">working_directory</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Working directory %s aready exists, won&#39;t download test data.
+</pre></div></div>
+</div>
+</section>
+<section id="Load-Structures-with-StructureSet">
+<h2>Load Structures with <code class="docutils literal notranslate"><span class="pre">StructureSet</span></code><a class="headerlink" href="#Load-Structures-with-StructureSet" title="Permalink to this heading">#</a></h2>
+<p>With the <code class="docutils literal notranslate"><span class="pre">StructureSet</span></code>, we can load structures in a structure set, with the structure name being the key and the <code class="docutils literal notranslate"><span class="pre">SimpleITK</span></code> Image of the mask as the value.</p>
+<p>In the following cell, we create a <code class="docutils literal notranslate"><span class="pre">StructureSet</span></code> object, determine the names of the structures in that structure set, and iterate over each structure, printing the sum of all voxel values in the mask (for demonstration purposes).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the converted data</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pydicer</span><span class="o">.</span><span class="n">read_converted_data</span><span class="p">()</span>
+<span class="n">df_structs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">modality</span><span class="o">==</span><span class="s2">&quot;RTSTRUCT&quot;</span><span class="p">]</span>
+
+<span class="c1"># Create a StructureSet for the first row</span>
+<span class="n">struct_row</span> <span class="o">=</span> <span class="n">df_structs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">structure_set</span> <span class="o">=</span> <span class="n">StructureSet</span><span class="p">(</span><span class="n">struct_row</span><span class="p">)</span>
+
+<span class="n">structure_names</span> <span class="o">=</span> <span class="n">structure_set</span><span class="o">.</span><span class="n">structure_names</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Structure names: </span><span class="si">{</span><span class="n">structure_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">structure</span> <span class="ow">in</span> <span class="n">structure_names</span><span class="p">:</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">GetArrayFromImage</span><span class="p">(</span><span class="n">structure_set</span><span class="p">[</span><span class="n">structure</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mask voxel sum for </span><span class="si">{</span><span class="n">structure</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+Mask voxel sum for Lung_R: 68074
+Mask voxel sum for SpinalCord: 4157
+Mask voxel sum for Heart: 23857
+Mask voxel sum for Lung_L: 52528
+Mask voxel sum for Esophagus: 1151
+</pre></div></div>
+</div>
+<p>In the next cell, we iterate over all our structure sets, and print out the names of the structures available. Notice that for some structure sets, structures aren’t named consistently. In the next section we will resolve this with a structure name mapping.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pydicer</span><span class="o">.</span><span class="n">read_converted_data</span><span class="p">()</span>
+<span class="n">df_structs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">modality</span><span class="o">==</span><span class="s2">&quot;RTSTRUCT&quot;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">struct_row</span> <span class="ow">in</span> <span class="n">df_structs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">structure_set</span> <span class="o">=</span> <span class="n">StructureSet</span><span class="p">(</span><span class="n">struct_row</span><span class="p">)</span>
+
+    <span class="n">structure_names</span> <span class="o">=</span> <span class="n">structure_set</span><span class="o">.</span><span class="n">structure_names</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patient: </span><span class="si">{</span><span class="n">struct_row</span><span class="o">.</span><span class="n">patient_id</span><span class="si">}</span><span class="s2">, Structure names: </span><span class="si">{</span><span class="n">structure_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Patient: LCTSC-Train-S1-007, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Patient: LCTSC-Train-S1-008, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Patient: LCTSC-Train-S1-002, Structure names: [&#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_Left&#39;, &#39;Esophagus&#39;, &#39;Lung_Right&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Patient: LCTSC-Train-S1-004, Structure names: [&#39;Lung_R&#39;, &#39;SC&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Patient: LCTSC-Train-S1-001, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Patient: LCTSC-Test-S1-101, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Patient: LCTSC-Train-S1-006, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Patient: LCTSC-Train-S1-005, Structure names: [&#39;L_Lung&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Patient: LCTSC-Test-S1-102, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id default
+Patient: LCTSC-Train-S1-003, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+</pre></div></div>
+</div>
+</section>
+<section id="Add-Structure-Name-Mapping">
+<h2>Add Structure Name Mapping<a class="headerlink" href="#Add-Structure-Name-Mapping" title="Permalink to this heading">#</a></h2>
+<p>Structure name mappings are defined as Python dictionaries, with the standardised structure name as the key, and the value a list of name variations which should map to the standardised name.</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">add_structure_name_mapping</span></code> to add a mapping. A <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code> may be supplied to refer to different mappings. If no <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code> is supplied, a default mapping id is used.</p>
+<p>If a <code class="docutils literal notranslate"><span class="pre">structure_set_row</span></code> or <code class="docutils literal notranslate"><span class="pre">patient_id</span></code> is supplied, then the mapping will be stored at the corresponding level. If neither is supplied, the mapping will be stored globally for all structure sets in the datasets.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Esophagus&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;Heart&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;Lung_L&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Lung_Left&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Lung_R&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Lung_Right&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;SpinalCord&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;SC&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pydicer</span><span class="o">.</span><span class="n">add_structure_name_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
+</pre></div></div>
+</div>
+<p>The default mapping has been saved. You can find the saved mapping in the <code class="docutils literal notranslate"><span class="pre">testdata_lctsc/.pydicer/.structure_set_mappings</span></code> directory.</p>
+<p>Now we can check our <code class="docutils literal notranslate"><span class="pre">StructureSet</span></code> to confirm the names are mapped properly.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">struct_row</span> <span class="ow">in</span> <span class="n">df_structs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">structure_set</span> <span class="o">=</span> <span class="n">StructureSet</span><span class="p">(</span><span class="n">struct_row</span><span class="p">)</span>
+
+    <span class="n">structure_names</span> <span class="o">=</span> <span class="n">structure_set</span><span class="o">.</span><span class="n">structure_names</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patient: </span><span class="si">{</span><span class="n">struct_row</span><span class="o">.</span><span class="n">patient_id</span><span class="si">}</span><span class="s2">, Structure names: </span><span class="si">{</span><span class="n">structure_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-007, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-008, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-002, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-004, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-001, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Test-S1-101, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-006, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-005, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Test-S1-102, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-003, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+</pre></div></div>
+</div>
+</section>
+<section id="Subsets-of-Structures">
+<h2>Subsets of Structures<a class="headerlink" href="#Subsets-of-Structures" title="Permalink to this heading">#</a></h2>
+<p>Structure name mappings are also useful if you only want to work with a subset of structures available. Simply leave them out of the mapping entirely, and they won’t be loaded as part of the <code class="docutils literal notranslate"><span class="pre">StructureSet</span></code>.</p>
+<p>In this example, we use a <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code> of <code class="docutils literal notranslate"><span class="pre">struct_subset</span></code> to keep this mapping separate from the mapping defined above.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mapping_id</span> <span class="o">=</span> <span class="s2">&quot;struct_subset&quot;</span>
+<span class="n">sub_mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Lung_L&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Lung_Left&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Lung_R&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Lung_Right&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">pydicer</span><span class="o">.</span><span class="n">add_structure_name_mapping</span><span class="p">(</span><span class="n">sub_mapping</span><span class="p">,</span> <span class="n">mapping_id</span><span class="o">=</span><span class="n">mapping_id</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">struct_row</span> <span class="ow">in</span> <span class="n">df_structs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">structure_set</span> <span class="o">=</span> <span class="n">StructureSet</span><span class="p">(</span><span class="n">struct_row</span><span class="p">,</span> <span class="n">mapping_id</span><span class="o">=</span><span class="n">mapping_id</span><span class="p">)</span> <span class="c1"># Provide the mapping_id!</span>
+
+    <span class="n">structure_names</span> <span class="o">=</span> <span class="n">structure_set</span><span class="o">.</span><span class="n">structure_names</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patient: </span><span class="si">{</span><span class="n">struct_row</span><span class="o">.</span><span class="n">patient_id</span><span class="si">}</span><span class="s2">, Structure names: </span><span class="si">{</span><span class="n">structure_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-007, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-008, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-002, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-004, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-001, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Test-S1-101, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-006, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-005, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Test-S1-102, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-003, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+</pre></div></div>
+</div>
+</section>
+<section id="Local-Structure-Name-Mappings">
+<h2>Local Structure Name Mappings<a class="headerlink" href="#Local-Structure-Name-Mappings" title="Permalink to this heading">#</a></h2>
+<p>Next, we only specify a mapping for one specific structure set. We will use <code class="docutils literal notranslate"><span class="pre">local_mapping</span></code> as the <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code>. In the output you will see that only one structure set has had the mapping applied.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mapping_id</span> <span class="o">=</span> <span class="s2">&quot;local_mapping&quot;</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Esophagus&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;Heart&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;Lung_L&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Lung_Left&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Lung_R&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Lung_Right&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;SpinalCord&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;SC&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">struct_row</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">patient_id</span><span class="o">==</span><span class="s2">&quot;LCTSC-Train-S1-002&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">modality</span><span class="o">==</span><span class="s2">&quot;RTSTRUCT&quot;</span><span class="p">)]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Only adding mapping for one structure set</span>
+<span class="n">pydicer</span><span class="o">.</span><span class="n">add_structure_name_mapping</span><span class="p">(</span>
+    <span class="n">mapping</span><span class="p">,</span>
+    <span class="n">mapping_id</span><span class="o">=</span><span class="n">mapping_id</span><span class="p">,</span>
+    <span class="n">structure_set_row</span><span class="o">=</span><span class="n">struct_row</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">struct_row</span> <span class="ow">in</span> <span class="n">df_structs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">structure_set</span> <span class="o">=</span> <span class="n">StructureSet</span><span class="p">(</span><span class="n">struct_row</span><span class="p">,</span> <span class="n">mapping_id</span><span class="o">=</span><span class="n">mapping_id</span><span class="p">)</span> <span class="c1"># Provide the mapping_id!</span>
+
+    <span class="n">structure_names</span> <span class="o">=</span> <span class="n">structure_set</span><span class="o">.</span><span class="n">structure_names</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patient: </span><span class="si">{</span><span class="n">struct_row</span><span class="o">.</span><span class="n">patient_id</span><span class="si">}</span><span class="s2">, Structure names: </span><span class="si">{</span><span class="n">structure_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+pydicer.utils - INFO - Adding mapping local_mapping for structure set f036b8
+pydicer.utils - INFO - Adding mapping for stucture_set in testdata_lctsc/data/LCTSC-Train-S1-002/structures/f036b8
+pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
+Patient: LCTSC-Train-S1-007, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
+Patient: LCTSC-Train-S1-008, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/data/LCTSC-Train-S1-002/structures/f036b8/.structure_set_mappings/local_mapping.json
+Patient: LCTSC-Train-S1-002, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
+Patient: LCTSC-Train-S1-004, Structure names: [&#39;Lung_R&#39;, &#39;SC&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
+Patient: LCTSC-Train-S1-001, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
+Patient: LCTSC-Test-S1-101, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
+Patient: LCTSC-Train-S1-006, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
+Patient: LCTSC-Train-S1-005, Structure names: [&#39;L_Lung&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
+Patient: LCTSC-Test-S1-102, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
+Patient: LCTSC-Train-S1-003, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+</pre></div></div>
+</div>
+<p>Notice that mapping has only been applied to the structure set for patient <code class="docutils literal notranslate"><span class="pre">LCTSC-Train-S1-002</span></code></p>
+</section>
+<section id="Using-Mappings-in-PyDicer">
+<h2>Using Mappings in PyDicer<a class="headerlink" href="#Using-Mappings-in-PyDicer" title="Permalink to this heading">#</a></h2>
+<p>Once mappings are defined, these can be used when you: - Compute Dose Metrics - Fetch Radiomics Features - Analyse Auto-segmentations - Prepare data for nnUNet training</p>
+<p>Check out the documentation for those modules to see where you can supply your <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code> to have the structure set standardisation applied. If you have used the default <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code>, the standardisation will be applied automatically.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ObjectGeneration.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Generating Data Objects</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="WorkingWithData.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Working with Data</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Ingham Medical Physics
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Working with Structures</a><ul>
+<li><a class="reference internal" href="#Setup-PyDicer">Setup PyDicer</a></li>
+<li><a class="reference internal" href="#Load-Structures-with-StructureSet">Load Structures with <code class="docutils literal notranslate"><span class="pre">StructureSet</span></code></a></li>
+<li><a class="reference internal" href="#Add-Structure-Name-Mapping">Add Structure Name Mapping</a></li>
+<li><a class="reference internal" href="#Subsets-of-Structures">Subsets of Structures</a></li>
+<li><a class="reference internal" href="#Local-Structure-Name-Mappings">Local Structure Name Mappings</a></li>
+<li><a class="reference internal" href="#Using-Mappings-in-PyDicer">Using Mappings in PyDicer</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

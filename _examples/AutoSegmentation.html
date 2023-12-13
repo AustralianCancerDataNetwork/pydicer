@@ -1,0 +1,1640 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="nnUNet Data Preparation" href="nnUNet.html" /><link rel="prev" title="Dataset Preparation" href="DatasetPreparation.html" />
+
+    <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+        <title>Auto-segmentation Inference &amp; Analysis - PyDicer 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="GettingStarted.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConvertingData.html">Converting Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="VisualiseData.html">Visualise Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Radiomics.html">Compute Radiomics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DoseMetrics.html">Dose Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DatasetPreparation.html">Dataset Preparation</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Auto-segmentation Inference &amp; Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nnUNet.html">nnUNet Data Preparation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="WorkingWithData.html">Working with Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorkingWithStructures.html">Working with Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ObjectGeneration.html">Generating Data Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration.html">Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_of_conduct.html">Code of Conduct</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tool.html">PyDicer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input.html">Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../preprocess.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../convert.html">Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualise.html">Visualisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generate.html">Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nnunet.html">nnUNet</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars and line breaks on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+    white-space: pre;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Auto-segmentation-Inference-&amp;-Analysis">
+<h1>Auto-segmentation Inference &amp; Analysis<a class="headerlink" href="#Auto-segmentation-Inference-&-Analysis" title="Permalink to this heading">#</a></h1>
+<p>A common task when working the medical imaging data, it to run an auto-segmentation model (inference) on the images in your dataset. If you have manual definitions of the same structures available in your dataset, you will typically want to compare the auto and the manual segmentations, computing metrics and produce plots and visualisation.</p>
+<p>This example notebook will guide you through the process of performing model inference and analysis of those structures. We will use a single atlas-based segmentation model for demonstration purposes.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pydicer</span> <span class="kn">import</span> <span class="n">PyDicer</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>pydicer
+    <span class="kn">from</span> <span class="nn">pydicer</span> <span class="kn">import</span> <span class="n">PyDicer</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">SimpleITK</span> <span class="k">as</span> <span class="nn">sitk</span>
+
+<span class="kn">from</span> <span class="nn">platipy.imaging.registration.utils</span> <span class="kn">import</span> <span class="n">apply_transform</span>
+<span class="kn">from</span> <span class="nn">platipy.imaging.registration.linear</span> <span class="kn">import</span> <span class="n">linear_registration</span>
+<span class="kn">from</span> <span class="nn">platipy.imaging.registration.deformable</span> <span class="kn">import</span> <span class="n">fast_symmetric_forces_demons_registration</span>
+
+<span class="kn">from</span> <span class="nn">pydicer.utils</span> <span class="kn">import</span> <span class="n">fetch_converted_test_data</span>
+
+<span class="kn">from</span> <span class="nn">pydicer.generate.segmentation</span> <span class="kn">import</span> <span class="n">segment_image</span><span class="p">,</span> <span class="n">read_all_segmentation_logs</span>
+
+<span class="kn">from</span> <span class="nn">pydicer.analyse.compare</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">compute_contour_similarity_metrics</span><span class="p">,</span>
+    <span class="n">get_all_similarity_metrics_for_dataset</span><span class="p">,</span>
+    <span class="n">prepare_similarity_metric_analysis</span>
+<span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<section id="Setup-PyDicer">
+<h2>Setup PyDicer<a class="headerlink" href="#Setup-PyDicer" title="Permalink to this heading">#</a></h2>
+<p>For this example, we will use the LCTSC test data which has already been converted using PyDicer. We also initialise our PyDicer object.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">working_directory</span> <span class="o">=</span> <span class="n">fetch_converted_test_data</span><span class="p">(</span><span class="s2">&quot;./lctsc_autoseg&quot;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;LCTSC&quot;</span><span class="p">)</span>
+<span class="n">pydicer</span> <span class="o">=</span> <span class="n">PyDicer</span><span class="p">(</span><span class="n">working_directory</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Prepare-Atlas">
+<h2>Prepare Atlas<a class="headerlink" href="#Prepare-Atlas" title="Permalink to this heading">#</a></h2>
+<p>Since we will use a single atlas-based segmentation model, we must split our data, selecting one case as our <code class="docutils literal notranslate"><span class="pre">atlas</span></code> and the remaining cases as the <code class="docutils literal notranslate"><span class="pre">validation</span></code> set. We use the PyDicer <code class="docutils literal notranslate"><span class="pre">dataset</span> <span class="pre">preparation</span></code> module to split our dataset.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pydicer</span><span class="o">.</span><span class="n">read_converted_data</span><span class="p">()</span>
+
+<span class="c1"># Specify the patient ID to use as the atlas case</span>
+<span class="n">atlas_dataset</span> <span class="o">=</span> <span class="s2">&quot;atlas&quot;</span>
+<span class="n">atlas_case</span>  <span class="o">=</span> <span class="s2">&quot;LCTSC-Train-S1-001&quot;</span>
+<span class="n">df_atlas</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">patient_id</span><span class="o">==</span><span class="n">atlas_case</span><span class="p">]</span>
+
+<span class="c1"># And the remaining cases will make up our validation set</span>
+<span class="n">validation_dataset</span> <span class="o">=</span> <span class="s2">&quot;validation&quot;</span>
+<span class="n">df_validation</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">patient_id</span><span class="o">!=</span><span class="n">atlas_case</span><span class="p">]</span>
+
+<span class="c1"># Use the dataset preparation module to prepare these two data subsets</span>
+<span class="n">pydicer</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">prepare_from_dataframe</span><span class="p">(</span><span class="n">atlas_dataset</span><span class="p">,</span> <span class="n">df_atlas</span><span class="p">)</span>
+<span class="n">pydicer</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">prepare_from_dataframe</span><span class="p">(</span><span class="n">validation_dataset</span><span class="p">,</span> <span class="n">df_validation</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Define-Segmentation-Function">
+<h2>Define Segmentation Function<a class="headerlink" href="#Define-Segmentation-Function" title="Permalink to this heading">#</a></h2>
+<p>Now that our <code class="docutils literal notranslate"><span class="pre">atlas</span></code> and <code class="docutils literal notranslate"><span class="pre">validation</span></code> sets are ready, we will define our function which will run our simple single atlas-based auto-segmentation model for us. This example uses the <a class="reference external" href="https://pyplati.github.io/platipy/_examples/atlas_segmentation.html#">atlas-based segmentation tools available in PlatiPy</a>.</p>
+<p>In a real-world scenario, you will have your own segmentation model you wish to apply. You should integrate this model into such a function which accepts an image and returns a dictionary of structures.</p>
+<p>To get started, we recommend you try running the <code class="docutils literal notranslate"><span class="pre">`TotalSegmentator</span></code> &lt;<a class="reference external" href="https://github.com/wasserth/TotalSegmentator">https://github.com/wasserth/TotalSegmentator</a>&gt;`__ model on your CT data. PyDicer already has a function ready which runs this model, check out <code class="docutils literal notranslate"><span class="pre">run_total_segmentator</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">single_atlas_segmentation</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Segment an image using a single atlas case</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img (SimpleITK.Image): The SimpleITK image to segment.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: The segmented structure dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Load the atlas case image</span>
+    <span class="n">atlas_img_row</span> <span class="o">=</span> <span class="n">df_atlas</span><span class="p">[</span><span class="n">df_atlas</span><span class="o">.</span><span class="n">modality</span><span class="o">==</span><span class="s2">&quot;CT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">atlas_img</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">ReadImage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">atlas_img_row</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;CT.nii.gz&quot;</span><span class="p">)))</span>
+
+    <span class="c1"># Load the atlas case structures</span>
+    <span class="n">atlas_structures</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">atlas_struct_row</span> <span class="o">=</span> <span class="n">df_atlas</span><span class="p">[</span><span class="n">df_atlas</span><span class="o">.</span><span class="n">modality</span><span class="o">==</span><span class="s2">&quot;RTSTRUCT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">struct_path</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="n">atlas_struct_row</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.nii.gz&quot;</span><span class="p">):</span>
+        <span class="n">struct_name</span> <span class="o">=</span> <span class="n">struct_path</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.nii.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">atlas_structures</span><span class="p">[</span><span class="n">struct_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">ReadImage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">struct_path</span><span class="p">))</span>
+
+    <span class="c1"># Use a simple linear (rigid) registration to align the input image with the atlas image</span>
+    <span class="n">img_ct_atlas_reg_linear</span><span class="p">,</span> <span class="n">tfm_linear</span> <span class="o">=</span> <span class="n">linear_registration</span><span class="p">(</span>
+        <span class="n">fixed_image</span> <span class="o">=</span> <span class="n">img</span><span class="p">,</span>
+        <span class="n">moving_image</span> <span class="o">=</span> <span class="n">atlas_img</span><span class="p">,</span>
+        <span class="n">reg_method</span><span class="o">=</span><span class="s1">&#39;similarity&#39;</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;mean_squares&#39;</span><span class="p">,</span>
+        <span class="n">optimiser</span><span class="o">=</span><span class="s1">&#39;gradient_descent&#39;</span><span class="p">,</span>
+        <span class="n">shrink_factors</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="n">smooth_sigmas</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="n">sampling_rate</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">number_of_iterations</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Perform a fast deformable registration</span>
+    <span class="n">img_ct_atlas_reg_dir</span><span class="p">,</span> <span class="n">tfm_dir</span><span class="p">,</span> <span class="n">dvf</span> <span class="o">=</span> <span class="n">fast_symmetric_forces_demons_registration</span><span class="p">(</span>
+        <span class="n">img</span><span class="p">,</span>
+        <span class="n">img_ct_atlas_reg_linear</span><span class="p">,</span>
+        <span class="n">ncores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">isotropic_resample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">resolution_staging</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+        <span class="n">iteration_staging</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Combine the two transforms</span>
+    <span class="n">tfm_combined</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">CompositeTransform</span><span class="p">((</span><span class="n">tfm_linear</span><span class="p">,</span> <span class="n">tfm_dir</span><span class="p">))</span>
+
+    <span class="c1"># Apply the transform to the atlas structures</span>
+    <span class="n">auto_segmentations</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">atlas_structures</span><span class="p">:</span>
+        <span class="n">auto_segmentations</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_transform</span><span class="p">(</span>
+            <span class="n">atlas_structures</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+            <span class="n">reference_image</span><span class="o">=</span><span class="n">img</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">tfm_combined</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">auto_segmentations</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Run-Auto-segmentation">
+<h2>Run Auto-segmentation<a class="headerlink" href="#Run-Auto-segmentation" title="Permalink to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">segment_dataset</span></code> function will run over all images in our dataset and will pass the images to a function we define for segmentation. We pass in the name of our <code class="docutils literal notranslate"><span class="pre">validation_dataset</span></code> so that only the images in this dataset will be segmented.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">segment_id</span> <span class="o">=</span> <span class="s2">&quot;atlas&quot;</span> <span class="c1"># Used to generate the ID of the resulting auto-segmented structure sets</span>
+
+<span class="n">pydicer</span><span class="o">.</span><span class="n">segment_dataset</span><span class="p">(</span><span class="n">segment_id</span><span class="p">,</span> <span class="n">single_atlas_segmentation</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="n">validation_dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.73s/it]
+</pre></div></div>
+</div>
+<p>We can use PyDicer’s <code class="docutils literal notranslate"><span class="pre">visualisation</span></code> module to produce snapshots of the auto-segmentations produced.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pydicer</span><span class="o">.</span><span class="n">visualise</span><span class="o">.</span><span class="n">visualise</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 29/29 [00:09&lt;00:00,  3.14objects/s, visualise]
+</pre></div></div>
+</div>
+</section>
+<section id="Read-Segmentation-Logs">
+<h2>Read Segmentation Logs<a class="headerlink" href="#Read-Segmentation-Logs" title="Permalink to this heading">#</a></h2>
+<p>After running the auto-segmentation on across the dataset, we can fetch the logs to confirm that everything went well. This will also let us inspect the runtime of the segmentation. In case something went wrong, we can use these logs to help debug the issue.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read the segmentation log DataFrame</span>
+<span class="n">df_logs</span> <span class="o">=</span> <span class="n">read_all_segmentation_logs</span><span class="p">(</span><span class="n">working_directory</span><span class="p">)</span>
+<span class="n">df_logs</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>patient_id</th>
+      <th>segment_id</th>
+      <th>img_id</th>
+      <th>start_time</th>
+      <th>end_time</th>
+      <th>total_time_seconds</th>
+      <th>success_flag</th>
+      <th>error</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>LCTSC-Train-S1-007</td>
+      <td>atlas</td>
+      <td>5adf40</td>
+      <td>2023-12-13 06:21:10.934171</td>
+      <td>2023-12-13 06:21:17.712102</td>
+      <td>6.777931</td>
+      <td>True</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>LCTSC-Train-S1-008</td>
+      <td>atlas</td>
+      <td>dd0026</td>
+      <td>2023-12-13 06:21:17.735213</td>
+      <td>2023-12-13 06:21:24.043503</td>
+      <td>6.308290</td>
+      <td>True</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>LCTSC-Train-S1-002</td>
+      <td>atlas</td>
+      <td>aa38e6</td>
+      <td>2023-12-13 06:21:24.065444</td>
+      <td>2023-12-13 06:21:31.478974</td>
+      <td>7.413530</td>
+      <td>True</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>LCTSC-Train-S1-004</td>
+      <td>atlas</td>
+      <td>d91c84</td>
+      <td>2023-12-13 06:21:31.502059</td>
+      <td>2023-12-13 06:21:38.431013</td>
+      <td>6.928954</td>
+      <td>True</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>LCTSC-Test-S1-101</td>
+      <td>atlas</td>
+      <td>666be6</td>
+      <td>2023-12-13 06:21:38.452669</td>
+      <td>2023-12-13 06:21:44.832885</td>
+      <td>6.380216</td>
+      <td>True</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>LCTSC-Train-S1-006</td>
+      <td>atlas</td>
+      <td>88c5ef</td>
+      <td>2023-12-13 06:21:44.858538</td>
+      <td>2023-12-13 06:21:51.459084</td>
+      <td>6.600546</td>
+      <td>True</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>LCTSC-Train-S1-005</td>
+      <td>atlas</td>
+      <td>738c1a</td>
+      <td>2023-12-13 06:21:51.480928</td>
+      <td>2023-12-13 06:21:57.521394</td>
+      <td>6.040466</td>
+      <td>True</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>LCTSC-Test-S1-102</td>
+      <td>atlas</td>
+      <td>914d57</td>
+      <td>2023-12-13 06:21:57.546595</td>
+      <td>2023-12-13 06:22:04.522132</td>
+      <td>6.975537</td>
+      <td>True</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>LCTSC-Train-S1-003</td>
+      <td>atlas</td>
+      <td>2bf2f9</td>
+      <td>2023-12-13 06:22:04.547151</td>
+      <td>2023-12-13 06:22:11.491276</td>
+      <td>6.944125</td>
+      <td>True</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use some Pandas magic to produce some stats on the segmentation runtime</span>
+<span class="n">df_success</span> <span class="o">=</span> <span class="n">df_logs</span><span class="p">[</span><span class="n">df_logs</span><span class="o">.</span><span class="n">success_flag</span><span class="p">]</span>
+<span class="n">agg_stats</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">]</span>
+<span class="n">df_success</span><span class="p">[[</span><span class="s2">&quot;segment_id&quot;</span><span class="p">,</span> <span class="s2">&quot;total_time_seconds&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;segment_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">agg_stats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="5" halign="left">total_time_seconds</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>max</th>
+      <th>min</th>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>segment_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>atlas</th>
+      <td>6.707733</td>
+      <td>0.418804</td>
+      <td>7.41353</td>
+      <td>6.040466</td>
+      <td>9</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Auto-segmentation-Analysis">
+<h2>Auto-segmentation Analysis<a class="headerlink" href="#Auto-segmentation-Analysis" title="Permalink to this heading">#</a></h2>
+<p>Now that our auto-segmentation model has been run on our <code class="docutils literal notranslate"><span class="pre">validation</span></code> set, we can compare these structures to the manual structures available on this dataset. PyDicer provides functionality to compute similarity metrics, but we must first prepare a DataFrame containing our auto structure sets (<code class="docutils literal notranslate"><span class="pre">df_target</span></code>) and a separate DataFrame with our manual structure sets (<code class="docutils literal notranslate"><span class="pre">df_reference</span></code>).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pydicer</span><span class="o">.</span><span class="n">read_converted_data</span><span class="p">(</span><span class="n">dataset_name</span><span class="o">=</span><span class="n">validation_dataset</span><span class="p">)</span>
+<span class="n">df_structs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">modality</span><span class="o">==</span><span class="s2">&quot;RTSTRUCT&quot;</span><span class="p">]</span>
+
+<span class="n">df_reference</span> <span class="o">=</span> <span class="n">df_structs</span><span class="p">[</span><span class="o">~</span><span class="n">df_structs</span><span class="o">.</span><span class="n">hashed_uid</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;atlas_&quot;</span><span class="p">)]</span>
+<span class="n">df_target</span> <span class="o">=</span> <span class="n">df_structs</span><span class="p">[</span><span class="n">df_structs</span><span class="o">.</span><span class="n">hashed_uid</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;atlas_&quot;</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_reference</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sop_instance_uid</th>
+      <th>hashed_uid</th>
+      <th>modality</th>
+      <th>patient_id</th>
+      <th>series_uid</th>
+      <th>for_uid</th>
+      <th>referenced_sop_instance_uid</th>
+      <th>path</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
+      <td>ed6686</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-007</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-007/structur...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
+      <td>48a970</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-008</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-008/structur...</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.291449913947...</td>
+      <td>f036b8</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-002</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.291449913947...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.145984743865...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-002/structur...</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.595315284787...</td>
+      <td>61758b</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-004</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.595315284787...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.313160975008...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.141349678572...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-004/structur...</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.929007819506...</td>
+      <td>cc682f</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Test-S1-101</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.280355341349...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.171234424242...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.333558838494...</td>
+      <td>lctsc_autoseg/data/LCTSC-Test-S1-101/structure...</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
+      <td>ceb111</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-006</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-006/structur...</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>68d663</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-005/structur...</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
+      <td>6c6ea4</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Test-S1-102</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
+      <td>lctsc_autoseg/data/LCTSC-Test-S1-102/structure...</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>8e34f9</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-003/structur...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_target</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sop_instance_uid</th>
+      <th>hashed_uid</th>
+      <th>modality</th>
+      <th>patient_id</th>
+      <th>series_uid</th>
+      <th>for_uid</th>
+      <th>referenced_sop_instance_uid</th>
+      <th>path</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>atlas_5adf40</td>
+      <td>atlas_5adf40</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-007</td>
+      <td>atlas_5adf40</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-007/structur...</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>atlas_dd0026</td>
+      <td>atlas_dd0026</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-008</td>
+      <td>atlas_dd0026</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-008/structur...</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>atlas_aa38e6</td>
+      <td>atlas_aa38e6</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-002</td>
+      <td>atlas_aa38e6</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.145984743865...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-002/structur...</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>atlas_d91c84</td>
+      <td>atlas_d91c84</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-004</td>
+      <td>atlas_d91c84</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.313160975008...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.141349678572...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-004/structur...</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>atlas_666be6</td>
+      <td>atlas_666be6</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Test-S1-101</td>
+      <td>atlas_666be6</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.171234424242...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.333558838494...</td>
+      <td>lctsc_autoseg/data/LCTSC-Test-S1-101/structure...</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>atlas_88c5ef</td>
+      <td>atlas_88c5ef</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-006</td>
+      <td>atlas_88c5ef</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-006/structur...</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>atlas_738c1a</td>
+      <td>atlas_738c1a</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>atlas_738c1a</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-005/structur...</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>atlas_914d57</td>
+      <td>atlas_914d57</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Test-S1-102</td>
+      <td>atlas_914d57</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
+      <td>lctsc_autoseg/data/LCTSC-Test-S1-102/structure...</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>atlas_2bf2f9</td>
+      <td>atlas_2bf2f9</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>atlas_2bf2f9</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-003/structur...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<section id="Compute-Similarity">
+<h3>Compute Similarity<a class="headerlink" href="#Compute-Similarity" title="Permalink to this heading">#</a></h3>
+<p>We use the <code class="docutils literal notranslate"><span class="pre">compute_contour_similarity_metrics</span></code> function to compute the metrics comparing our target structures to our reference structures.</p>
+<p>We can specify which metrics we want to compute, in this example we compute the Dice Similarity Coefficient (DSC), Hausdorff Distance, Mean Surface Distance and the Surface DSC.</p>
+<blockquote>
+<div><p>Structure names must match exactly, so we use a structure name mapping to standardise our structure names prior to computing the similarity metrics.</p>
+</div></blockquote>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add our structure name mapping</span>
+<span class="n">mapping_id</span> <span class="o">=</span> <span class="s2">&quot;nnunet_lctsc&quot;</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Esophagus&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;Heart&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;Lung_L&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;L_Lung&quot;</span><span class="p">,</span> <span class="s2">&quot;Lung_Left&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Lung_R&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Lung_Right&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;SpinalCord&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;SC&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+<span class="n">pydicer</span><span class="o">.</span><span class="n">add_structure_name_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">mapping_id</span><span class="p">)</span>
+
+<span class="c1"># Specify the metrics we want to compute</span>
+<span class="n">compute_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DSC&quot;</span><span class="p">,</span> <span class="s2">&quot;hausdorffDistance&quot;</span><span class="p">,</span> <span class="s2">&quot;meanSurfaceDistance&quot;</span><span class="p">,</span> <span class="s2">&quot;surfaceDSC&quot;</span><span class="p">]</span>
+
+<span class="c1"># Compute the similarity metrics</span>
+<span class="n">compute_contour_similarity_metrics</span><span class="p">(</span>
+    <span class="n">df_target</span><span class="p">,</span>
+    <span class="n">df_reference</span><span class="p">,</span>
+    <span class="n">segment_id</span><span class="p">,</span>
+    <span class="n">compute_metrics</span><span class="o">=</span><span class="n">compute_metrics</span><span class="p">,</span>
+    <span class="n">mapping_id</span><span class="o">=</span><span class="n">mapping_id</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 9/9 [00:21&lt;00:00,  2.40s/structure sets, Compare Structures]
+</pre></div></div>
+</div>
+</section>
+<section id="Fetch-the-similarity-metrics">
+<h3>Fetch the similarity metrics<a class="headerlink" href="#Fetch-the-similarity-metrics" title="Permalink to this heading">#</a></h3>
+<p>Here we fetch the metrics computed and output some stats. Note that if a segmentation fails, surface metrics will return NaN and will be excluded from these stats.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fetch the similarity metrics</span>
+<span class="n">df_metrics</span> <span class="o">=</span> <span class="n">get_all_similarity_metrics_for_dataset</span><span class="p">(</span>
+    <span class="n">working_directory</span><span class="p">,</span>
+    <span class="n">dataset_name</span><span class="o">=</span><span class="n">validation_dataset</span><span class="p">,</span>
+    <span class="n">structure_mapping_id</span><span class="o">=</span><span class="n">mapping_id</span>
+<span class="p">)</span>
+
+<span class="c1"># Aggregate the stats using Pandas</span>
+<span class="n">df_metrics</span><span class="p">[</span>
+    <span class="p">[</span><span class="s2">&quot;segment_id&quot;</span><span class="p">,</span> <span class="s2">&quot;structure&quot;</span><span class="p">,</span> <span class="s2">&quot;metric&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;segment_id&quot;</span><span class="p">,</span> <span class="s2">&quot;structure&quot;</span><span class="p">,</span> <span class="s2">&quot;metric&quot;</span><span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th colspan="5" halign="left">value</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>mean</th>
+      <th>std</th>
+      <th>min</th>
+      <th>max</th>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>segment_id</th>
+      <th>structure</th>
+      <th>metric</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="20" valign="top">atlas</th>
+      <th rowspan="4" valign="top">Esophagus</th>
+      <th>DSC</th>
+      <td>0.023485</td>
+      <td>0.039155</td>
+      <td>0.000000</td>
+      <td>0.109864</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>hausdorffDistance</th>
+      <td>86.016542</td>
+      <td>31.242434</td>
+      <td>51.074932</td>
+      <td>138.589307</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>meanSurfaceDistance</th>
+      <td>50.829617</td>
+      <td>29.069703</td>
+      <td>13.329453</td>
+      <td>88.431997</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>surfaceDSC</th>
+      <td>0.044144</td>
+      <td>0.076819</td>
+      <td>0.000000</td>
+      <td>0.222843</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th rowspan="4" valign="top">Heart</th>
+      <th>DSC</th>
+      <td>0.245349</td>
+      <td>0.213440</td>
+      <td>0.000000</td>
+      <td>0.485516</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>hausdorffDistance</th>
+      <td>81.796660</td>
+      <td>28.022026</td>
+      <td>45.554259</td>
+      <td>127.344050</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>meanSurfaceDistance</th>
+      <td>34.477665</td>
+      <td>22.412489</td>
+      <td>13.660061</td>
+      <td>71.395360</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>surfaceDSC</th>
+      <td>0.136241</td>
+      <td>0.112819</td>
+      <td>0.000000</td>
+      <td>0.297727</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th rowspan="4" valign="top">Lung_L</th>
+      <th>DSC</th>
+      <td>0.345206</td>
+      <td>0.227535</td>
+      <td>0.042621</td>
+      <td>0.665717</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>hausdorffDistance</th>
+      <td>107.038653</td>
+      <td>31.328493</td>
+      <td>67.318771</td>
+      <td>166.238581</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>meanSurfaceDistance</th>
+      <td>33.207495</td>
+      <td>20.589999</td>
+      <td>15.643577</td>
+      <td>64.321409</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>surfaceDSC</th>
+      <td>0.261660</td>
+      <td>0.173089</td>
+      <td>0.034036</td>
+      <td>0.567455</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th rowspan="4" valign="top">Lung_R</th>
+      <th>DSC</th>
+      <td>0.435620</td>
+      <td>0.211995</td>
+      <td>0.120374</td>
+      <td>0.654082</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>hausdorffDistance</th>
+      <td>93.095879</td>
+      <td>30.999991</td>
+      <td>58.515670</td>
+      <td>158.412996</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>meanSurfaceDistance</th>
+      <td>27.582301</td>
+      <td>16.213033</td>
+      <td>12.244833</td>
+      <td>58.727983</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>surfaceDSC</th>
+      <td>0.302265</td>
+      <td>0.149149</td>
+      <td>0.084824</td>
+      <td>0.468548</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th rowspan="4" valign="top">SpinalCord</th>
+      <th>DSC</th>
+      <td>0.059047</td>
+      <td>0.133917</td>
+      <td>0.000000</td>
+      <td>0.398152</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>hausdorffDistance</th>
+      <td>107.062020</td>
+      <td>37.777640</td>
+      <td>65.512324</td>
+      <td>153.971275</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>meanSurfaceDistance</th>
+      <td>50.480604</td>
+      <td>35.360977</td>
+      <td>9.644323</td>
+      <td>122.360613</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>surfaceDSC</th>
+      <td>0.086375</td>
+      <td>0.184924</td>
+      <td>0.000000</td>
+      <td>0.543595</td>
+      <td>9</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Perform-Analysis">
+<h3>Perform Analysis<a class="headerlink" href="#Perform-Analysis" title="Permalink to this heading">#</a></h3>
+<p>There are various plots and visualisations you may wish to produce following computation of similarity metrics. The <code class="docutils literal notranslate"><span class="pre">prepare_similarity_metric_analysis</span></code> will generate several useful plots which will serve as a useful starting point when analysing your auto-segmentation results.</p>
+<p>Plots are generated in a directory you provide. In this example, plots and tables (<code class="docutils literal notranslate"><span class="pre">.csv</span></code>) are output in the <code class="docutils literal notranslate"><span class="pre">testdata_lctsc/analysis/atlas</span></code> directory. Run the following cell, then navigate to that directory to explore the results.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">analysis_output_directory</span> <span class="o">=</span> <span class="n">working_directory</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+    <span class="s2">&quot;analysis&quot;</span><span class="p">,</span>
+    <span class="n">segment_id</span>
+<span class="p">)</span>
+<span class="n">analysis_output_directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">prepare_similarity_metric_analysis</span><span class="p">(</span>
+    <span class="n">working_directory</span><span class="p">,</span>
+    <span class="n">analysis_output_directory</span><span class="o">=</span><span class="n">analysis_output_directory</span><span class="p">,</span>
+    <span class="n">dataset_name</span><span class="o">=</span><span class="n">validation_dataset</span><span class="p">,</span>
+    <span class="n">structure_mapping_id</span><span class="o">=</span><span class="n">mapping_id</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/_examples_AutoSegmentation_24_0.png" src="../_images/_examples_AutoSegmentation_24_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/_examples_AutoSegmentation_24_1.png" src="../_images/_examples_AutoSegmentation_24_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/_examples_AutoSegmentation_24_2.png" src="../_images/_examples_AutoSegmentation_24_2.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/_examples_AutoSegmentation_24_3.png" src="../_images/_examples_AutoSegmentation_24_3.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="nnUNet.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">nnUNet Data Preparation</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="DatasetPreparation.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Dataset Preparation</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Ingham Medical Physics
+            </div>
+            Made with 
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Auto-segmentation Inference &amp; Analysis</a><ul>
+<li><a class="reference internal" href="#Setup-PyDicer">Setup PyDicer</a></li>
+<li><a class="reference internal" href="#Prepare-Atlas">Prepare Atlas</a></li>
+<li><a class="reference internal" href="#Define-Segmentation-Function">Define Segmentation Function</a></li>
+<li><a class="reference internal" href="#Run-Auto-segmentation">Run Auto-segmentation</a></li>
+<li><a class="reference internal" href="#Read-Segmentation-Logs">Read Segmentation Logs</a></li>
+<li><a class="reference internal" href="#Auto-segmentation-Analysis">Auto-segmentation Analysis</a><ul>
+<li><a class="reference internal" href="#Compute-Similarity">Compute Similarity</a></li>
+<li><a class="reference internal" href="#Fetch-the-similarity-metrics">Fetch the similarity metrics</a></li>
+<li><a class="reference internal" href="#Perform-Analysis">Perform Analysis</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    </body>
+</html>

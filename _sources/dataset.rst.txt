@@ -13,3 +13,9 @@ Preparation Functions
 
 .. automodule:: pydicer.dataset.functions
     :members:
+
+Structure Sets
+==============
+
+.. automodule:: pydicer.dataset.structureset
+    :members:

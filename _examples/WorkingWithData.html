@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Contributing" href="../contributing.html" /><link rel="prev" title="Dataset Preparation" href="DatasetPreparation.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Working with Structures" href="WorkingWithStructures.html" /><link rel="prev" title="nnUNet Data Preparation" href="nnUNet.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>Working with Data - PyDicer 0.1.0 documentation</title>
@@ -163,10 +163,15 @@
 <li class="toctree-l1"><a class="reference internal" href="Radiomics.html">Compute Radiomics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DoseMetrics.html">Dose Metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DatasetPreparation.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AutoSegmentation.html">Auto-segmentation Inference &amp; Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nnUNet.html">nnUNet Data Preparation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Working with Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WorkingWithStructures.html">Working with Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ObjectGeneration.html">Generating Data Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Configuration.html">Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -178,11 +183,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../tool.html">PyDicer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../input.html">Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../preprocess.html">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../convert.html">Conversion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../visualise.html">Visualisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html">Dataset Preparation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../generate.html">Generation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../nnunet.html">nnUNet</a></li>
 </ul>
 
@@ -490,11 +497,12 @@ div.rendered_html tbody tr:hover {
 
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span> <span class="nn">SimpleITK</span> <span class="k">as</span> <span class="nn">sitk</span>
-
-<span class="kn">from</span> <span class="nn">pydicer.utils</span> <span class="kn">import</span> <span class="n">fetch_converted_test_data</span>
-
-<span class="kn">from</span> <span class="nn">pydicer.utils</span> <span class="kn">import</span> <span class="n">load_object_metadata</span><span class="p">,</span> <span class="n">determine_dcm_datetime</span>
+<span class="kn">from</span> <span class="nn">pydicer.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">fetch_converted_test_data</span><span class="p">,</span>
+    <span class="n">load_object_metadata</span><span class="p">,</span>
+    <span class="n">determine_dcm_datetime</span><span class="p">,</span>
+    <span class="n">read_simple_itk_image</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -568,28 +576,50 @@ Working directory %s aready exists, won&#39;t download test data.
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
-      <td>914d57</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
+      <td>5adf40</td>
       <td>CT</td>
-      <td>LCTSC-Test-S1-102</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.639871532605...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>LCTSC-Train-S1-007</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.335375068555...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
       <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Test-S1-102/images/9...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-007/images/...</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
-      <td>6c6ea4</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
+      <td>ed6686</td>
       <td>RTSTRUCT</td>
-      <td>LCTSC-Test-S1-102</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
-      <td>testdata_lctsc/data/LCTSC-Test-S1-102/structur...</td>
+      <td>LCTSC-Train-S1-007</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-007/structu...</td>
     </tr>
     <tr>
       <th>2</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
+      <td>dd0026</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-008</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.135073567254...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-008/images/...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
+      <td>48a970</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-008</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-008/structu...</td>
+    </tr>
+    <tr>
+      <th>4</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
       <td>aa38e6</td>
       <td>CT</td>
@@ -600,7 +630,7 @@ Working directory %s aready exists, won&#39;t download test data.
       <td>testdata_lctsc/data/LCTSC-Train-S1-002/images/...</td>
     </tr>
     <tr>
-      <th>3</th>
+      <th>5</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.291449913947...</td>
       <td>f036b8</td>
       <td>RTSTRUCT</td>
@@ -609,28 +639,6 @@ Working directory %s aready exists, won&#39;t download test data.
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.145984743865...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
       <td>testdata_lctsc/data/LCTSC-Train-S1-002/structu...</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
-      <td>6834c9</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-001</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.330486033168...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-001/images/...</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
-      <td>b5bddb</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-001</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-001/structu...</td>
     </tr>
     <tr>
       <th>6</th>
@@ -656,94 +664,28 @@ Working directory %s aready exists, won&#39;t download test data.
     </tr>
     <tr>
       <th>8</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
-      <td>738c1a</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
+      <td>6834c9</td>
       <td>CT</td>
-      <td>LCTSC-Train-S1-005</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.338518041666...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>LCTSC-Train-S1-001</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.330486033168...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
       <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-005/images/...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-001/images/...</td>
     </tr>
     <tr>
       <th>9</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
-      <td>68d663</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
+      <td>b5bddb</td>
       <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-005</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-005/structu...</td>
+      <td>LCTSC-Train-S1-001</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-001/structu...</td>
     </tr>
     <tr>
       <th>10</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
-      <td>5adf40</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-007</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.335375068555...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-007/images/...</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
-      <td>ed6686</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-007</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-007/structu...</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
-      <td>dd0026</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-008</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.135073567254...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-008/images/...</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
-      <td>48a970</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-008</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-008/structu...</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
-      <td>2bf2f9</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-003</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.742383887179...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-003/images/...</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
-      <td>8e34f9</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-003</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-003/structu...</td>
-    </tr>
-    <tr>
-      <th>16</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.333558838494...</td>
       <td>666be6</td>
       <td>CT</td>
@@ -754,7 +696,7 @@ Working directory %s aready exists, won&#39;t download test data.
       <td>testdata_lctsc/data/LCTSC-Test-S1-101/images/6...</td>
     </tr>
     <tr>
-      <th>17</th>
+      <th>11</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.929007819506...</td>
       <td>cc682f</td>
       <td>RTSTRUCT</td>
@@ -765,7 +707,7 @@ Working directory %s aready exists, won&#39;t download test data.
       <td>testdata_lctsc/data/LCTSC-Test-S1-101/structur...</td>
     </tr>
     <tr>
-      <th>18</th>
+      <th>12</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
       <td>88c5ef</td>
       <td>CT</td>
@@ -776,7 +718,7 @@ Working directory %s aready exists, won&#39;t download test data.
       <td>testdata_lctsc/data/LCTSC-Train-S1-006/images/...</td>
     </tr>
     <tr>
-      <th>19</th>
+      <th>13</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
       <td>ceb111</td>
       <td>RTSTRUCT</td>
@@ -785,6 +727,72 @@ Working directory %s aready exists, won&#39;t download test data.
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
       <td>testdata_lctsc/data/LCTSC-Train-S1-006/structu...</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>738c1a</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.338518041666...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-005/images/...</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>68d663</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-005/structu...</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
+      <td>914d57</td>
+      <td>CT</td>
+      <td>LCTSC-Test-S1-102</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.639871532605...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-102/images/9...</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
+      <td>6c6ea4</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Test-S1-102</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-102/structur...</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>2bf2f9</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.742383887179...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-003/images/...</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>8e34f9</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-003/structu...</td>
     </tr>
   </tbody>
 </table>
@@ -802,8 +810,7 @@ Working directory %s aready exists, won&#39;t download test data.
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading image with hashed UID: </span><span class="si">{</span><span class="n">ct_row</span><span class="o">.</span><span class="n">hashed_uid</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-    <span class="n">img_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ct_row</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;CT.nii.gz&quot;</span><span class="p">)</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">ReadImage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">img_path</span><span class="p">))</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">read_simple_itk_image</span><span class="p">(</span><span class="n">ct_row</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; Complete&quot;</span><span class="p">)</span>
 </pre></div>
@@ -814,16 +821,16 @@ Working directory %s aready exists, won&#39;t download test data.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Loading image with hashed UID: 914d57... Complete
-Loading image with hashed UID: aa38e6... Complete
-Loading image with hashed UID: 6834c9... Complete
-Loading image with hashed UID: d91c84... Complete
-Loading image with hashed UID: 738c1a... Complete
 Loading image with hashed UID: 5adf40... Complete
 Loading image with hashed UID: dd0026... Complete
-Loading image with hashed UID: 2bf2f9... Complete
+Loading image with hashed UID: aa38e6... Complete
+Loading image with hashed UID: d91c84... Complete
+Loading image with hashed UID: 6834c9... Complete
 Loading image with hashed UID: 666be6... Complete
 Loading image with hashed UID: 88c5ef... Complete
+Loading image with hashed UID: 738c1a... Complete
+Loading image with hashed UID: 914d57... Complete
+Loading image with hashed UID: 2bf2f9... Complete
 </pre></div></div>
 </div>
 </section>
@@ -849,24 +856,24 @@ Loading image with hashed UID: 88c5ef... Complete
 (0008, 0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;
 (0008, 0008) Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AXIAL&#39;, &#39;CT_SOM5 SPI&#39;]
 (0008, 0012) Instance Creation Date              DA: &#39;20050726&#39;
-(0008, 0013) Instance Creation Time              TM: &#39;091720.609000&#39;
+(0008, 0013) Instance Creation Time              TM: &#39;090342.451000&#39;
 (0008, 0016) SOP Class UID                       UI: CT Image Storage
-(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364823930179693677352
-(0008, 0020) Study Date                          DA: &#39;20031104&#39;
-(0008, 0021) Series Date                         DA: &#39;20031104&#39;
-(0008, 0023) Content Date                        DA: &#39;20031104&#39;
-(0008, 0030) Study Time                          TM: &#39;112017.690000&#39;
-(0008, 0031) Series Time                         TM: &#39;114545.847000&#39;
-(0008, 0033) Content Time                        TM: &#39;114241.493000&#39;
-(0008, 0050) Accession Number                    SH: &#39;2356173256177297&#39;
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755643512811062844019
+(0008, 0020) Study Date                          DA: &#39;20031213&#39;
+(0008, 0021) Series Date                         DA: &#39;20031213&#39;
+(0008, 0023) Content Date                        DA: &#39;20031213&#39;
+(0008, 0030) Study Time                          TM: &#39;140027.397000&#39;
+(0008, 0031) Series Time                         TM: &#39;141846.903000&#39;
+(0008, 0033) Content Time                        TM: &#39;141558.073000&#39;
+(0008, 0050) Accession Number                    SH: &#39;1507292331039118&#39;
 (0008, 0060) Modality                            CS: &#39;CT&#39;
 (0008, 0070) Manufacturer                        LO: &#39;SIEMENS&#39;
 (0008, 0090) Referring Physician&#39;s Name          PN: &#39;&#39;
 (0008, 1030) Study Description                   LO: &#39;RT^RCCT_THORAX_8F_High (Adult)&#39;
-(0008, 103e) Series Description                  LO: &#39;CT114545:RespCT  3.0  B30f  50% Ex&#39;
+(0008, 103e) Series Description                  LO: &#39;CT:P1B3RespCT  3.0  B30f  50% Ex&#39;
 (0008, 1090) Manufacturer&#39;s Model Name           LO: &#39;Sensation Open&#39;
-(0010, 0010) Patient&#39;s Name                      PN: &#39;LCTSC-Test-S1-102&#39;
-(0010, 0020) Patient ID                          LO: &#39;LCTSC-Test-S1-102&#39;
+(0010, 0010) Patient&#39;s Name                      PN: &#39;LCTSC-Train-S1-007&#39;
+(0010, 0020) Patient ID                          LO: &#39;LCTSC-Train-S1-007&#39;
 (0010, 0030) Patient&#39;s Birth Date                DA: &#39;&#39;
 (0010, 0040) Patient&#39;s Sex                       CS: &#39;F&#39;
 (0012, 0062) Patient Identity Removed            CS: &#39;YES&#39;
@@ -947,7 +954,7 @@ Loading image with hashed UID: 88c5ef... Complete
 (0018, 1110) Distance Source to Detector         DS: &#39;1040.0&#39;
 (0018, 1111) Distance Source to Patient          DS: &#39;570.0&#39;
 (0018, 1120) Gantry/Detector Tilt                DS: &#39;0.0&#39;
-(0018, 1130) Table Height                        DS: &#39;200.0&#39;
+(0018, 1130) Table Height                        DS: &#39;184.0&#39;
 (0018, 1140) Rotation Direction                  CS: &#39;CW&#39;
 (0018, 1150) Exposure Time                       IS: &#39;361&#39;
 (0018, 1151) X-Ray Tube Current                  IS: &#39;100&#39;
@@ -957,17 +964,17 @@ Loading image with hashed UID: 88c5ef... Complete
 (0018, 1190) Focal Spot(s)                       DS: &#39;1.2&#39;
 (0018, 1210) Convolution Kernel                  SH: &#39;B30f&#39;
 (0018, 5100) Patient Position                    CS: &#39;HFS&#39;
-(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.238478060677653494401819620444
-(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.639871532605224417554459681163
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.208415500372767635171688815875
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.335375068555840597820636886710
 (0020, 0010) Study ID                            SH: &#39;&#39;
 (0020, 0011) Series Number                       IS: &#39;0&#39;
 (0020, 0012) Acquisition Number                  IS: &#39;2&#39;
-(0020, 0013) Instance Number                     IS: &#39;148&#39;
-(0020, 0032) Image Position (Patient)            DS: [-249.51171875, -449.51171875, -663.5]
+(0020, 0013) Instance Number                     IS: &#39;149&#39;
+(0020, 0032) Image Position (Patient)            DS: [-249.51171875, -433.51171875, -702.5]
 (0020, 0037) Image Orientation (Patient)         DS: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0]
-(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497667143598295356169
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743964862096664351089
 (0020, 1040) Position Reference Indicator        LO: &#39;&#39;
-(0020, 1041) Slice Location                      DS: &#39;-663.5&#39;
+(0020, 1041) Slice Location                      DS: &#39;-702.5&#39;
 (0028, 0002) Samples per Pixel                   US: 1
 (0028, 0004) Photometric Interpretation          CS: &#39;MONOCHROME2&#39;
 (0028, 0010) Rows                                US: 512
@@ -1008,7 +1015,7 @@ Loading image with hashed UID: 88c5ef... Complete
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(0008, 0020) Study Date                          DA: &#39;20031104&#39;
+(0008, 0020) Study Date                          DA: &#39;20031213&#39;
 (0008, 0070) Manufacturer                        LO: &#39;SIEMENS&#39;
 (0010, 0040) Patient&#39;s Sex                       CS: &#39;F&#39;
 </pre></div></div>
@@ -1063,30 +1070,54 @@ Loading image with hashed UID: 88c5ef... Complete
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
-      <td>914d57</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
+      <td>5adf40</td>
       <td>CT</td>
-      <td>LCTSC-Test-S1-102</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.639871532605...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>LCTSC-Train-S1-007</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.335375068555...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
       <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Test-S1-102/images/9...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-007/images/...</td>
       <td>RT^RCCT_THORAX_8F_High (Adult)</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
-      <td>6c6ea4</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
+      <td>ed6686</td>
       <td>RTSTRUCT</td>
-      <td>LCTSC-Test-S1-102</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
-      <td>testdata_lctsc/data/LCTSC-Test-S1-102/structur...</td>
+      <td>LCTSC-Train-S1-007</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-007/structu...</td>
       <td>RT^RCCT_THORAX_8F_High (Adult)</td>
     </tr>
     <tr>
       <th>2</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
+      <td>dd0026</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-008</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.135073567254...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-008/images/...</td>
+      <td>Specials^RCCTPET_THORAX_8F (Adult)</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
+      <td>48a970</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-008</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-008/structu...</td>
+      <td>Specials^RCCTPET_THORAX_8F (Adult)</td>
+    </tr>
+    <tr>
+      <th>4</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
       <td>aa38e6</td>
       <td>CT</td>
@@ -1098,7 +1129,7 @@ Loading image with hashed UID: 88c5ef... Complete
       <td>RT^RCCT_THORAX_8F (Adult)</td>
     </tr>
     <tr>
-      <th>3</th>
+      <th>5</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.291449913947...</td>
       <td>f036b8</td>
       <td>RTSTRUCT</td>
@@ -1108,30 +1139,6 @@ Loading image with hashed UID: 88c5ef... Complete
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
       <td>testdata_lctsc/data/LCTSC-Train-S1-002/structu...</td>
       <td>RT^RCCT_THORAX_8F (Adult)</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
-      <td>6834c9</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-001</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.330486033168...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-001/images/...</td>
-      <td>RT^RCCT_THORAX_8F_Low (Adult)</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
-      <td>b5bddb</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-001</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-001/structu...</td>
-      <td>RT^RCCT_THORAX_8F_Low (Adult)</td>
     </tr>
     <tr>
       <th>6</th>
@@ -1159,102 +1166,30 @@ Loading image with hashed UID: 88c5ef... Complete
     </tr>
     <tr>
       <th>8</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
-      <td>738c1a</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
+      <td>6834c9</td>
       <td>CT</td>
-      <td>LCTSC-Train-S1-005</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.338518041666...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>LCTSC-Train-S1-001</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.330486033168...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
       <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-005/images/...</td>
-      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-001/images/...</td>
+      <td>RT^RCCT_THORAX_8F_Low (Adult)</td>
     </tr>
     <tr>
       <th>9</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
-      <td>68d663</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
+      <td>b5bddb</td>
       <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-005</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-005/structu...</td>
-      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+      <td>LCTSC-Train-S1-001</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.109432485688...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-001/structu...</td>
+      <td>RT^RCCT_THORAX_8F_Low (Adult)</td>
     </tr>
     <tr>
       <th>10</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
-      <td>5adf40</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-007</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.335375068555...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-007/images/...</td>
-      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
-      <td>ed6686</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-007</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.187709044743...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-007/structu...</td>
-      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
-      <td>dd0026</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-008</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.135073567254...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-008/images/...</td>
-      <td>Specials^RCCTPET_THORAX_8F (Adult)</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
-      <td>48a970</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-008</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.243364093992...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-008/structu...</td>
-      <td>Specials^RCCTPET_THORAX_8F (Adult)</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
-      <td>2bf2f9</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-003</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.742383887179...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-003/images/...</td>
-      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
-      <td>8e34f9</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-003</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-003/structu...</td>
-      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
-    </tr>
-    <tr>
-      <th>16</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.333558838494...</td>
       <td>666be6</td>
       <td>CT</td>
@@ -1266,7 +1201,7 @@ Loading image with hashed UID: 88c5ef... Complete
       <td></td>
     </tr>
     <tr>
-      <th>17</th>
+      <th>11</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.929007819506...</td>
       <td>cc682f</td>
       <td>RTSTRUCT</td>
@@ -1278,7 +1213,7 @@ Loading image with hashed UID: 88c5ef... Complete
       <td></td>
     </tr>
     <tr>
-      <th>18</th>
+      <th>12</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
       <td>88c5ef</td>
       <td>CT</td>
@@ -1290,7 +1225,7 @@ Loading image with hashed UID: 88c5ef... Complete
       <td>RT^RCCT_THORAX_8F_High (Adult)</td>
     </tr>
     <tr>
-      <th>19</th>
+      <th>13</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
       <td>ceb111</td>
       <td>RTSTRUCT</td>
@@ -1299,6 +1234,78 @@ Loading image with hashed UID: 88c5ef... Complete
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
       <td>testdata_lctsc/data/LCTSC-Train-S1-006/structu...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>738c1a</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.338518041666...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-005/images/...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>68d663</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-005/structu...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
+      <td>914d57</td>
+      <td>CT</td>
+      <td>LCTSC-Test-S1-102</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.639871532605...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-102/images/9...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
+      <td>6c6ea4</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Test-S1-102</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
+      <td>testdata_lctsc/data/LCTSC-Test-S1-102/structur...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>2bf2f9</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.742383887179...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-003/images/...</td>
+      <td>RT^RCCT_THORAX_8F_High (Adult)</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>8e34f9</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-003/structu...</td>
       <td>RT^RCCT_THORAX_8F_High (Adult)</td>
     </tr>
   </tbody>
@@ -1324,7 +1331,7 @@ Loading image with hashed UID: 88c5ef... Complete
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2003-11-04 11:45:45.847000
+2003-12-13 14:18:46.903000
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -1344,23 +1351,23 @@ Loading image with hashed UID: 88c5ef... Complete
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../contributing.html">
+          <a class="next-page" href="WorkingWithStructures.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Contributing</div>
+                <div class="title">Working with Structures</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="DatasetPreparation.html">
+          <a class="prev-page" href="nnUNet.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Dataset Preparation</div>
+                <div class="title">nnUNet Data Preparation</div>
                 
               </div>
             </a>

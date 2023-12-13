@@ -163,10 +163,15 @@
 <li class="toctree-l1"><a class="reference internal" href="_examples/Radiomics.html">Compute Radiomics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_examples/DoseMetrics.html">Dose Metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_examples/DatasetPreparation.html">Dataset Preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/AutoSegmentation.html">Auto-segmentation Inference &amp; Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/nnUNet.html">nnUNet Data Preparation</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithData.html">Working with Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/WorkingWithStructures.html">Working with Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/ObjectGeneration.html">Generating Data Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_examples/Configuration.html">Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -178,11 +183,13 @@
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">PyDicer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input.html">Input</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocessing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="convert.html">Conversion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualise.html">Visualisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Dataset Preparation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="analyse.html">Analyse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate.html">Generation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nnunet.html">nnUNet</a></li>
 </ul>
 
@@ -260,6 +267,34 @@ to None.</p></li>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>ValueError</strong> – Raised then the patient ID does not exist</p></li>
 <li><p><strong>SystemError</strong> – Raised when a linked_plan is provided but can’t be found for this patient.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicer.tool.PyDicer.add_image_object">
+<span class="sig-name descname"><span class="pre">add_image_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pydicer.tool.PyDicer.add_image_object" title="Permalink to this definition">#</a></dt>
+<dd><p>Add a generated image object to the project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>sitk.Image</em>) – The SimpleITK.Image object to save.</p></li>
+<li><p><strong>image_id</strong> (<em>str</em>) – The unique ID of the new image object.</p></li>
+<li><p><strong>modality</strong> (<em>str</em>) – The modality of the image being saved.</p></li>
+<li><p><strong>patient_id</strong> (<em>str</em>) – The ID of the patient of this object.</p></li>
+<li><p><strong>linked_image</strong> (<em>str</em><em>|</em><em>pd.Series</em><em>, </em><em>optional</em>) – The hashed_uid or the Pandas DataFrame row of the
+image object to link to. If None the new object won’t be linked. Defaults to None.</p></li>
+<li><p><strong>for_uid</strong> (<em>str</em><em>, </em><em>optional</em>) – Frame Of Reference UID for new data object. If not provided it
+will be extracted from the linked image (if available). Defaults to None.</p></li>
+<li><p><strong>datasets</strong> (<em>list</em><em>|</em><em>str</em><em>, </em><em>optional</em>) – The name(s) of the dataset(s) to add the object to. Defaults
+to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – Raised then the patient ID does not exist</p></li>
+<li><p><strong>SystemError</strong> – Raised when a linked_image is provided but can’t be found for this patient.</p></li>
 </ul>
 </dd>
 </dl>
@@ -406,7 +441,9 @@ already been preprocessed). Defaults to True.</p>
 :param dataset_name: The name of the dataset to read for.
 :type dataset_name: str
 :param segment_id: The ID of the auto-segmentation run.
-:type segment_id: str</p>
+:type segment_id: str
+:param modality: The modality of the images to read logs for.
+:type modality: str</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The pandas DataFrame object with all logs for the dataset.</p>
@@ -675,6 +712,7 @@ display a progress bar. Other values indicate Python’s build in logging levels
 <li><a class="reference internal" href="#">PyDicer</a><ul>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer"><code class="docutils literal notranslate"><span class="pre">PyDicer</span></code></a><ul>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.add_dose_object"><code class="docutils literal notranslate"><span class="pre">PyDicer.add_dose_object()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.tool.PyDicer.add_image_object"><code class="docutils literal notranslate"><span class="pre">PyDicer.add_image_object()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.add_input"><code class="docutils literal notranslate"><span class="pre">PyDicer.add_input()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.add_object"><code class="docutils literal notranslate"><span class="pre">PyDicer.add_object()</span></code></a></li>
 <li><a class="reference internal" href="#pydicer.tool.PyDicer.add_structure_name_mapping"><code class="docutils literal notranslate"><span class="pre">PyDicer.add_structure_name_mapping()</span></code></a></li>
