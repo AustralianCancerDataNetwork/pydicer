@@ -26,6 +26,7 @@ from pydicer.constants import (
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
     PET_IMAGE_STORAGE_UID,
+    MR_IMAGE_STORAGE_UID,
 )
 from pydicer.logger import PatientLogger
 
@@ -407,6 +408,34 @@ class ConvertData:
                             str(nifti_file.relative_to(self.output_directory)),
                             json_file,
                         )
+
+                    entry["path"] = str(output_dir.relative_to(self.working_directory))
+
+                    self.add_entry(entry)
+
+                elif sop_class_uid == MR_IMAGE_STORAGE_UID:
+                    # TODO Handle inconsistent slice spacing
+                    if config.get_config("interp_missing_slices"):
+                        series_files = handle_missing_slice(df_files)
+                    else:
+                        raise ValueError("Slice Locations are not evenly spaced")
+
+                    series_files = [str(f) for f in series_files]
+                    series = sitk.ReadImage(series_files)
+
+                    output_dir = patient_directory.joinpath("images", sop_instance_hash)
+                    output_dir.mkdir(exist_ok=True, parents=True)
+
+                    nifti_file = output_dir.joinpath("MR.nii.gz")
+                    sitk.WriteImage(series, str(nifti_file))
+                    logger.debug("Writing MR Image Series to: %s", nifti_file)
+
+                    json_file = output_dir.joinpath("metadata.json")
+                    convert_dicom_headers(
+                        series_files[0],
+                        str(nifti_file.relative_to(self.output_directory)),
+                        json_file,
+                    )
 
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
 

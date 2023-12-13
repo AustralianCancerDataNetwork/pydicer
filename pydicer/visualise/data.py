@@ -52,7 +52,7 @@ class VisualiseData:
             join_working_directory=True,
         )
 
-        visualise_modalities = ["CT", "RTSTRUCT", "RTDOSE", "PT"]
+        visualise_modalities = ["CT", "MR", "RTSTRUCT", "RTDOSE", "PT"]
         df_process = df_process[df_process.modality.isin(visualise_modalities)]
 
         for _, row in get_iterator(
@@ -139,9 +139,9 @@ class VisualiseData:
                 patient_logger.eval_module_process("visualise", row.hashed_uid)
                 logger.debug("Created CT visualisation: %s", vis_filename)
 
-            if row.modality == "PT":
+            if row.modality in ("MR", "PT"):
                 img_path = Path(row.path)
-                vis_filename = img_path.joinpath("PT.png")
+                vis_filename = img_path.joinpath(f"{row.modality}.png")
 
                 if vis_filename.exists() and not force:
                     logger.info("Visualisation already exists at %s", vis_filename)
@@ -149,7 +149,6 @@ class VisualiseData:
 
                 img = sitk.ReadImage(str(img_path.joinpath(f"{row.modality}.nii.gz")))
 
-                # TODO find linked CT and render PT on top of that
                 vis = ImageVisualiser(img)
                 fig = vis.show()
 
@@ -160,7 +159,7 @@ class VisualiseData:
                 plt.close(fig)
 
                 patient_logger.eval_module_process("visualise", row.hashed_uid)
-                logger.debug("Created PT visualisation: %s", vis_filename)
+                logger.debug("Created %s visualisation: %s", row.modality, vis_filename)
 
             # Visualise the structures on top of their linked image
             if row.modality == "RTSTRUCT":

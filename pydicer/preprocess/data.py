@@ -14,6 +14,7 @@ from pydicer.constants import (
     RT_PLAN_STORAGE_UID,
     RT_STRUCTURE_STORAGE_UID,
     CT_IMAGE_STORAGE_UID,
+    MR_IMAGE_STORAGE_UID,
 )
 from pydicer.quarantine import copy_file_to_quarantine
 from pydicer.utils import read_preprocessed_data, get_iterator
@@ -109,7 +110,11 @@ class PreprocessData:
                 except AttributeError:
                     logger.warning("Unable to determine Reference Series UID")
 
-            elif dicom_type_uid in (CT_IMAGE_STORAGE_UID, PET_IMAGE_STORAGE_UID):
+            elif dicom_type_uid in (
+                CT_IMAGE_STORAGE_UID,
+                PET_IMAGE_STORAGE_UID,
+                MR_IMAGE_STORAGE_UID,
+            ):
                 image_position = np.array(ds.ImagePositionPatient, dtype=float)
                 image_orientation = np.array(ds.ImageOrientationPatient, dtype=float)
 
@@ -212,8 +217,6 @@ class PreprocessData:
             files_already_scanned = df.file_path.tolist()
 
             files = [f for f in files if str(f) not in files_already_scanned]
-
-        logger.info("Found %d files to scan", len(files))
 
         result_list = []
 
