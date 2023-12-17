@@ -29,7 +29,7 @@ copyright = f"{year}, Ingham Medical Physics"
 author = "Ingham Medical Physics"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.0"
+release = "0.2.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -85,9 +85,13 @@ shutil.copy("../examples/ConvertingData.ipynb", "_examples/ConvertingData.ipynb"
 shutil.copy("../examples/VisualiseData.ipynb", "_examples/VisualiseData.ipynb")
 shutil.copy("../examples/DoseMetrics.ipynb", "_examples/DoseMetrics.ipynb")
 shutil.copy("../examples/Radiomics.ipynb", "_examples/Radiomics.ipynb")
-shutil.copy("../examples/DatasetPreparation.ipynb", "_examples/DatasetPreparation.ipynb")
+shutil.copy(
+    "../examples/DatasetPreparation.ipynb", "_examples/DatasetPreparation.ipynb"
+)
 shutil.copy("../examples/WorkingWithData.ipynb", "_examples/WorkingWithData.ipynb")
-shutil.copy("../examples/WorkingWithStructures.ipynb", "_examples/WorkingWithStructures.ipynb")
+shutil.copy(
+    "../examples/WorkingWithStructures.ipynb", "_examples/WorkingWithStructures.ipynb"
+)
 shutil.copy("../examples/Configuration.ipynb", "_examples/Configuration.ipynb")
 shutil.copy("../examples/ObjectGeneration.ipynb", "_examples/ObjectGeneration.ipynb")
 shutil.copy("../examples/AutoSegmentation.ipynb", "_examples/AutoSegmentation.ipynb")

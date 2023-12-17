@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pydicer"
-version = "0.1.0"
+version = "0.2.0"
 description = "PYthon Dicom Image ConvertER"
 authors = ["Ingham Medical Physics"]
 license = "Apache License 2.0"
