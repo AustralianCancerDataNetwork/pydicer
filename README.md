@@ -96,4 +96,7 @@ For more information, see the [Contributing documentation](https://australiancan
 
 ## Authors
 
-PyDicer was developed by the [Ingham Medical Physics team](https://www.unsw.edu.au/medicine-health/our-schools/clinical-medicine/research-impact/research-groups/cancer/ingham-medical-physics) in South-Western Sydney. It's development is part of the [Australian Cancer Data Network](https://australian-cancer-data.network/) supported by the [Australian Research Data Commons](https://ardc.edu.au/).
+PyDicer was developed by the [Ingham Medical Physics team](https://www.unsw.edu.au/medicine-health/our-schools/clinical-medicine/research-impact/research-groups/cancer/ingham-medical-physics) in South-Western Sydney. It was developed as part of the [Australian Cancer Data Network](https://australian-cancer-data.network/) supported by the [Australian Research Data Commons](https://ardc.edu.au/).
+
+- **Phillip Chlap** - [phillip.chlap@unsw.edu.au](phillip.chlap@unsw.edu.au)
+- **Daniel Al Mouiee** - [d.almouiee@unsw.edu.au](d.almouiee@unsw.edu.au)
