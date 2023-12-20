@@ -90,7 +90,7 @@ PyDicer is an open-source tool and contributions are welcome! Here are some ways
 - Correcting/extending the documentation.
 - Contributing a bug fix or extending some functionality.
 - Providing functionality to support additional DICOM modalities.
-- Giving the PyDicer project a star on GitHub.
+- Giving the [PyDicer project](https://github.com/AustralianCancerDataNetwork/pydicer) a star on GitHub.
 
 For more information, see the [Contributing documentation](https://australiancancerdatanetwork.github.io/pydicer/contributing.html).
 
