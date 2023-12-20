@@ -28,9 +28,6 @@ year = datetime.datetime.now().year
 copyright = f"{year}, Ingham Medical Physics"
 author = "Ingham Medical Physics"
 
-# The full version, including alpha/beta/rc tags
-release = "0.2.0"
-
 
 # -- General configuration ---------------------------------------------------
 
