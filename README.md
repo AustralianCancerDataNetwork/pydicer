@@ -1,6 +1,6 @@
 # PyDicer: PYthon Dicom Image ConvertER
 
-Welcome to pydicer, a tool to ease the process of converting Radiotherapy DICOM data objects into a format typically used for research purposes. In addition to data conversion, functionality is provided to help analyse the data. This includes computing radiomic features, radiotherapy dose metrics and auto-segmentation metrics. PyDicer uses the NIfTI format to store data is a well defined file system structure. Tracking of these data objects in CSV files, also stored on the file system, provides an easy and flexible way to work with the converted data in your research.
+Welcome to PyDicer, a tool to ease the process of converting Radiotherapy DICOM data objects into a format typically used for research purposes. In addition to data conversion, functionality is provided to help analyse the data. This includes computing radiomic features, radiotherapy dose metrics and auto-segmentation metrics. PyDicer uses the NIfTI format to store data is a well defined file system structure. Tracking of these data objects in CSV files, also stored on the file system, provides an easy and flexible way to work with the converted data in your research.
 
 The [PyDicer documentation](https://australiancancerdatanetwork.github.io/pydicer/index.html) provides several examples and guides to help you get started with the tool. Here are a few **PyDicer principles** to keep in mind as you get started:
 
