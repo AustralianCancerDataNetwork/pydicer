@@ -12,14 +12,14 @@ authors:
     family-names: Chlap
     email: phillip.chlap@unsw.edu.au
     affiliation: University of New South Wales
-    orcid: 'https://orcid.org/0000-0002-6517-8745'
+    orcid: "https://orcid.org/0000-0002-6517-8745"
   - given-names: Daniel
     family-names: Al Mouiee
     affiliation: Ingham Institute
   - given-names: Robert N.
     family-names: Finnegan
     affiliation: University of Sydney
-    orcid: 'https://orcid.org/0000-0003-4728-8462'
+    orcid: "https://orcid.org/0000-0003-4728-8462"
   - given-names: Xinyi
     family-names: Cui
     affiliation: University of New South Wales
@@ -34,12 +34,12 @@ authors:
   - given-names: Lois
     family-names: Holloway
     affiliation: University of New South Wales
-repository-code: 'https://github.com/AustralianCancerDataNetwork/pydicer'
-url: 'https://australiancancerdatanetwork.github.io/pydicer/'
+repository-code: "https://github.com/AustralianCancerDataNetwork/pydicer"
+url: "https://australiancancerdatanetwork.github.io/pydicer/"
 keywords:
   - medical imaging
   - DICOM
   - radiotherapy
 license: Apache-2.0
-version: 0.1.0
-date-released: '2023-06-04'
+version: 0.2.0
+date-released: "2023-12-20"
