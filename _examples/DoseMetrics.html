@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Dataset Preparation" href="DatasetPreparation.html" /><link rel="prev" title="Compute Radiomics" href="Radiomics.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>Dose Metrics - PyDicer 0.1.0 documentation</title>
+        <title>Dose Metrics - PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -484,7 +484,8 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Dose-Metrics">
 <h1>Dose Metrics<a class="headerlink" href="#Dose-Metrics" title="Permalink to this heading">#</a></h1>
-<p>In this example notebook we will compute Dose Volume Histograms (DVH) for our <code class="docutils literal notranslate"><span class="pre">RTDOSE</span></code> objects across structures found in <code class="docutils literal notranslate"><span class="pre">RTSTRUCT</span></code> objects in our dataset. We use <a class="reference external" href="https://wiki.cancerimagingarchive.net/display/Public/HNSCC">HNSCC</a> data from the Cancer Imaging Archive which has already been converted using PyDicer for demonstration purposes.</p>
+<p><a class="reference external" href="https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/DoseMetrics.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p>In this example notebook we will compute <a class="reference external" href="https://pyplati.github.io/platipy/dose.html#module-platipy.imaging.dose.dvh">Dose Volume Histograms (DVH)</a> for our <code class="docutils literal notranslate"><span class="pre">RTDOSE</span></code> objects across structures found in <code class="docutils literal notranslate"><span class="pre">RTSTRUCT</span></code> objects in our dataset. We use <a class="reference external" href="https://wiki.cancerimagingarchive.net/display/Public/HNSCC">HNSCC</a> data from the Cancer Imaging Archive which has already been converted using PyDicer for demonstration purposes.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -535,7 +536,7 @@ Working directory %s aready exists, won&#39;t download test data.
 </section>
 <section id="Compute-DVH">
 <h2>Compute DVH<a class="headerlink" href="#Compute-DVH" title="Permalink to this heading">#</a></h2>
-<p>Before we can extract dose metrics, we must compute Dose Volume Histograms for all dose objects and structure sets.</p>
+<p>Before we can extract dose metrics, we must compute Dose Volume Histograms for all dose objects and structure sets. This is done using the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/analyse.html#pydicer.analyse.data.AnalyseData.compute_dvh">compute_dvh</a> function.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -549,14 +550,14 @@ Working directory %s aready exists, won&#39;t download test data.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 4/4 [00:45&lt;00:00, 11.36s/objects, Compute DVH]
+100%|██████████| 4/4 [00:45&lt;00:00, 11.47s/objects, Compute DVH]
 </pre></div></div>
 </div>
 </section>
 <section id="Inspect-DVH">
 <h2>Inspect DVH<a class="headerlink" href="#Inspect-DVH" title="Permalink to this heading">#</a></h2>
 <p>DVHs computed are stored in the respective dose object directories on the file system. Inspect a dose object directory (e.g. <code class="docutils literal notranslate"><span class="pre">testdata_hnscc/data/HNSCC-01-0019/doses/309e1a</span></code>). Here you will find a <code class="docutils literal notranslate"><span class="pre">.png</span></code> file which plots the DVH for each of the linked structures. In addition a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file stores the raw DVH values.</p>
-<p>The DVHs can for this dataset can be loaded into a pandas DataFrame with the <code class="docutils literal notranslate"><span class="pre">get_all_dvhs_for_dataset</span></code> function.</p>
+<p>The DVHs can for this dataset can be loaded into a pandas DataFrame with the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/analyse.html#pydicer.analyse.data.AnalyseData.get_all_dvhs_for_dataset">get_all_dvhs_for_dataset</a> function.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -741,7 +742,7 @@ Working directory %s aready exists, won&#39;t download test data.
 </section>
 <section id="Compute-Dose-Metrics">
 <h2>Compute Dose Metrics<a class="headerlink" href="#Compute-Dose-Metrics" title="Permalink to this heading">#</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">compute_dose_metrics</span></code> function in the <code class="docutils literal notranslate"><span class="pre">analyse</span></code> module can compute <strong>D</strong>, <strong>V</strong> and <strong>Dcc</strong> metrics. Specify the points at which to compute those values. For example, the following cell computes the <strong>D95</strong>, <strong>D50</strong>, <strong>V5</strong> and <strong>Dcc10</strong>.</p>
+<p>The <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/analyse.html#pydicer.analyse.data.AnalyseData.compute_dose_metrics">compute_dose_metrics</a> function in the <code class="docutils literal notranslate"><span class="pre">analyse</span></code> module can compute <strong>D</strong>, <strong>V</strong> and <strong>Dcc</strong> metrics. Specify the points at which to compute those values. For example, the following cell computes the <strong>D95</strong>, <strong>D50</strong>, <strong>V5</strong> and <strong>Dcc10</strong>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -900,7 +901,7 @@ Working directory %s aready exists, won&#39;t download test data.
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>

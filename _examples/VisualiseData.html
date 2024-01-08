@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Compute Radiomics" href="Radiomics.html" /><link rel="prev" title="Converting Data" href="ConvertingData.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>Visualise Data - PyDicer 0.1.0 documentation</title>
+        <title>Visualise Data - PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -484,8 +484,9 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Visualise-Data">
 <h1>Visualise Data<a class="headerlink" href="#Visualise-Data" title="Permalink to this heading">#</a></h1>
-<p>PyDicer’s <code class="docutils literal notranslate"><span class="pre">visualise</span></code> module will produce cross-sections of data objects and store them in <code class="docutils literal notranslate"><span class="pre">.png</span></code> format within the data object directory. This is particularly useful for fast inspection of the data to ensure that nothing has gone wrong during conversion.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">visualise</span></code> module can be run at any time after conversion. If you are using advanced features of PyDicer, such as <code class="docutils literal notranslate"><span class="pre">auto-segmentation</span> <span class="pre">inference</span></code> and <code class="docutils literal notranslate"><span class="pre">object</span> <span class="pre">generation</span></code>, you can run the visualise module following the generation of the new data objects to produce the cross-section <code class="docutils literal notranslate"><span class="pre">.png</span></code> files.</p>
+<p><a class="reference external" href="https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/VisualiseData.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p>PyDicer’s <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/visualise.html">visualise module</a> will produce cross-sections of data objects and store them in <code class="docutils literal notranslate"><span class="pre">.png</span></code> format within the data object directory. This is particularly useful for fast inspection of the data to ensure that nothing has gone wrong during conversion.</p>
+<p>The visualise module can be run at any time after conversion. If you are using advanced features of PyDicer, such as <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/AutoSegmentation.html">auto-segmentation inference</a> and <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/ObjectGeneration.html">object generation</a>, you can run the visualise module following the generation of the new data objects to produce the cross-section <code class="docutils literal notranslate"><span class="pre">.png</span></code> files.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -526,7 +527,7 @@ Working directory %s aready exists, won&#39;t download test data.
 </section>
 <section id="id1">
 <h2>Visualise Data<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
-<p>We simply call the <code class="docutils literal notranslate"><span class="pre">visualise()</span></code> function of the <code class="docutils literal notranslate"><span class="pre">visualise</span></code> module to produce the cross-sections.</p>
+<p>We simply call the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/visualise.html#pydicer.visualise.data.VisualiseData.visualise">visualise</a> function of the <code class="docutils literal notranslate"><span class="pre">visualise</span></code> module to produce the cross-sections.</p>
 <p>Inspect some of the data object directories in <code class="docutils literal notranslate"><span class="pre">testdata_hnscc/data</span></code> and look for the <code class="docutils literal notranslate"><span class="pre">.png</span></code> cross-sections. The <code class="docutils literal notranslate"><span class="pre">{hashed_uid}</span></code> in files named <code class="docutils literal notranslate"><span class="pre">vis_{hashed_uid}.png</span></code> refers to a UID hash linking to the image being visualised. Visualisations are produced for: - Images - RT Structure Sets - RT Dose Grids</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -541,19 +542,19 @@ Working directory %s aready exists, won&#39;t download test data.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
- 47%|████▋     | 14/30 [00:59&lt;00:38,  2.43s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+ 17%|█▋        | 5/30 [00:39&lt;03:03,  7.35s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
   warnings.warn(msg)
- 50%|█████     | 15/30 [01:00&lt;00:27,  1.81s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+ 67%|██████▋   | 20/30 [01:40&lt;00:24,  2.46s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
   warnings.warn(msg)
- 53%|█████▎    | 16/30 [01:00&lt;00:18,  1.34s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+ 70%|███████   | 21/30 [01:40&lt;00:16,  1.83s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
   warnings.warn(msg)
- 57%|█████▋    | 17/30 [01:00&lt;00:13,  1.01s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+ 73%|███████▎  | 22/30 [01:40&lt;00:10,  1.36s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
   warnings.warn(msg)
- 77%|███████▋  | 23/30 [01:39&lt;00:43,  6.14s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+ 77%|███████▋  | 23/30 [01:40&lt;00:07,  1.03s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
   warnings.warn(msg)
- 97%|█████████▋| 29/30 [02:05&lt;00:04,  4.75s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+ 97%|█████████▋| 29/30 [02:07&lt;00:04,  4.20s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
   warnings.warn(msg)
-100%|██████████| 30/30 [02:06&lt;00:00,  4.21s/objects, visualise]
+100%|██████████| 30/30 [02:07&lt;00:00,  4.26s/objects, visualise]
 </pre></div></div>
 </div>
 <section id="Run-for-a-single-patient">
@@ -572,9 +573,9 @@ Working directory %s aready exists, won&#39;t download test data.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
- 83%|████████▎ | 5/6 [00:39&lt;00:07,  7.30s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
+ 83%|████████▎ | 5/6 [00:39&lt;00:07,  7.35s/objects, visualise]/home/runner/.cache/pypoetry/virtualenvs/pydicer-pNPN9n62-py3.9/lib/python3.9/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR DA: &#39;NaT&#39;.
   warnings.warn(msg)
-100%|██████████| 6/6 [00:39&lt;00:00,  6.59s/objects, visualise]
+100%|██████████| 6/6 [00:39&lt;00:00,  6.64s/objects, visualise]
 </pre></div></div>
 </div>
 </section>
@@ -594,7 +595,7 @@ Working directory %s aready exists, won&#39;t download test data.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 30/30 [00:00&lt;00:00, 400.86objects/s, visualise]
+100%|██████████| 30/30 [00:00&lt;00:00, 388.20objects/s, visualise]
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -638,7 +639,7 @@ Working directory %s aready exists, won&#39;t download test data.
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>

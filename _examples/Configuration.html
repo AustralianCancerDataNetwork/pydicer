@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Contributing" href="../contributing.html" /><link rel="prev" title="Generating Data Objects" href="ObjectGeneration.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>Configuration - PyDicer 0.1.0 documentation</title>
+        <title>Configuration - PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -484,6 +484,7 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Configuration">
 <h1>Configuration<a class="headerlink" href="#Configuration" title="Permalink to this heading">#</a></h1>
+<p><a class="reference external" href="https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/Configuration.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
 <p>PyDicer provides various options which you may configure to change the behaviour of the tool.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -507,7 +508,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <section id="Getting-and-Setting-Options">
 <h2>Getting and Setting Options<a class="headerlink" href="#Getting-and-Setting-Options" title="Permalink to this heading">#</a></h2>
-<p>Use the <code class="docutils literal notranslate"><span class="pre">get_config</span></code> and <code class="docutils literal notranslate"><span class="pre">set_config</span></code> functions of the <code class="docutils literal notranslate"><span class="pre">config</span></code> module to get and set configuration options respectively.</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">get_config</span></code> and <code class="docutils literal notranslate"><span class="pre">set_config</span></code> functions of the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/config.html">config module</a> to get and set configuration options respectively.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -537,7 +538,7 @@ New logging verbosity: 10
 <h2>Options Available<a class="headerlink" href="#Options-Available" title="Permalink to this heading">#</a></h2>
 <section id="Logging-Verbosity">
 <h3>Logging Verbosity<a class="headerlink" href="#Logging-Verbosity" title="Permalink to this heading">#</a></h3>
-<p>Level of output for standard out. Value indicates the Python built-in log level. A value of 0 (not set) will display the process bar. Logs of all levels are available in the .pydicer directory.</p>
+<p>Level of output for standard out. Value indicates the <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging-levels">Python built-in log level</a>. A value of 0 (not set) will display the process bar. Logs of all levels are available in the .pydicer directory.</p>
 <p>Valid options are: <code class="docutils literal notranslate"><span class="pre">[logging.NOTSET,</span> <span class="pre">logging.DEBUG,</span> <span class="pre">logging.INFO,</span> <span class="pre">logging.WARNING,</span> <span class="pre">logging.ERROR]</span></code></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -550,7 +551,7 @@ New logging verbosity: 10
 </section>
 <section id="Frame-of-Reference-Fallback-Linkage">
 <h3>Frame of Reference Fallback Linkage<a class="headerlink" href="#Frame-of-Reference-Fallback-Linkage" title="Permalink to this heading">#</a></h3>
-<p>Determine whether to fallback on linking objects via their Frame of Reference if no more stable link exists.</p>
+<p>Determine whether to fallback on linking objects via their <a class="reference external" href="https://dicom.innolitics.com/ciods/ct-image/frame-of-reference/00200052">Frame of Reference UID</a> if no more stable link exists.</p>
 <p>Valid options are: <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -602,7 +603,7 @@ New logging verbosity: 10
 </section>
 <section id="Generate-NRRD">
 <h3>Generate NRRD<a class="headerlink" href="#Generate-NRRD" title="Permalink to this heading">#</a></h3>
-<p>Whether or not to generate an additional NRRD file when converting RTSTRUCT. This allows loading easily into 3D slicer, but it takes up more disk space and takes time to generate the file.</p>
+<p>Whether or not to generate an additional NRRD file when converting RTSTRUCT. This allows loading easily into <a class="reference external" href="https://www.slicer.org/">3D slicer</a>, but it takes up more disk space and takes time to generate the file.</p>
 <p>Valid options are: <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -666,7 +667,7 @@ New logging verbosity: 10
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>

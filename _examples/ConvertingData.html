@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Visualise Data" href="VisualiseData.html" /><link rel="prev" title="Getting Started" href="GettingStarted.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>Converting Data - PyDicer 0.1.0 documentation</title>
+        <title>Converting Data - PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -484,6 +484,7 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Converting-Data">
 <h1>Converting Data<a class="headerlink" href="#Converting-Data" title="Permalink to this heading">#</a></h1>
+<p><a class="reference external" href="https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/ConvertingData.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
 <p>In this example, the preprocessing and conversion of DICOM data is demonstrated. These are essential first steps before data can be analysed using PyDicer.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -503,7 +504,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <section id="Setup-PyDicer">
 <h2>Setup PyDicer<a class="headerlink" href="#Setup-PyDicer" title="Permalink to this heading">#</a></h2>
-<p>As in the <code class="docutils literal notranslate"><span class="pre">Getting</span> <span class="pre">Started</span></code> example, we must first define a working directory for our dataset. We also create a <code class="docutils literal notranslate"><span class="pre">PyDicer</span></code> object.</p>
+<p>As in the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/GettingStarted.html">Getting Started example</a>, we must first define a working directory for our dataset. We also create a <code class="docutils literal notranslate"><span class="pre">PyDicer</span></code> object.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -516,7 +517,7 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="Fetch-some-data">
 <h2>Fetch some data<a class="headerlink" href="#Fetch-some-data" title="Permalink to this heading">#</a></h2>
-<p>A TestInput class is provided in pydicer to download some sample data to work with. Several other input classes exist if you’d like to retrieve DICOM data for conversion from somewhere else. See the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/html/input.html">docs for information</a> on how the PyDicer input classes work.</p>
+<p>A <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/input.html#pydicer.input.test.TestInput">TestInput class</a> is provided in pydicer to download some sample data to work with. Several other input classes exist if you’d like to retrieve DICOM data for conversion from somewhere else. See the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/html/input.html">docs for information</a> on how the PyDicer input classes work.</p>
 <p>Most commonly, if you have DICOM files stored within a folder on your file system you can simply pass the path to your DICOM directory to the <code class="docutils literal notranslate"><span class="pre">pydicer.add_input()</span></code> function.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -534,7 +535,7 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="Preprocess">
 <h2>Preprocess<a class="headerlink" href="#Preprocess" title="Permalink to this heading">#</a></h2>
-<p>With some DICOM data ready to work with, we must first use the PyDicer <code class="docutils literal notranslate"><span class="pre">preprocess</span></code> module. This module will crawl over all DICOM data available and will index all information required for conversion of the data.</p>
+<p>With some DICOM data ready to work with, we must first use the PyDicer <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/preprocess.html">preprocess module</a>. This module will crawl over all DICOM data available and will index all information required for conversion of the data.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -548,7 +549,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 1309/1309 [00:03&lt;00:00, 418.20files/s, preprocess]
+100%|██████████| 1309/1309 [00:03&lt;00:00, 409.97files/s, preprocess]
 </pre></div></div>
 </div>
 <section id="Inspect-Preprocessed-Data">
@@ -601,7 +602,7 @@ div.rendered_html tbody tr:hover {
   </thead>
   <tbody>
     <tr>
-      <th>1206</th>
+      <th>1299</th>
       <td>HNSCC-01-0019</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.797724702538...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.233510441938...</td>
@@ -615,7 +616,7 @@ div.rendered_html tbody tr:hover {
       <td>NaN</td>
     </tr>
     <tr>
-      <th>1199</th>
+      <th>1266</th>
       <td>HNSCC-01-0019</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.797724702538...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.233510441938...</td>
@@ -629,7 +630,7 @@ div.rendered_html tbody tr:hover {
       <td>NaN</td>
     </tr>
     <tr>
-      <th>1188</th>
+      <th>1216</th>
       <td>HNSCC-01-0019</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.797724702538...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.233510441938...</td>
@@ -643,7 +644,7 @@ div.rendered_html tbody tr:hover {
       <td>NaN</td>
     </tr>
     <tr>
-      <th>1229</th>
+      <th>1205</th>
       <td>HNSCC-01-0019</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.797724702538...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.233510441938...</td>
@@ -657,7 +658,7 @@ div.rendered_html tbody tr:hover {
       <td>NaN</td>
     </tr>
     <tr>
-      <th>1208</th>
+      <th>1245</th>
       <td>HNSCC-01-0019</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.797724702538...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.233510441938...</td>
@@ -680,7 +681,7 @@ div.rendered_html tbody tr:hover {
 <h2>Convert Data<a class="headerlink" href="#Convert-Data" title="Permalink to this heading">#</a></h2>
 <p>With the DICOM data having been indexed during preprocessing, we are now ready to convert this data into NIfTI format which will be stored within the PyDicer standard directory structure.</p>
 <p>Running the following cell will begin the conversion process. While this cell is running, take a look inside the <code class="docutils literal notranslate"><span class="pre">working/data</span></code> directory to see how the converted data is being stored.</p>
-<p>Notice the <code class="docutils literal notranslate"><span class="pre">converted.csv</span></code> file stored for each patient. This tracks each converted data object. This will be loaded as a Pandas DataFrame for use throughout PyDicer.</p>
+<p>Notice the <code class="docutils literal notranslate"><span class="pre">converted.csv</span></code> file stored for each patient. This tracks each converted data object. This will be loaded as a <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">Pandas DataFrame</a> for use throughout PyDicer.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -694,13 +695,13 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
- 24%|██▍       | 5/21 [00:51&lt;03:10, 11.89s/objects, convert]WARNING: In /tmp/SimpleITK-build/ITK-prefix/include/ITK-5.3/itkImageSeriesReader.hxx, line 477
-ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detected,  maximum nonuniformity:0.000641026
+ 24%|██▍       | 5/21 [00:52&lt;03:14, 12.15s/objects, convert]WARNING: In /tmp/SimpleITK-build/ITK-prefix/include/ITK-5.3/itkImageSeriesReader.hxx, line 477
+ImageSeriesReader (0x55baeceb7eb0): Non uniform sampling or missing slices detected,  maximum nonuniformity:0.000641026
 
- 29%|██▊       | 6/21 [00:52&lt;02:06,  8.46s/objects, convert]WARNING: In /tmp/SimpleITK-build/ITK-prefix/include/ITK-5.3/itkImageSeriesReader.hxx, line 477
-ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detected,  maximum nonuniformity:0.000641026
+ 29%|██▊       | 6/21 [00:53&lt;02:09,  8.63s/objects, convert]WARNING: In /tmp/SimpleITK-build/ITK-prefix/include/ITK-5.3/itkImageSeriesReader.hxx, line 477
+ImageSeriesReader (0x55baeceb7eb0): Non uniform sampling or missing slices detected,  maximum nonuniformity:0.000641026
 
-100%|██████████| 21/21 [04:01&lt;00:00, 11.52s/objects, convert]
+100%|██████████| 21/21 [04:05&lt;00:00, 11.67s/objects, convert]
 </pre></div></div>
 </div>
 <section id="Load-Converted-DataFrame">
@@ -752,116 +753,6 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
-      <td>c4ffd0</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.151938046710...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
-      <td>NaN</td>
-      <td>working/data/HNSCC-01-0176/images/c4ffd0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.107072817915...</td>
-      <td>8e0da9</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.176143398282...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.216161306702...</td>
-      <td>NaN</td>
-      <td>working/data/HNSCC-01-0176/images/8e0da9</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.133948865586...</td>
-      <td>ec4aec</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.192899726585...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.216161306702...</td>
-      <td>NaN</td>
-      <td>working/data/HNSCC-01-0176/images/ec4aec</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.469610481459...</td>
-      <td>33c44a</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.244362210503...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.310630617866...</td>
-      <td>NaN</td>
-      <td>working/data/HNSCC-01-0176/images/33c44a</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.169033525924...</td>
-      <td>833a74</td>
-      <td>RTDOSE</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.279793773343...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
-      <td>working/data/HNSCC-01-0176/doses/833a74</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.267291308489...</td>
-      <td>bf3fba</td>
-      <td>RTDOSE</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.283706688235...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.566662631858...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.173917268454...</td>
-      <td>working/data/HNSCC-01-0176/doses/bf3fba</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.173917268454...</td>
-      <td>6f7db7</td>
-      <td>RTPLAN</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120111576192...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.566662631858...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.323156708629...</td>
-      <td>working/data/HNSCC-01-0176/plans/6f7db7</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
-      <td>a6b346</td>
-      <td>RTPLAN</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.318927873561...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
-      <td>working/data/HNSCC-01-0176/plans/a6b346</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
-      <td>cbbf5b</td>
-      <td>RTSTRUCT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.276897558084...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
-      <td>working/data/HNSCC-01-0176/structures/cbbf5b</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.323156708629...</td>
-      <td>6d2934</td>
-      <td>RTSTRUCT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.495627765798...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.310630617866...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.469610481459...</td>
-      <td>working/data/HNSCC-01-0176/structures/6d2934</td>
-    </tr>
-    <tr>
-      <th>10</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.240263316258...</td>
       <td>72b0f9</td>
       <td>CT</td>
@@ -872,7 +763,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <td>working/data/HNSCC-01-0199/images/72b0f9</td>
     </tr>
     <tr>
-      <th>11</th>
+      <th>1</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.264264397186...</td>
       <td>c16e76</td>
       <td>RTDOSE</td>
@@ -883,7 +774,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <td>working/data/HNSCC-01-0199/doses/c16e76</td>
     </tr>
     <tr>
-      <th>12</th>
+      <th>2</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.287865632112...</td>
       <td>664e96</td>
       <td>RTPLAN</td>
@@ -894,7 +785,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <td>working/data/HNSCC-01-0199/plans/664e96</td>
     </tr>
     <tr>
-      <th>13</th>
+      <th>3</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.166429645421...</td>
       <td>06e49c</td>
       <td>RTSTRUCT</td>
@@ -903,6 +794,116 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.870916135819...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.240263316258...</td>
       <td>working/data/HNSCC-01-0199/structures/06e49c</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
+      <td>c4ffd0</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.151938046710...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
+      <td>NaN</td>
+      <td>working/data/HNSCC-01-0176/images/c4ffd0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.107072817915...</td>
+      <td>8e0da9</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.176143398282...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.216161306702...</td>
+      <td>NaN</td>
+      <td>working/data/HNSCC-01-0176/images/8e0da9</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.133948865586...</td>
+      <td>ec4aec</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.192899726585...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.216161306702...</td>
+      <td>NaN</td>
+      <td>working/data/HNSCC-01-0176/images/ec4aec</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.469610481459...</td>
+      <td>33c44a</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.244362210503...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.310630617866...</td>
+      <td>NaN</td>
+      <td>working/data/HNSCC-01-0176/images/33c44a</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.169033525924...</td>
+      <td>833a74</td>
+      <td>RTDOSE</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.279793773343...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
+      <td>working/data/HNSCC-01-0176/doses/833a74</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.267291308489...</td>
+      <td>bf3fba</td>
+      <td>RTDOSE</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.283706688235...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.566662631858...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.173917268454...</td>
+      <td>working/data/HNSCC-01-0176/doses/bf3fba</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.173917268454...</td>
+      <td>6f7db7</td>
+      <td>RTPLAN</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120111576192...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.566662631858...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.323156708629...</td>
+      <td>working/data/HNSCC-01-0176/plans/6f7db7</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
+      <td>a6b346</td>
+      <td>RTPLAN</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.318927873561...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
+      <td>working/data/HNSCC-01-0176/plans/a6b346</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
+      <td>cbbf5b</td>
+      <td>RTSTRUCT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.276897558084...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
+      <td>working/data/HNSCC-01-0176/structures/cbbf5b</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.323156708629...</td>
+      <td>6d2934</td>
+      <td>RTSTRUCT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.495627765798...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.310630617866...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.469610481459...</td>
+      <td>working/data/HNSCC-01-0176/structures/6d2934</td>
     </tr>
     <tr>
       <th>14</th>
@@ -1005,27 +1006,27 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <th>0</th>
       <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
       <td>2 slices at location 0.0 containing different ...</td>
-      <td>2023-12-13 23:30:07.253797</td>
-      <td>HNSCC-01-0176</td>
-      <td>CT</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.181695106907...</td>
-      <td>SCOUT/NECK-ORAL/NASO W/CON</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
-      <td>2 slices at location 0.0 containing different ...</td>
-      <td>2023-12-13 23:30:07.258578</td>
+      <td>2024-01-08 14:49:38.117672</td>
       <td>HNSCC-01-0176</td>
       <td>CT</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.258957568007...</td>
       <td>SCOUT/NECK-ORAL/NASO W/CON</td>
     </tr>
     <tr>
+      <th>1</th>
+      <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
+      <td>2 slices at location 0.0 containing different ...</td>
+      <td>2024-01-08 14:49:38.122659</td>
+      <td>HNSCC-01-0176</td>
+      <td>CT</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.181695106907...</td>
+      <td>SCOUT/NECK-ORAL/NASO W/CON</td>
+    </tr>
+    <tr>
       <th>2</th>
       <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
       <td>2 slices at location -155.0 containing differe...</td>
-      <td>2023-12-13 23:30:07.273135</td>
+      <td>2024-01-08 14:49:38.137575</td>
       <td>HNSCC-01-0176</td>
       <td>CT</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.308207714344...</td>
@@ -1035,7 +1036,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <th>3</th>
       <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
       <td>2 slices at location -155.0 containing differe...</td>
-      <td>2023-12-13 23:30:07.278531</td>
+      <td>2024-01-08 14:49:38.143617</td>
       <td>HNSCC-01-0176</td>
       <td>CT</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.189167578552...</td>
@@ -1045,7 +1046,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <th>4</th>
       <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
       <td>2 slices at location -155.0 containing differe...</td>
-      <td>2023-12-13 23:30:07.283695</td>
+      <td>2024-01-08 14:49:38.148905</td>
       <td>HNSCC-01-0176</td>
       <td>CT</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.146032766668...</td>
@@ -1065,7 +1066,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <th>607</th>
       <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
       <td>2 slices at location -155.0 containing differe...</td>
-      <td>2023-12-13 23:30:11.932058</td>
+      <td>2024-01-08 14:49:43.017564</td>
       <td>HNSCC-01-0176</td>
       <td>CT</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.190466192108...</td>
@@ -1075,7 +1076,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <th>608</th>
       <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
       <td>2 slices at location -155.0 containing differe...</td>
-      <td>2023-12-13 23:30:11.942193</td>
+      <td>2024-01-08 14:49:43.028143</td>
       <td>HNSCC-01-0176</td>
       <td>CT</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.209452648754...</td>
@@ -1085,7 +1086,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <th>609</th>
       <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
       <td>2 slices at location -155.0 containing differe...</td>
-      <td>2023-12-13 23:30:11.952565</td>
+      <td>2024-01-08 14:49:43.038581</td>
       <td>HNSCC-01-0176</td>
       <td>CT</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.174557835738...</td>
@@ -1095,7 +1096,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <th>610</th>
       <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
       <td>2 slices at location -155.0 containing differe...</td>
-      <td>2023-12-13 23:30:11.962822</td>
+      <td>2024-01-08 14:49:43.049173</td>
       <td>HNSCC-01-0176</td>
       <td>CT</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.113716820433...</td>
@@ -1105,7 +1106,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
       <th>611</th>
       <td>working/dicom/HNSCC/HNSCC-01-0176/03-05-2004-N...</td>
       <td>2 slices at location -155.0 containing differe...</td>
-      <td>2023-12-13 23:30:11.973046</td>
+      <td>2024-01-08 14:49:43.059810</td>
       <td>HNSCC-01-0176</td>
       <td>CT</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.141027169157...</td>
@@ -1156,7 +1157,7 @@ ImageSeriesReader (0x55f2c9c8e570): Non uniform sampling or missing slices detec
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>

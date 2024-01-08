@@ -6,6 +6,8 @@
    "source": [
     "# nnUNet Data Preparation\n",
     "\n",
+    "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/nnUNet.ipynb)\n",
+    "\n",
     "The [nnUNet](https://github.com/MIC-DKFZ/nnUNet) is a self-configuring method for deep\n",
     "learning-based biomedical image segmentation. However it does require data to be formatted in a\n",
     "specific way on the file system. In this notebook, we demonstrate some useful functionality to\n",
@@ -157,7 +159,7 @@
     "DataFrame to confirm that this is the case.\n",
     "\n",
     "If your dataset isn't yet in such as state, you can use the \n",
-    "[`dataset preparation`](https://australiancancerdatanetwork.github.io/pydicer/_examples/DatasetPreparation.html)\n",
+    "[dataset preparation](https://australiancancerdatanetwork.github.io/pydicer/_examples/DatasetPreparation.html)\n",
     "module in PyDicer to prepare a subset of data. Once the dataset is prepared, pass the\n",
     "`dataset_name` argument when creating the `NNUNetDataset` object above."
    ]
@@ -199,7 +201,7 @@
     "\n",
     "Here we randomly split our dataset into a training and testing set. You can specify the\n",
     "`training_cases` and `testing_cases` to use in the `split_dataset` function. If these aren't\n",
-    "supplied, the [`train_test_split`](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)\n",
+    "supplied, the [train_test_split](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)\n",
     "function from `sklearn` will be used. You can pass keyword arguments to this function via the\n",
     "`split_dataset` function."
    ]
@@ -326,7 +328,10 @@
     "]\n",
     "\n",
     "script_path = nnunet.generate_training_scripts(script_header=script_header)\n",
-    "print(f\"Training script ready in: {script_path}\")"
+    "print(f\"Training script ready in: {script_path}\")\n",
+    "\n",
+    "# Set the logging verbosity back to NOTSET\n",
+    "pydicer.set_verbosity(logging.NOTSET)"
    ]
   },
   {

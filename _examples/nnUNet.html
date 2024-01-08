@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Working with Data" href="WorkingWithData.html" /><link rel="prev" title="Auto-segmentation Inference &amp; Analysis" href="AutoSegmentation.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>nnUNet Data Preparation - PyDicer 0.1.0 documentation</title>
+        <title>nnUNet Data Preparation - PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -484,6 +484,7 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="nnUNet-Data-Preparation">
 <h1>nnUNet Data Preparation<a class="headerlink" href="#nnUNet-Data-Preparation" title="Permalink to this heading">#</a></h1>
+<p><a class="reference external" href="https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/nnUNet.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
 <p>The <a class="reference external" href="https://github.com/MIC-DKFZ/nnUNet">nnUNet</a> is a self-configuring method for deep learning-based biomedical image segmentation. However it does require data to be formatted in a specific way on the file system. In this notebook, we demonstrate some useful functionality to prepare a dataset converted by PyDicer for training using nnUNet.</p>
 <blockquote>
 <div><p>Note: PyDicer currently only supports nnUNet v1. Contributions adding support for nnUNet v2 are welcome.</p>
@@ -602,7 +603,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
 <section id="Inspect-Dataset">
 <h2>Inspect Dataset<a class="headerlink" href="#Inspect-Dataset" title="Permalink to this heading">#</a></h2>
 <p>Our <code class="docutils literal notranslate"><span class="pre">NNUNetDataset</span></code> tool expects to have exactly one image and one structure set per patient (multi-modal training not yet supported, contributions welcome). Let’s fetch our converted DataFrame to confirm that this is the case.</p>
-<p>If your dataset isn’t yet in such as state, you can use the <code class="docutils literal notranslate"><span class="pre">`dataset</span> <span class="pre">preparation</span></code> &lt;<a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/DatasetPreparation.html">https://australiancancerdatanetwork.github.io/pydicer/_examples/DatasetPreparation.html</a>&gt;`__ module in PyDicer to prepare a subset of data. Once the dataset is prepared, pass the <code class="docutils literal notranslate"><span class="pre">dataset_name</span></code> argument when creating the <code class="docutils literal notranslate"><span class="pre">NNUNetDataset</span></code> object above.</p>
+<p>If your dataset isn’t yet in such as state, you can use the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/DatasetPreparation.html">dataset preparation</a> module in PyDicer to prepare a subset of data. Once the dataset is prepared, pass the <code class="docutils literal notranslate"><span class="pre">dataset_name</span></code> argument when creating the <code class="docutils literal notranslate"><span class="pre">NNUNetDataset</span></code> object above.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -648,28 +649,6 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
-      <td>738c1a</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-005</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.338518041666...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-005/images/...</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
-      <td>68d663</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-005</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-005/structu...</td>
-    </tr>
-    <tr>
-      <th>2</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.168227681755...</td>
       <td>5adf40</td>
       <td>CT</td>
@@ -680,7 +659,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Train-S1-007/images/...</td>
     </tr>
     <tr>
-      <th>3</th>
+      <th>1</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
       <td>ed6686</td>
       <td>RTSTRUCT</td>
@@ -691,7 +670,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Train-S1-007/structu...</td>
     </tr>
     <tr>
-      <th>4</th>
+      <th>2</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.217118546740...</td>
       <td>dd0026</td>
       <td>CT</td>
@@ -702,7 +681,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Train-S1-008/images/...</td>
     </tr>
     <tr>
-      <th>5</th>
+      <th>3</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
       <td>48a970</td>
       <td>RTSTRUCT</td>
@@ -713,7 +692,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Train-S1-008/structu...</td>
     </tr>
     <tr>
-      <th>6</th>
+      <th>4</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.318848546630...</td>
       <td>aa38e6</td>
       <td>CT</td>
@@ -724,7 +703,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Train-S1-002/images/...</td>
     </tr>
     <tr>
-      <th>7</th>
+      <th>5</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.291449913947...</td>
       <td>f036b8</td>
       <td>RTSTRUCT</td>
@@ -735,29 +714,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Train-S1-002/structu...</td>
     </tr>
     <tr>
-      <th>8</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
-      <td>2bf2f9</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-003</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.742383887179...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-003/images/...</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
-      <td>8e34f9</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-003</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-003/structu...</td>
-    </tr>
-    <tr>
-      <th>10</th>
+      <th>6</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.141349678572...</td>
       <td>d91c84</td>
       <td>CT</td>
@@ -768,7 +725,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Train-S1-004/images/...</td>
     </tr>
     <tr>
-      <th>11</th>
+      <th>7</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.595315284787...</td>
       <td>61758b</td>
       <td>RTSTRUCT</td>
@@ -779,7 +736,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Train-S1-004/structu...</td>
     </tr>
     <tr>
-      <th>12</th>
+      <th>8</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.188371727865...</td>
       <td>6834c9</td>
       <td>CT</td>
@@ -790,7 +747,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Train-S1-001/images/...</td>
     </tr>
     <tr>
-      <th>13</th>
+      <th>9</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.267594131248...</td>
       <td>b5bddb</td>
       <td>RTSTRUCT</td>
@@ -801,29 +758,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Train-S1-001/structu...</td>
     </tr>
     <tr>
-      <th>14</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
-      <td>88c5ef</td>
-      <td>CT</td>
-      <td>LCTSC-Train-S1-006</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.770569242984...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
-      <td>NaN</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-006/images/...</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
-      <td>ceb111</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-006</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
-      <td>testdata_lctsc/data/LCTSC-Train-S1-006/structu...</td>
-    </tr>
-    <tr>
-      <th>16</th>
+      <th>10</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.333558838494...</td>
       <td>666be6</td>
       <td>CT</td>
@@ -834,7 +769,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Test-S1-101/images/6...</td>
     </tr>
     <tr>
-      <th>17</th>
+      <th>11</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.929007819506...</td>
       <td>cc682f</td>
       <td>RTSTRUCT</td>
@@ -845,7 +780,51 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Test-S1-101/structur...</td>
     </tr>
     <tr>
-      <th>18</th>
+      <th>12</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
+      <td>88c5ef</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-006</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.770569242984...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-006/images/...</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
+      <td>ceb111</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-006</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-006/structu...</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>738c1a</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.338518041666...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-005/images/...</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>68d663</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-005/structu...</td>
+    </tr>
+    <tr>
+      <th>16</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
       <td>914d57</td>
       <td>CT</td>
@@ -856,7 +835,7 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>testdata_lctsc/data/LCTSC-Test-S1-102/images/9...</td>
     </tr>
     <tr>
-      <th>19</th>
+      <th>17</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
       <td>6c6ea4</td>
       <td>RTSTRUCT</td>
@@ -865,6 +844,28 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
       <td>testdata_lctsc/data/LCTSC-Test-S1-102/structur...</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>2bf2f9</td>
+      <td>CT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.742383887179...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>NaN</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-003/images/...</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>8e34f9</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>testdata_lctsc/data/LCTSC-Train-S1-003/structu...</td>
     </tr>
   </tbody>
 </table>
@@ -893,7 +894,7 @@ pydicer.dataset.nnunet - INFO - Dataset OK
 </section>
 <section id="Split-Dataset">
 <h2>Split Dataset<a class="headerlink" href="#Split-Dataset" title="Permalink to this heading">#</a></h2>
-<p>Here we randomly split our dataset into a training and testing set. You can specify the <code class="docutils literal notranslate"><span class="pre">training_cases</span></code> and <code class="docutils literal notranslate"><span class="pre">testing_cases</span></code> to use in the <code class="docutils literal notranslate"><span class="pre">split_dataset</span></code> function. If these aren’t supplied, the <code class="docutils literal notranslate"><span class="pre">`train_test_split</span></code> &lt;<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html">https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html</a>&gt;`__ function from <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> will be used. You can pass keyword arguments to this function via the <code class="docutils literal notranslate"><span class="pre">split_dataset</span></code> function.</p>
+<p>Here we randomly split our dataset into a training and testing set. You can specify the <code class="docutils literal notranslate"><span class="pre">training_cases</span></code> and <code class="docutils literal notranslate"><span class="pre">testing_cases</span></code> to use in the <code class="docutils literal notranslate"><span class="pre">split_dataset</span></code> function. If these aren’t supplied, the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html">train_test_split</a> function from <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> will be used. You can pass keyword arguments to this function via the <code class="docutils literal notranslate"><span class="pre">split_dataset</span></code> function.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -908,8 +909,8 @@ pydicer.dataset.nnunet - INFO - Dataset OK
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 pydicer.dataset.nnunet - INFO - Dataset split OK
-pydicer.dataset.nnunet - INFO - Training cases: [&#39;LCTSC-Train-S1-005&#39;, &#39;LCTSC-Train-S1-006&#39;, &#39;LCTSC-Train-S1-008&#39;, &#39;LCTSC-Test-S1-102&#39;, &#39;LCTSC-Train-S1-003&#39;, &#39;LCTSC-Train-S1-002&#39;, &#39;LCTSC-Train-S1-001&#39;]
-pydicer.dataset.nnunet - INFO - Testing cases: [&#39;LCTSC-Test-S1-101&#39;, &#39;LCTSC-Train-S1-007&#39;, &#39;LCTSC-Train-S1-004&#39;]
+pydicer.dataset.nnunet - INFO - Training cases: [&#39;LCTSC-Train-S1-007&#39;, &#39;LCTSC-Train-S1-005&#39;, &#39;LCTSC-Train-S1-002&#39;, &#39;LCTSC-Train-S1-003&#39;, &#39;LCTSC-Train-S1-001&#39;, &#39;LCTSC-Train-S1-004&#39;, &#39;LCTSC-Train-S1-006&#39;]
+pydicer.dataset.nnunet - INFO - Testing cases: [&#39;LCTSC-Test-S1-102&#39;, &#39;LCTSC-Train-S1-008&#39;, &#39;LCTSC-Test-S1-101&#39;]
 </pre></div></div>
 </div>
 </section>
@@ -952,123 +953,123 @@ pydicer.dataset.nnunet - INFO - No duplicate images found in training and testin
 </div>
 <div class="output_area rendered_html docutils container">
 <style type="text/css">
-#T_c6f2e_row0_col2, #T_c6f2e_row0_col3, #T_c6f2e_row0_col4, #T_c6f2e_row0_col5, #T_c6f2e_row0_col6, #T_c6f2e_row1_col2, #T_c6f2e_row1_col3, #T_c6f2e_row1_col4, #T_c6f2e_row1_col5, #T_c6f2e_row1_col6, #T_c6f2e_row2_col2, #T_c6f2e_row2_col3, #T_c6f2e_row2_col4, #T_c6f2e_row2_col5, #T_c6f2e_row2_col6, #T_c6f2e_row3_col2, #T_c6f2e_row3_col3, #T_c6f2e_row3_col4, #T_c6f2e_row3_col5, #T_c6f2e_row3_col6, #T_c6f2e_row4_col2, #T_c6f2e_row4_col3, #T_c6f2e_row4_col4, #T_c6f2e_row4_col5, #T_c6f2e_row4_col6, #T_c6f2e_row5_col2, #T_c6f2e_row5_col3, #T_c6f2e_row5_col4, #T_c6f2e_row5_col5, #T_c6f2e_row5_col6, #T_c6f2e_row6_col2, #T_c6f2e_row6_col3, #T_c6f2e_row6_col4, #T_c6f2e_row6_col5, #T_c6f2e_row6_col6, #T_c6f2e_row7_col2, #T_c6f2e_row7_col3, #T_c6f2e_row7_col4, #T_c6f2e_row7_col5, #T_c6f2e_row7_col6, #T_c6f2e_row8_col2, #T_c6f2e_row8_col3, #T_c6f2e_row8_col4, #T_c6f2e_row8_col5, #T_c6f2e_row8_col6, #T_c6f2e_row9_col2, #T_c6f2e_row9_col3, #T_c6f2e_row9_col4, #T_c6f2e_row9_col5, #T_c6f2e_row9_col6 {
+#T_1a340_row0_col2, #T_1a340_row0_col3, #T_1a340_row0_col4, #T_1a340_row0_col5, #T_1a340_row0_col6, #T_1a340_row1_col2, #T_1a340_row1_col3, #T_1a340_row1_col4, #T_1a340_row1_col5, #T_1a340_row1_col6, #T_1a340_row2_col2, #T_1a340_row2_col3, #T_1a340_row2_col4, #T_1a340_row2_col5, #T_1a340_row2_col6, #T_1a340_row3_col2, #T_1a340_row3_col3, #T_1a340_row3_col4, #T_1a340_row3_col5, #T_1a340_row3_col6, #T_1a340_row4_col2, #T_1a340_row4_col3, #T_1a340_row4_col4, #T_1a340_row4_col5, #T_1a340_row4_col6, #T_1a340_row5_col2, #T_1a340_row5_col3, #T_1a340_row5_col4, #T_1a340_row5_col5, #T_1a340_row5_col6, #T_1a340_row6_col2, #T_1a340_row6_col3, #T_1a340_row6_col4, #T_1a340_row6_col5, #T_1a340_row6_col6, #T_1a340_row7_col2, #T_1a340_row7_col3, #T_1a340_row7_col4, #T_1a340_row7_col5, #T_1a340_row7_col6, #T_1a340_row8_col2, #T_1a340_row8_col3, #T_1a340_row8_col4, #T_1a340_row8_col5, #T_1a340_row8_col6, #T_1a340_row9_col2, #T_1a340_row9_col3, #T_1a340_row9_col4, #T_1a340_row9_col5, #T_1a340_row9_col6 {
   background-color: green;
 }
 </style>
-<table id="T_c6f2e">
+<table id="T_1a340">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_c6f2e_level0_col0" class="col_heading level0 col0" >patient_id</th>
-      <th id="T_c6f2e_level0_col1" class="col_heading level0 col1" >struct_hash</th>
-      <th id="T_c6f2e_level0_col2" class="col_heading level0 col2" >Esophagus</th>
-      <th id="T_c6f2e_level0_col3" class="col_heading level0 col3" >Heart</th>
-      <th id="T_c6f2e_level0_col4" class="col_heading level0 col4" >Lung_L</th>
-      <th id="T_c6f2e_level0_col5" class="col_heading level0 col5" >Lung_R</th>
-      <th id="T_c6f2e_level0_col6" class="col_heading level0 col6" >SpinalCord</th>
+      <th id="T_1a340_level0_col0" class="col_heading level0 col0" >patient_id</th>
+      <th id="T_1a340_level0_col1" class="col_heading level0 col1" >struct_hash</th>
+      <th id="T_1a340_level0_col2" class="col_heading level0 col2" >Esophagus</th>
+      <th id="T_1a340_level0_col3" class="col_heading level0 col3" >Heart</th>
+      <th id="T_1a340_level0_col4" class="col_heading level0 col4" >Lung_L</th>
+      <th id="T_1a340_level0_col5" class="col_heading level0 col5" >Lung_R</th>
+      <th id="T_1a340_level0_col6" class="col_heading level0 col6" >SpinalCord</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th id="T_c6f2e_level0_row0" class="row_heading level0 row0" >0</th>
-      <td id="T_c6f2e_row0_col0" class="data row0 col0" >LCTSC-Train-S1-005</td>
-      <td id="T_c6f2e_row0_col1" class="data row0 col1" >68d663</td>
-      <td id="T_c6f2e_row0_col2" class="data row0 col2" >1</td>
-      <td id="T_c6f2e_row0_col3" class="data row0 col3" >1</td>
-      <td id="T_c6f2e_row0_col4" class="data row0 col4" >1</td>
-      <td id="T_c6f2e_row0_col5" class="data row0 col5" >1</td>
-      <td id="T_c6f2e_row0_col6" class="data row0 col6" >1</td>
+      <th id="T_1a340_level0_row0" class="row_heading level0 row0" >0</th>
+      <td id="T_1a340_row0_col0" class="data row0 col0" >LCTSC-Train-S1-007</td>
+      <td id="T_1a340_row0_col1" class="data row0 col1" >ed6686</td>
+      <td id="T_1a340_row0_col2" class="data row0 col2" >1</td>
+      <td id="T_1a340_row0_col3" class="data row0 col3" >1</td>
+      <td id="T_1a340_row0_col4" class="data row0 col4" >1</td>
+      <td id="T_1a340_row0_col5" class="data row0 col5" >1</td>
+      <td id="T_1a340_row0_col6" class="data row0 col6" >1</td>
     </tr>
     <tr>
-      <th id="T_c6f2e_level0_row1" class="row_heading level0 row1" >1</th>
-      <td id="T_c6f2e_row1_col0" class="data row1 col0" >LCTSC-Train-S1-007</td>
-      <td id="T_c6f2e_row1_col1" class="data row1 col1" >ed6686</td>
-      <td id="T_c6f2e_row1_col2" class="data row1 col2" >1</td>
-      <td id="T_c6f2e_row1_col3" class="data row1 col3" >1</td>
-      <td id="T_c6f2e_row1_col4" class="data row1 col4" >1</td>
-      <td id="T_c6f2e_row1_col5" class="data row1 col5" >1</td>
-      <td id="T_c6f2e_row1_col6" class="data row1 col6" >1</td>
+      <th id="T_1a340_level0_row1" class="row_heading level0 row1" >1</th>
+      <td id="T_1a340_row1_col0" class="data row1 col0" >LCTSC-Train-S1-008</td>
+      <td id="T_1a340_row1_col1" class="data row1 col1" >48a970</td>
+      <td id="T_1a340_row1_col2" class="data row1 col2" >1</td>
+      <td id="T_1a340_row1_col3" class="data row1 col3" >1</td>
+      <td id="T_1a340_row1_col4" class="data row1 col4" >1</td>
+      <td id="T_1a340_row1_col5" class="data row1 col5" >1</td>
+      <td id="T_1a340_row1_col6" class="data row1 col6" >1</td>
     </tr>
     <tr>
-      <th id="T_c6f2e_level0_row2" class="row_heading level0 row2" >2</th>
-      <td id="T_c6f2e_row2_col0" class="data row2 col0" >LCTSC-Train-S1-008</td>
-      <td id="T_c6f2e_row2_col1" class="data row2 col1" >48a970</td>
-      <td id="T_c6f2e_row2_col2" class="data row2 col2" >1</td>
-      <td id="T_c6f2e_row2_col3" class="data row2 col3" >1</td>
-      <td id="T_c6f2e_row2_col4" class="data row2 col4" >1</td>
-      <td id="T_c6f2e_row2_col5" class="data row2 col5" >1</td>
-      <td id="T_c6f2e_row2_col6" class="data row2 col6" >1</td>
+      <th id="T_1a340_level0_row2" class="row_heading level0 row2" >2</th>
+      <td id="T_1a340_row2_col0" class="data row2 col0" >LCTSC-Train-S1-002</td>
+      <td id="T_1a340_row2_col1" class="data row2 col1" >f036b8</td>
+      <td id="T_1a340_row2_col2" class="data row2 col2" >1</td>
+      <td id="T_1a340_row2_col3" class="data row2 col3" >1</td>
+      <td id="T_1a340_row2_col4" class="data row2 col4" >1</td>
+      <td id="T_1a340_row2_col5" class="data row2 col5" >1</td>
+      <td id="T_1a340_row2_col6" class="data row2 col6" >1</td>
     </tr>
     <tr>
-      <th id="T_c6f2e_level0_row3" class="row_heading level0 row3" >3</th>
-      <td id="T_c6f2e_row3_col0" class="data row3 col0" >LCTSC-Train-S1-002</td>
-      <td id="T_c6f2e_row3_col1" class="data row3 col1" >f036b8</td>
-      <td id="T_c6f2e_row3_col2" class="data row3 col2" >1</td>
-      <td id="T_c6f2e_row3_col3" class="data row3 col3" >1</td>
-      <td id="T_c6f2e_row3_col4" class="data row3 col4" >1</td>
-      <td id="T_c6f2e_row3_col5" class="data row3 col5" >1</td>
-      <td id="T_c6f2e_row3_col6" class="data row3 col6" >1</td>
+      <th id="T_1a340_level0_row3" class="row_heading level0 row3" >3</th>
+      <td id="T_1a340_row3_col0" class="data row3 col0" >LCTSC-Train-S1-004</td>
+      <td id="T_1a340_row3_col1" class="data row3 col1" >61758b</td>
+      <td id="T_1a340_row3_col2" class="data row3 col2" >1</td>
+      <td id="T_1a340_row3_col3" class="data row3 col3" >1</td>
+      <td id="T_1a340_row3_col4" class="data row3 col4" >1</td>
+      <td id="T_1a340_row3_col5" class="data row3 col5" >1</td>
+      <td id="T_1a340_row3_col6" class="data row3 col6" >1</td>
     </tr>
     <tr>
-      <th id="T_c6f2e_level0_row4" class="row_heading level0 row4" >4</th>
-      <td id="T_c6f2e_row4_col0" class="data row4 col0" >LCTSC-Train-S1-003</td>
-      <td id="T_c6f2e_row4_col1" class="data row4 col1" >8e34f9</td>
-      <td id="T_c6f2e_row4_col2" class="data row4 col2" >1</td>
-      <td id="T_c6f2e_row4_col3" class="data row4 col3" >1</td>
-      <td id="T_c6f2e_row4_col4" class="data row4 col4" >1</td>
-      <td id="T_c6f2e_row4_col5" class="data row4 col5" >1</td>
-      <td id="T_c6f2e_row4_col6" class="data row4 col6" >1</td>
+      <th id="T_1a340_level0_row4" class="row_heading level0 row4" >4</th>
+      <td id="T_1a340_row4_col0" class="data row4 col0" >LCTSC-Train-S1-001</td>
+      <td id="T_1a340_row4_col1" class="data row4 col1" >b5bddb</td>
+      <td id="T_1a340_row4_col2" class="data row4 col2" >1</td>
+      <td id="T_1a340_row4_col3" class="data row4 col3" >1</td>
+      <td id="T_1a340_row4_col4" class="data row4 col4" >1</td>
+      <td id="T_1a340_row4_col5" class="data row4 col5" >1</td>
+      <td id="T_1a340_row4_col6" class="data row4 col6" >1</td>
     </tr>
     <tr>
-      <th id="T_c6f2e_level0_row5" class="row_heading level0 row5" >5</th>
-      <td id="T_c6f2e_row5_col0" class="data row5 col0" >LCTSC-Train-S1-004</td>
-      <td id="T_c6f2e_row5_col1" class="data row5 col1" >61758b</td>
-      <td id="T_c6f2e_row5_col2" class="data row5 col2" >1</td>
-      <td id="T_c6f2e_row5_col3" class="data row5 col3" >1</td>
-      <td id="T_c6f2e_row5_col4" class="data row5 col4" >1</td>
-      <td id="T_c6f2e_row5_col5" class="data row5 col5" >1</td>
-      <td id="T_c6f2e_row5_col6" class="data row5 col6" >1</td>
+      <th id="T_1a340_level0_row5" class="row_heading level0 row5" >5</th>
+      <td id="T_1a340_row5_col0" class="data row5 col0" >LCTSC-Test-S1-101</td>
+      <td id="T_1a340_row5_col1" class="data row5 col1" >cc682f</td>
+      <td id="T_1a340_row5_col2" class="data row5 col2" >1</td>
+      <td id="T_1a340_row5_col3" class="data row5 col3" >1</td>
+      <td id="T_1a340_row5_col4" class="data row5 col4" >1</td>
+      <td id="T_1a340_row5_col5" class="data row5 col5" >1</td>
+      <td id="T_1a340_row5_col6" class="data row5 col6" >1</td>
     </tr>
     <tr>
-      <th id="T_c6f2e_level0_row6" class="row_heading level0 row6" >6</th>
-      <td id="T_c6f2e_row6_col0" class="data row6 col0" >LCTSC-Train-S1-001</td>
-      <td id="T_c6f2e_row6_col1" class="data row6 col1" >b5bddb</td>
-      <td id="T_c6f2e_row6_col2" class="data row6 col2" >1</td>
-      <td id="T_c6f2e_row6_col3" class="data row6 col3" >1</td>
-      <td id="T_c6f2e_row6_col4" class="data row6 col4" >1</td>
-      <td id="T_c6f2e_row6_col5" class="data row6 col5" >1</td>
-      <td id="T_c6f2e_row6_col6" class="data row6 col6" >1</td>
+      <th id="T_1a340_level0_row6" class="row_heading level0 row6" >6</th>
+      <td id="T_1a340_row6_col0" class="data row6 col0" >LCTSC-Train-S1-006</td>
+      <td id="T_1a340_row6_col1" class="data row6 col1" >ceb111</td>
+      <td id="T_1a340_row6_col2" class="data row6 col2" >1</td>
+      <td id="T_1a340_row6_col3" class="data row6 col3" >1</td>
+      <td id="T_1a340_row6_col4" class="data row6 col4" >1</td>
+      <td id="T_1a340_row6_col5" class="data row6 col5" >1</td>
+      <td id="T_1a340_row6_col6" class="data row6 col6" >1</td>
     </tr>
     <tr>
-      <th id="T_c6f2e_level0_row7" class="row_heading level0 row7" >7</th>
-      <td id="T_c6f2e_row7_col0" class="data row7 col0" >LCTSC-Train-S1-006</td>
-      <td id="T_c6f2e_row7_col1" class="data row7 col1" >ceb111</td>
-      <td id="T_c6f2e_row7_col2" class="data row7 col2" >1</td>
-      <td id="T_c6f2e_row7_col3" class="data row7 col3" >1</td>
-      <td id="T_c6f2e_row7_col4" class="data row7 col4" >1</td>
-      <td id="T_c6f2e_row7_col5" class="data row7 col5" >1</td>
-      <td id="T_c6f2e_row7_col6" class="data row7 col6" >1</td>
+      <th id="T_1a340_level0_row7" class="row_heading level0 row7" >7</th>
+      <td id="T_1a340_row7_col0" class="data row7 col0" >LCTSC-Train-S1-005</td>
+      <td id="T_1a340_row7_col1" class="data row7 col1" >68d663</td>
+      <td id="T_1a340_row7_col2" class="data row7 col2" >1</td>
+      <td id="T_1a340_row7_col3" class="data row7 col3" >1</td>
+      <td id="T_1a340_row7_col4" class="data row7 col4" >1</td>
+      <td id="T_1a340_row7_col5" class="data row7 col5" >1</td>
+      <td id="T_1a340_row7_col6" class="data row7 col6" >1</td>
     </tr>
     <tr>
-      <th id="T_c6f2e_level0_row8" class="row_heading level0 row8" >8</th>
-      <td id="T_c6f2e_row8_col0" class="data row8 col0" >LCTSC-Test-S1-101</td>
-      <td id="T_c6f2e_row8_col1" class="data row8 col1" >cc682f</td>
-      <td id="T_c6f2e_row8_col2" class="data row8 col2" >1</td>
-      <td id="T_c6f2e_row8_col3" class="data row8 col3" >1</td>
-      <td id="T_c6f2e_row8_col4" class="data row8 col4" >1</td>
-      <td id="T_c6f2e_row8_col5" class="data row8 col5" >1</td>
-      <td id="T_c6f2e_row8_col6" class="data row8 col6" >1</td>
+      <th id="T_1a340_level0_row8" class="row_heading level0 row8" >8</th>
+      <td id="T_1a340_row8_col0" class="data row8 col0" >LCTSC-Test-S1-102</td>
+      <td id="T_1a340_row8_col1" class="data row8 col1" >6c6ea4</td>
+      <td id="T_1a340_row8_col2" class="data row8 col2" >1</td>
+      <td id="T_1a340_row8_col3" class="data row8 col3" >1</td>
+      <td id="T_1a340_row8_col4" class="data row8 col4" >1</td>
+      <td id="T_1a340_row8_col5" class="data row8 col5" >1</td>
+      <td id="T_1a340_row8_col6" class="data row8 col6" >1</td>
     </tr>
     <tr>
-      <th id="T_c6f2e_level0_row9" class="row_heading level0 row9" >9</th>
-      <td id="T_c6f2e_row9_col0" class="data row9 col0" >LCTSC-Test-S1-102</td>
-      <td id="T_c6f2e_row9_col1" class="data row9 col1" >6c6ea4</td>
-      <td id="T_c6f2e_row9_col2" class="data row9 col2" >1</td>
-      <td id="T_c6f2e_row9_col3" class="data row9 col3" >1</td>
-      <td id="T_c6f2e_row9_col4" class="data row9 col4" >1</td>
-      <td id="T_c6f2e_row9_col5" class="data row9 col5" >1</td>
-      <td id="T_c6f2e_row9_col6" class="data row9 col6" >1</td>
+      <th id="T_1a340_level0_row9" class="row_heading level0 row9" >9</th>
+      <td id="T_1a340_row9_col0" class="data row9 col0" >LCTSC-Train-S1-003</td>
+      <td id="T_1a340_row9_col1" class="data row9 col1" >8e34f9</td>
+      <td id="T_1a340_row9_col2" class="data row9 col2" >1</td>
+      <td id="T_1a340_row9_col3" class="data row9 col3" >1</td>
+      <td id="T_1a340_row9_col4" class="data row9 col4" >1</td>
+      <td id="T_1a340_row9_col5" class="data row9 col5" >1</td>
+      <td id="T_1a340_row9_col6" class="data row9 col6" >1</td>
     </tr>
   </tbody>
 </table></div>
@@ -1091,9 +1092,6 @@ pydicer.dataset.nnunet - INFO - No duplicate images found in training and testin
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Heart overlaps with Lung_L for patient LCTSC-Train-S1-005 structure set 68d663
-Heart overlaps with Lung_R for patient LCTSC-Train-S1-005 structure set 68d663
-Lung_L overlaps with Lung_R for patient LCTSC-Train-S1-005 structure set 68d663
 Esophagus overlaps with Heart for patient LCTSC-Train-S1-007 structure set ed6686
 Esophagus overlaps with Lung_L for patient LCTSC-Train-S1-007 structure set ed6686
 Esophagus overlaps with Lung_R for patient LCTSC-Train-S1-007 structure set ed6686
@@ -1106,12 +1104,6 @@ Esophagus overlaps with Lung_R for patient LCTSC-Train-S1-002 structure set f036
 Heart overlaps with Lung_L for patient LCTSC-Train-S1-002 structure set f036b8
 Heart overlaps with Lung_R for patient LCTSC-Train-S1-002 structure set f036b8
 Lung_L overlaps with Lung_R for patient LCTSC-Train-S1-002 structure set f036b8
-Esophagus overlaps with Heart for patient LCTSC-Train-S1-003 structure set 8e34f9
-Esophagus overlaps with Lung_L for patient LCTSC-Train-S1-003 structure set 8e34f9
-Esophagus overlaps with Lung_R for patient LCTSC-Train-S1-003 structure set 8e34f9
-Heart overlaps with Lung_L for patient LCTSC-Train-S1-003 structure set 8e34f9
-Heart overlaps with Lung_R for patient LCTSC-Train-S1-003 structure set 8e34f9
-Lung_L overlaps with Lung_R for patient LCTSC-Train-S1-003 structure set 8e34f9
 Esophagus overlaps with Heart for patient LCTSC-Train-S1-004 structure set 61758b
 Esophagus overlaps with Lung_L for patient LCTSC-Train-S1-004 structure set 61758b
 Esophagus overlaps with Lung_R for patient LCTSC-Train-S1-004 structure set 61758b
@@ -1122,19 +1114,28 @@ Esophagus overlaps with Heart for patient LCTSC-Train-S1-001 structure set b5bdd
 Esophagus overlaps with Lung_R for patient LCTSC-Train-S1-001 structure set b5bddb
 Heart overlaps with Lung_L for patient LCTSC-Train-S1-001 structure set b5bddb
 Heart overlaps with Lung_R for patient LCTSC-Train-S1-001 structure set b5bddb
+Esophagus overlaps with Heart for patient LCTSC-Test-S1-101 structure set cc682f
+Heart overlaps with Lung_L for patient LCTSC-Test-S1-101 structure set cc682f
+Heart overlaps with Lung_R for patient LCTSC-Test-S1-101 structure set cc682f
 Esophagus overlaps with Heart for patient LCTSC-Train-S1-006 structure set ceb111
 Esophagus overlaps with Lung_R for patient LCTSC-Train-S1-006 structure set ceb111
 Heart overlaps with Lung_L for patient LCTSC-Train-S1-006 structure set ceb111
 Heart overlaps with Lung_R for patient LCTSC-Train-S1-006 structure set ceb111
 Lung_L overlaps with Lung_R for patient LCTSC-Train-S1-006 structure set ceb111
-Esophagus overlaps with Heart for patient LCTSC-Test-S1-101 structure set cc682f
-Heart overlaps with Lung_L for patient LCTSC-Test-S1-101 structure set cc682f
-Heart overlaps with Lung_R for patient LCTSC-Test-S1-101 structure set cc682f
+Heart overlaps with Lung_L for patient LCTSC-Train-S1-005 structure set 68d663
+Heart overlaps with Lung_R for patient LCTSC-Train-S1-005 structure set 68d663
+Lung_L overlaps with Lung_R for patient LCTSC-Train-S1-005 structure set 68d663
 Esophagus overlaps with Heart for patient LCTSC-Test-S1-102 structure set 6c6ea4
 Esophagus overlaps with Lung_L for patient LCTSC-Test-S1-102 structure set 6c6ea4
 Esophagus overlaps with Lung_R for patient LCTSC-Test-S1-102 structure set 6c6ea4
 Heart overlaps with Lung_L for patient LCTSC-Test-S1-102 structure set 6c6ea4
 Heart overlaps with Lung_R for patient LCTSC-Test-S1-102 structure set 6c6ea4
+Esophagus overlaps with Heart for patient LCTSC-Train-S1-003 structure set 8e34f9
+Esophagus overlaps with Lung_L for patient LCTSC-Train-S1-003 structure set 8e34f9
+Esophagus overlaps with Lung_R for patient LCTSC-Train-S1-003 structure set 8e34f9
+Heart overlaps with Lung_L for patient LCTSC-Train-S1-003 structure set 8e34f9
+Heart overlaps with Lung_R for patient LCTSC-Train-S1-003 structure set 8e34f9
+Lung_L overlaps with Lung_R for patient LCTSC-Train-S1-003 structure set 8e34f9
 pydicer.dataset.nnunet - WARNING - Overlapping structures were detected
 </pre></div></div>
 </div>
@@ -1175,6 +1176,9 @@ Dataset prepared in: nnScratch/nnUNet_raw_data/Task123_LCTSC_Test
 
 <span class="n">script_path</span> <span class="o">=</span> <span class="n">nnunet</span><span class="o">.</span><span class="n">generate_training_scripts</span><span class="p">(</span><span class="n">script_header</span><span class="o">=</span><span class="n">script_header</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training script ready in: </span><span class="si">{</span><span class="n">script_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Set the logging verbosity back to NOTSET</span>
+<span class="n">pydicer</span><span class="o">.</span><span class="n">set_verbosity</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1226,7 +1230,7 @@ Training script ready in: train_123_LCTSC_Test.sh
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>

@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Converting Data" href="ConvertingData.html" /><link rel="prev" title="PyDicer: PYthon Dicom Image ConvertER" href="../index.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>Getting Started - PyDicer 0.1.0 documentation</title>
+        <title>Getting Started - PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -484,6 +484,7 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Getting-Started">
 <h1>Getting Started<a class="headerlink" href="#Getting-Started" title="Permalink to this heading">#</a></h1>
+<p><a class="reference external" href="https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/GettingStarted.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
 <p>This notebook provides a basic example to run the PyDicer pipeline using some test data.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -515,7 +516,7 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="Create-a-PyDicer-object">
 <h2>Create a PyDicer object<a class="headerlink" href="#Create-a-PyDicer-object" title="Permalink to this heading">#</a></h2>
-<p>The PyDicer class provides all functionlity to run the pipeline and work with the data stored and converted in your project directory</p>
+<p>The <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/tool.html">PyDicer class</a> provides all functionlity to run the pipeline and work with the data stored and converted in your project directory</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -527,7 +528,7 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="Fetch-some-data">
 <h2>Fetch some data<a class="headerlink" href="#Fetch-some-data" title="Permalink to this heading">#</a></h2>
-<p>A TestInput class is provided in pydicer to download some sample data to work with. Several other input classes exist if you’d like to retrieve DICOM data for conversion from somewhere else, <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/html/input.html">see the docs for information on how these work</a>.</p>
+<p>A <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/input.html#pydicer.input.test.TestInput">TestInput class</a> is provided in pydicer to download some sample data to work with. Several other input classes exist if you’d like to retrieve DICOM data for conversion from somewhere else, <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/html/input.html">see the docs for information on how these work</a>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -544,8 +545,9 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="Run-the-pipeline">
 <h2>Run the pipeline<a class="headerlink" href="#Run-the-pipeline" title="Permalink to this heading">#</a></h2>
-<p>The function runs the entire PyDicer pipeline on the test DICOM data. This includes: - Preprocessing the DICOM data (data which can’t be handled or is corrupt will be placed in Quarantine) - Convert the data to Nifti format (see the output in the <code class="docutils literal notranslate"><span class="pre">data</span></code> directory) - Visualise the data (png files will be placed alongside the converted Nifti files) - Compute Radiomics features (Results are stored in a csv alongside the converted structures) - Compute Dose Volume Histograms (results are stored
-alongside converted dose data)</p>
+<p>The function runs the entire PyDicer pipeline on the test DICOM data. This includes: - <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/preprocess.html">Preprocessing</a> the DICOM data (data which can’t be handled or is corrupt will be placed in Quarantine) - <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/convert.html">Convert</a> the data to Nifti format (see the output in the <code class="docutils literal notranslate"><span class="pre">data</span></code> directory) -
+<a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/visualise.html">Visualise</a> the data (png files will be placed alongside the converted Nifti files) - <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/analyse.html#pydicer.analyse.data.AnalyseData.compute_radiomics">Compute Radiomics features</a> (Results are stored in a csv alongside the converted structures) - <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/analyse.html#pydicer.analyse.data.AnalyseData.compute_dvh">Compute Dose Volume
+Histograms</a> (results are stored alongside converted dose data)</p>
 <blockquote>
 <div><p>Note that the entire Pipeline can be quite time consuming to run. Depending on your project’s dataset you will likely want to run only portions of the pipeline with finer control over each step. For this reason we only run the pipeline for one patient here as a demonstration.</p>
 </div></blockquote>
@@ -562,11 +564,11 @@ alongside converted dose data)</p>
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 1309/1309 [00:03&lt;00:00, 417.75files/s, preprocess]
-100%|██████████| 4/4 [00:49&lt;00:00, 12.45s/objects, convert]
-100%|██████████| 3/3 [00:15&lt;00:00,  5.11s/objects, visualise]
-100%|██████████| 1/1 [00:17&lt;00:00, 17.97s/objects, Compute Radiomics]
-100%|██████████| 1/1 [00:09&lt;00:00,  9.74s/objects, Compute DVH]
+100%|██████████| 1309/1309 [00:03&lt;00:00, 412.60files/s, preprocess]
+100%|██████████| 4/4 [00:50&lt;00:00, 12.68s/objects, convert]
+100%|██████████| 3/3 [00:15&lt;00:00,  5.19s/objects, visualise]
+100%|██████████| 1/1 [00:18&lt;00:00, 18.16s/objects, Compute Radiomics]
+100%|██████████| 1/1 [00:09&lt;00:00,  9.95s/objects, Compute DVH]
 </pre></div></div>
 </div>
 </section>
@@ -574,6 +576,7 @@ alongside converted dose data)</p>
 <h2>Prepare a dataset<a class="headerlink" href="#Prepare-a-dataset" title="Permalink to this heading">#</a></h2>
 <p>Datasets which are extracted in DICOM format can often be a bit messy and require some cleaning up after conversion. Exactly what data objects to extract for the clean dataset will differ by project but here we use a somewhat common approach of extracting the latest structure set for each patient and the image linked to that.</p>
 <p>The resulting dataset is stored in a folder with your dataset name (<code class="docutils literal notranslate"><span class="pre">clean</span></code> for this example).</p>
+<p>See the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/DatasetPreparation.html">dataset preparation example</a> for a more detailed description on how this works.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -586,6 +589,7 @@ alongside converted dose data)</p>
 <section id="Analyse-the-dataset">
 <h2>Analyse the dataset<a class="headerlink" href="#Analyse-the-dataset" title="Permalink to this heading">#</a></h2>
 <p>The pipeline computes first-order radiomics features by default, as well as dose volume histograms. Here we can extract out the results easily into a Pandas DataFrame for analysis.</p>
+<p>Check out the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/Radiomics.html">Compute Radiomics</a> and the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/DoseMetrics.html">Dose Metrics</a> examples for further details on how to use these functions.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -644,7 +648,7 @@ alongside converted dose data)</p>
   </thead>
   <tbody>
     <tr>
-      <th>22</th>
+      <th>21</th>
       <td>+1</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -668,7 +672,7 @@ alongside converted dose data)</p>
       <td>302955.835075</td>
     </tr>
     <tr>
-      <th>27</th>
+      <th>26</th>
       <td>-.3</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -692,7 +696,7 @@ alongside converted dose data)</p>
       <td>148482.826970</td>
     </tr>
     <tr>
-      <th>25</th>
+      <th>5</th>
       <td>Brain</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -716,7 +720,7 @@ alongside converted dose data)</p>
       <td>1283.403884</td>
     </tr>
     <tr>
-      <th>8</th>
+      <th>22</th>
       <td>Brainstem</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -740,7 +744,7 @@ alongside converted dose data)</p>
       <td>190.937232</td>
     </tr>
     <tr>
-      <th>28</th>
+      <th>10</th>
       <td>CTV63</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -764,7 +768,7 @@ alongside converted dose data)</p>
       <td>78938.289561</td>
     </tr>
     <tr>
-      <th>0</th>
+      <th>16</th>
       <td>CTV63_Sep</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -788,7 +792,7 @@ alongside converted dose data)</p>
       <td>165046.562407</td>
     </tr>
     <tr>
-      <th>11</th>
+      <th>25</th>
       <td>CTV70</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -812,7 +816,7 @@ alongside converted dose data)</p>
       <td>39966.337967</td>
     </tr>
     <tr>
-      <th>30</th>
+      <th>27</th>
       <td>Cord</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -836,7 +840,7 @@ alongside converted dose data)</p>
       <td>2656.829157</td>
     </tr>
     <tr>
-      <th>10</th>
+      <th>17</th>
       <td>Cord_EXPANDED</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -860,7 +864,7 @@ alongside converted dose data)</p>
       <td>97873.824272</td>
     </tr>
     <tr>
-      <th>4</th>
+      <th>13</th>
       <td>External</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -884,7 +888,7 @@ alongside converted dose data)</p>
       <td>137265.474901</td>
     </tr>
     <tr>
-      <th>26</th>
+      <th>18</th>
       <td>GTV1</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -908,7 +912,7 @@ alongside converted dose data)</p>
       <td>5560.934010</td>
     </tr>
     <tr>
-      <th>1</th>
+      <th>20</th>
       <td>LT_Parotid</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -932,7 +936,7 @@ alongside converted dose data)</p>
       <td>1667.158645</td>
     </tr>
     <tr>
-      <th>24</th>
+      <th>7</th>
       <td>Lt_Deep_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -956,7 +960,7 @@ alongside converted dose data)</p>
       <td>1949.874234</td>
     </tr>
     <tr>
-      <th>14</th>
+      <th>8</th>
       <td>Lt_Sup_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -980,7 +984,7 @@ alongside converted dose data)</p>
       <td>1220.955994</td>
     </tr>
     <tr>
-      <th>3</th>
+      <th>19</th>
       <td>Mandible</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1004,7 +1008,7 @@ alongside converted dose data)</p>
       <td>213150.151566</td>
     </tr>
     <tr>
-      <th>16</th>
+      <th>1</th>
       <td>Optic_Nerve</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1028,7 +1032,7 @@ alongside converted dose data)</p>
       <td>11370.238228</td>
     </tr>
     <tr>
-      <th>7</th>
+      <th>6</th>
       <td>Oral_Avoid</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1052,7 +1056,7 @@ alongside converted dose data)</p>
       <td>294221.363063</td>
     </tr>
     <tr>
-      <th>13</th>
+      <th>2</th>
       <td>PTV57</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1076,7 +1080,7 @@ alongside converted dose data)</p>
       <td>41822.111014</td>
     </tr>
     <tr>
-      <th>20</th>
+      <th>28</th>
       <td>PTV63</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1100,7 +1104,7 @@ alongside converted dose data)</p>
       <td>146160.163747</td>
     </tr>
     <tr>
-      <th>18</th>
+      <th>9</th>
       <td>PTV70</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1124,7 +1128,7 @@ alongside converted dose data)</p>
       <td>87418.493331</td>
     </tr>
     <tr>
-      <th>9</th>
+      <th>14</th>
       <td>Post_Neck</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1148,7 +1152,7 @@ alongside converted dose data)</p>
       <td>51927.617163</td>
     </tr>
     <tr>
-      <th>2</th>
+      <th>11</th>
       <td>RT_Parotid</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1172,7 +1176,7 @@ alongside converted dose data)</p>
       <td>3975.769687</td>
     </tr>
     <tr>
-      <th>23</th>
+      <th>30</th>
       <td>Ring</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1196,7 +1200,7 @@ alongside converted dose data)</p>
       <td>302955.835075</td>
     </tr>
     <tr>
-      <th>29</th>
+      <th>15</th>
       <td>Rt_Deep_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1220,7 +1224,7 @@ alongside converted dose data)</p>
       <td>8531.391337</td>
     </tr>
     <tr>
-      <th>17</th>
+      <th>3</th>
       <td>Rt_Sup_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1244,7 +1248,7 @@ alongside converted dose data)</p>
       <td>2927.633827</td>
     </tr>
     <tr>
-      <th>6</th>
+      <th>0</th>
       <td>chiasm</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1268,7 +1272,7 @@ alongside converted dose data)</p>
       <td>5285.781869</td>
     </tr>
     <tr>
-      <th>21</th>
+      <th>4</th>
       <td>cold</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1292,7 +1296,7 @@ alongside converted dose data)</p>
       <td>12220.107157</td>
     </tr>
     <tr>
-      <th>5</th>
+      <th>24</th>
       <td>cool_off</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1316,7 +1320,7 @@ alongside converted dose data)</p>
       <td>2713.685499</td>
     </tr>
     <tr>
-      <th>12</th>
+      <th>29</th>
       <td>ctv_57</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1340,7 +1344,7 @@ alongside converted dose data)</p>
       <td>29437.802764</td>
     </tr>
     <tr>
-      <th>19</th>
+      <th>12</th>
       <td>hotspot</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1364,7 +1368,7 @@ alongside converted dose data)</p>
       <td>295022.446264</td>
     </tr>
     <tr>
-      <th>15</th>
+      <th>23</th>
       <td>larynx_avoidance</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
@@ -1853,7 +1857,7 @@ alongside converted dose data)</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>

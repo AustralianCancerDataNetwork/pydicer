@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Getting Started" href="_examples/GettingStarted.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>PyDicer 0.1.0 documentation</title>
+        <title>PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="#"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -227,7 +227,14 @@
         <article role="main">
           <section id="pydicer-python-dicom-image-converter">
 <h1>PyDicer: PYthon Dicom Image ConvertER<a class="headerlink" href="#pydicer-python-dicom-image-converter" title="Permalink to this heading">#</a></h1>
-<p>Welcome to pydicer, a tool to ease the process of converting DICOM data objects into a format typically used for research purposes. In addition to data conversion, functionality is provided to help analyse the data such as the computing radiomic features or radiotherapy dose metrics. PyDicer uses the NIfTI format to store data is a well defined file system structure. Tracking of these data objects in CSV files, also stored on the file system, provides an easy and flexible way to work with the converted data in your research.</p>
+<p>Welcome to PyDicer, a tool to ease the process of converting Radiotherapy DICOM data objects into a format typically used for research purposes. In addition to data conversion, functionality is provided to help analyse the data. This includes computing radiomic features, radiotherapy dose metrics and auto-segmentation metrics. PyDicer uses the NIfTI format to store data is a well defined file system structure. Tracking of these data objects in CSV files, also stored on the file system, provides an easy and flexible way to work with the converted data in your research.</p>
+<p>The <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/index.html">PyDicer documentation</a> provides several examples and guides to help you get started with the tool. Here are a few <strong>PyDicer principles</strong> to keep in mind as you get started:</p>
+<ul class="simple">
+<li><p>The <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/index.html#directory-structure">working directory structure</a> is standardised and generalisable for use with any DICOM dataset.</p></li>
+<li><p>Use <a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">Pandas DataFrame’s</a> to work with converted data objects.</p></li>
+<li><p><a class="reference external" href="https://simpleitk.readthedocs.io/en/master/">SimpleITK</a> and <a class="reference external" href="https://pyplati.github.io/platipy/">PlatiPy</a> are used under the hood for the image conversion, visualisation and analysis tasks.</p></li>
+<li><p>Always inspect visualisations, plots and metrics produced by PyDicer in your working directory. Remember, PyDicer is a research tool so only use it for research purposes and expect the unexpected!</p></li>
+</ul>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h2>
 <p>PyDicer currently supports Python version 3.8, 3.9 and 3.10. Install PyDicer in your Python
@@ -236,9 +243,21 @@ environment using <code class="docutils literal notranslate"><span class="pre">p
 </pre></div>
 </div>
 </section>
+<section id="supported-modalities">
+<h2>Supported Modalities<a class="headerlink" href="#supported-modalities" title="Permalink to this heading">#</a></h2>
+<p>PyDicer currently supports converting and analysing the following DICOM modalities:</p>
+<ul class="simple">
+<li><p>CT</p></li>
+<li><p>MR</p></li>
+<li><p>PT (Experimental)</p></li>
+<li><p>RTSTRUCT</p></li>
+<li><p>RTPLAN (Not converted since this only consists of meta data)</p></li>
+<li><p>RTDOSE</p></li>
+</ul>
+</section>
 <section id="directory-structure">
 <h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this heading">#</a></h2>
-<p>pydicer will place converted and intermediate files into a specific directory structure. Within the configured working directory <code class="docutils literal notranslate"><span class="pre">[working]</span></code>, the following directories will be generated:</p>
+<p>PyDicer will place converted and intermediate files into a specific directory structure. Visualisation, metrics computed and plots are also stored along side the converted data objects. Within the configured working directory <code class="docutils literal notranslate"><span class="pre">[working]</span></code>, the following directories will be generated:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[working]/data</span></code>: Directory in which converted data will be placed</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">[working]/quarantine</span></code>: Files which couldn’t be preprocessed or converted will be placed in here for you to investigate further</p></li>
@@ -287,27 +306,23 @@ environment using <code class="docutils literal notranslate"><span class="pre">p
 </section>
 <section id="contributing">
 <h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">#</a></h2>
-<p>PyDicer is a research tool and adding to its functionality is encouraged. All GitHub Pull Requests
-are welcome. We do ask that you abide by our code of conduct and follow our coding standards.</p>
-<section id="coding-standards">
-<h3>Coding standards<a class="headerlink" href="#coding-standards" title="Permalink to this heading">#</a></h3>
-<p>Code in pydicer must conform to Python’s PEP-8 standards to ensure consistent formatting between contributors. To ensure this, pylint is used to check code conforms to these standards before a Pull Request can be merged. You can run pylint from the command line using the following command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pylint<span class="w"> </span>pydicer
-</pre></div>
-</div>
-<p>But a better idea is to ensure you are using a Python IDE which supports linting (such as <a class="reference external" href="https://code.visualstudio.com/docs/python/linting">VSCode</a> or PyCharm). Make sure you resolve all suggestions from pylint before submitting your pull request.</p>
-<p>If you’re new to using pylint, you may like to <a class="reference external" href="https://docs.pylint.org/en/v2.11.1/tutorial.html">read this guide</a>.</p>
+<p>PyDicer is an open-source tool and contributions are welcome! Here are some ways you might consider contributing to the project:</p>
+<ul class="simple">
+<li><p>Reporting issues on GitHub.</p></li>
+<li><p>Correcting/extending the documentation.</p></li>
+<li><p>Contributing a bug fix or extending some functionality.</p></li>
+<li><p>Providing functionality to support additional DICOM modalities.</p></li>
+<li><p>Giving the <a class="reference external" href="https://github.com/AustralianCancerDataNetwork/pydicer">PyDicer project</a> a star on GitHub.</p></li>
+</ul>
+<p>For more information, see the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/contributing.html">Contributing documentation</a>.</p>
 </section>
-<section id="automated-tests">
-<h3>Automated tests<a class="headerlink" href="#automated-tests" title="Permalink to this heading">#</a></h3>
-<p>A test suite is included in pydicer which ensures that code contributed to the repository functions as expected and continues to function as further development takes place. Any code submitted via a pull request should include appropriate automated tests for the new code.</p>
-<p>pytest is used as a testing library. Running the tests from the command line is really easy:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest
-</pre></div>
-</div>
-<p>Add your tests to the appropriate file in the <code class="docutils literal notranslate"><span class="pre">tests/</span></code> directory. See the <a class="reference external" href="https://docs.pytest.org/en/6.2.x/getting-started.html">pytest documention</a> for more information.
-or check out the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/GettingStarted.html">Getting Started Example</a>.</p>
-<a class="reference external image-reference" href="https://colab.research.google.com/github/australiancancerdatanetwork/pydicer/blob/main/examples/GettingStarted.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
+<section id="authors">
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this heading">#</a></h2>
+<p>PyDicer was developed by the <a class="reference external" href="https://www.unsw.edu.au/medicine-health/our-schools/clinical-medicine/research-impact/research-groups/cancer/ingham-medical-physics">Ingham Medical Physics team</a> in South-Western Sydney. It was developed as part of the <a class="reference external" href="https://australian-cancer-data.network/">Australian Cancer Data Network</a> supported by the <a class="reference external" href="https://ardc.edu.au/">Australian Research Data Commons</a>.</p>
+<ul class="simple">
+<li><p><strong>Phillip Chlap</strong> - <a class="reference external" href="mailto:phillip&#46;chlap&#37;&#52;&#48;unsw&#46;edu&#46;au">phillip<span>&#46;</span>chlap<span>&#64;</span>unsw<span>&#46;</span>edu<span>&#46;</span>au</a></p></li>
+<li><p><strong>Daniel Al Mouiee</strong> - <a class="reference external" href="mailto:d&#46;almouiee&#37;&#52;&#48;unsw&#46;edu&#46;au">d<span>&#46;</span>almouiee<span>&#64;</span>unsw<span>&#46;</span>edu<span>&#46;</span>au</a></p></li>
+</ul>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">
@@ -316,7 +331,6 @@ or check out the <a class="reference external" href="https://australiancancerdat
 </div>
 <div class="toctree-wrapper compound">
 </div>
-</section>
 </section>
 </section>
 
@@ -339,7 +353,7 @@ or check out the <a class="reference external" href="https://australiancancerdat
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>
@@ -366,14 +380,12 @@ or check out the <a class="reference external" href="https://australiancancerdat
             <ul>
 <li><a class="reference internal" href="#">PyDicer: PYthon Dicom Image ConvertER</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#supported-modalities">Supported Modalities</a></li>
 <li><a class="reference internal" href="#directory-structure">Directory Structure</a></li>
 <li><a class="reference internal" href="#pipeline">Pipeline</a></li>
 <li><a class="reference internal" href="#getting-started">Getting Started</a></li>
-<li><a class="reference internal" href="#contributing">Contributing</a><ul>
-<li><a class="reference internal" href="#coding-standards">Coding standards</a></li>
-<li><a class="reference internal" href="#automated-tests">Automated tests</a><ul>
-</ul>
-</li>
+<li><a class="reference internal" href="#contributing">Contributing</a></li>
+<li><a class="reference internal" href="#authors">Authors</a><ul>
 </ul>
 </li>
 </ul>

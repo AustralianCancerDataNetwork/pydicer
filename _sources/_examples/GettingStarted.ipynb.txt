@@ -7,6 +7,8 @@
    "source": [
     "# Getting Started\n",
     "\n",
+    "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/GettingStarted.ipynb)\n",
+    "\n",
     "This notebook provides a basic example to run the PyDicer pipeline using some test data."
    ]
   },
@@ -52,7 +54,7 @@
    "source": [
     "## Create a PyDicer object\n",
     "\n",
-    "The PyDicer class provides all functionlity to run the pipeline and work with the data stored and\n",
+    "The [PyDicer class](https://australiancancerdatanetwork.github.io/pydicer/tool.html) provides all functionlity to run the pipeline and work with the data stored and\n",
     "converted in your project directory"
    ]
   },
@@ -71,7 +73,7 @@
    "source": [
     "## Fetch some data\n",
     "\n",
-    "A TestInput class is provided in pydicer to download some sample data to work with. Several other\n",
+    "A [TestInput class](https://australiancancerdatanetwork.github.io/pydicer/input.html#pydicer.input.test.TestInput) is provided in pydicer to download some sample data to work with. Several other\n",
     "input classes exist if you'd like to retrieve DICOM data for conversion from somewhere else, [see \n",
     "the docs for information on how these work](https://australiancancerdatanetwork.github.io/pydicer/html/input.html)."
    ]
@@ -97,11 +99,11 @@
     "## Run the pipeline\n",
     "\n",
     "The function runs the entire PyDicer pipeline on the test DICOM data. This includes:\n",
-    "- Preprocessing the DICOM data (data which can't be handled or is corrupt will be placed in Quarantine)\n",
-    "- Convert the data to Nifti format (see the output in the `data` directory)\n",
-    "- Visualise the data (png files will be placed alongside the converted Nifti files)\n",
-    "- Compute Radiomics features (Results are stored in a csv alongside the converted structures)\n",
-    "- Compute Dose Volume Histograms (results are stored alongside converted dose data)\n",
+    "- [Preprocessing](https://australiancancerdatanetwork.github.io/pydicer/preprocess.html) the DICOM data (data which can't be handled or is corrupt will be placed in Quarantine)\n",
+    "- [Convert](https://australiancancerdatanetwork.github.io/pydicer/convert.html) the data to Nifti format (see the output in the `data` directory)\n",
+    "- [Visualise](https://australiancancerdatanetwork.github.io/pydicer/visualise.html) the data (png files will be placed alongside the converted Nifti files)\n",
+    "- [Compute Radiomics features](https://australiancancerdatanetwork.github.io/pydicer/analyse.html#pydicer.analyse.data.AnalyseData.compute_radiomics) (Results are stored in a csv alongside the converted structures)\n",
+    "- [Compute Dose Volume Histograms](https://australiancancerdatanetwork.github.io/pydicer/analyse.html#pydicer.analyse.data.AnalyseData.compute_dvh) (results are stored alongside converted dose data)\n",
     "\n",
     "> Note that the entire Pipeline can be quite time consuming to run. Depending on your project's\n",
     "> dataset you will likely want to run only portions of the pipeline with finer control over each\n",
@@ -128,7 +130,9 @@
     "but here we use a somewhat common approach of extracting the latest structure set for each patient\n",
     "and the image linked to that.\n",
     "\n",
-    "The resulting dataset is stored in a folder with your dataset name (`clean` for this example).\n"
+    "The resulting dataset is stored in a folder with your dataset name (`clean` for this example).\n",
+    "\n",
+    "See the [dataset preparation example](https://australiancancerdatanetwork.github.io/pydicer/_examples/DatasetPreparation.html) for a more detailed description on how this works.\n"
    ]
   },
   {
@@ -147,7 +151,9 @@
     "## Analyse the dataset\n",
     "\n",
     "The pipeline computes first-order radiomics features by default, as well as dose volume histograms.\n",
-    "Here we can extract out the results easily into a Pandas DataFrame for analysis."
+    "Here we can extract out the results easily into a Pandas DataFrame for analysis.\n",
+    "\n",
+    "Check out the [Compute Radiomics](https://australiancancerdatanetwork.github.io/pydicer/_examples/Radiomics.html) and the [Dose Metrics](https://australiancancerdatanetwork.github.io/pydicer/_examples/DoseMetrics.html) examples for further details on how to use these functions."
    ]
   },
   {

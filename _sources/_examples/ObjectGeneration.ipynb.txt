@@ -7,6 +7,8 @@
    "source": [
     "# Generating Data Objects\n",
     "\n",
+    "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/ObjectGeneration.ipynb)\n",
+    "\n",
     "While PyDicer primarily deals with converting data objects from DICOM, there are instances where\n",
     "you may want to generate a new data object and have it integrated into your PyDicer dataset.\n",
     "\n",
@@ -136,7 +138,7 @@
     "- Load the CT image using SimpleITK, and apply a threshold to segment bones\n",
     "- Save the segmented bones as a new structure set object\n",
     "\n",
-    "> Note: This specific functionality is supported by the auto-segmentation inference module. If you\n",
+    "> Note: This specific functionality is supported by the [auto-segmentation inference module](https://australiancancerdatanetwork.github.io/pydicer/generate.html#module-pydicer.generate.segmentation). If you\n",
     "> are using this to generate auto-segmentations it is recommended you use that functionality."
    ]
   },
@@ -199,7 +201,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "And we can also run the visualise module. Use the `force=False` flag to ensure that only the newly\n",
+    "And we can also run the [visualise module](https://australiancancerdatanetwork.github.io/pydicer/visualise.html). Use the `force=False` flag to ensure that only the newly\n",
     "generated objects are visualised"
    ]
   },
@@ -269,7 +271,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Now we can visualise the images and produce snapshots once more. Find the sharpen images in the\n",
+    "Now we can visualise the images and produce snapshots once more. Find the sharpened images in the\n",
     "working directory. Can you see the difference between the sharpened CT and the original?"
    ]
   },

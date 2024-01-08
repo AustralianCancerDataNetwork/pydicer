@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="nnUNet Data Preparation" href="nnUNet.html" /><link rel="prev" title="Dataset Preparation" href="DatasetPreparation.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>Auto-segmentation Inference &amp; Analysis - PyDicer 0.1.0 documentation</title>
+        <title>Auto-segmentation Inference &amp; Analysis - PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -484,8 +484,12 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Auto-segmentation-Inference-&amp;-Analysis">
 <h1>Auto-segmentation Inference &amp; Analysis<a class="headerlink" href="#Auto-segmentation-Inference-&-Analysis" title="Permalink to this heading">#</a></h1>
+<p><a class="reference external" href="https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/AutoSegmentation.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
 <p>A common task when working the medical imaging data, it to run an auto-segmentation model (inference) on the images in your dataset. If you have manual definitions of the same structures available in your dataset, you will typically want to compare the auto and the manual segmentations, computing metrics and produce plots and visualisation.</p>
 <p>This example notebook will guide you through the process of performing model inference and analysis of those structures. We will use a single atlas-based segmentation model for demonstration purposes.</p>
+<blockquote>
+<div><p>Warning: The auto-segmentation results produced by the example in this notebook are poor. The atlas based segmentation function is optimised for runtime is purely provided to demonstrate how to run and analyse an auto-segmentation model.</p>
+</div></blockquote>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -534,7 +538,7 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="Prepare-Atlas">
 <h2>Prepare Atlas<a class="headerlink" href="#Prepare-Atlas" title="Permalink to this heading">#</a></h2>
-<p>Since we will use a single atlas-based segmentation model, we must split our data, selecting one case as our <code class="docutils literal notranslate"><span class="pre">atlas</span></code> and the remaining cases as the <code class="docutils literal notranslate"><span class="pre">validation</span></code> set. We use the PyDicer <code class="docutils literal notranslate"><span class="pre">dataset</span> <span class="pre">preparation</span></code> module to split our dataset.</p>
+<p>Since we will use a single atlas-based segmentation model, we must split our data, selecting one case as our <code class="docutils literal notranslate"><span class="pre">atlas</span></code> and the remaining cases as the <code class="docutils literal notranslate"><span class="pre">validation</span></code> set. We use the PyDicer <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/DatasetPreparation.html">dataset preparation module</a> to create these subsets of data.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -561,7 +565,7 @@ div.rendered_html tbody tr:hover {
 <h2>Define Segmentation Function<a class="headerlink" href="#Define-Segmentation-Function" title="Permalink to this heading">#</a></h2>
 <p>Now that our <code class="docutils literal notranslate"><span class="pre">atlas</span></code> and <code class="docutils literal notranslate"><span class="pre">validation</span></code> sets are ready, we will define our function which will run our simple single atlas-based auto-segmentation model for us. This example uses the <a class="reference external" href="https://pyplati.github.io/platipy/_examples/atlas_segmentation.html#">atlas-based segmentation tools available in PlatiPy</a>.</p>
 <p>In a real-world scenario, you will have your own segmentation model you wish to apply. You should integrate this model into such a function which accepts an image and returns a dictionary of structures.</p>
-<p>To get started, we recommend you try running the <code class="docutils literal notranslate"><span class="pre">`TotalSegmentator</span></code> &lt;<a class="reference external" href="https://github.com/wasserth/TotalSegmentator">https://github.com/wasserth/TotalSegmentator</a>&gt;`__ model on your CT data. PyDicer already has a function ready which runs this model, check out <code class="docutils literal notranslate"><span class="pre">run_total_segmentator</span></code>.</p>
+<p>To get started, we recommend you try running the <a class="reference external" href="https://github.com/wasserth/TotalSegmentator">TotalSegmentator</a> model on your CT data. PyDicer already has a function ready which runs this model, check out <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/generate.html#pydicer.generate.models.run_total_segmentator">run_total_segmentator</a>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -629,7 +633,7 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="Run-Auto-segmentation">
 <h2>Run Auto-segmentation<a class="headerlink" href="#Run-Auto-segmentation" title="Permalink to this heading">#</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">segment_dataset</span></code> function will run over all images in our dataset and will pass the images to a function we define for segmentation. We pass in the name of our <code class="docutils literal notranslate"><span class="pre">validation_dataset</span></code> so that only the images in this dataset will be segmented.</p>
+<p>The <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/generate.html#pydicer.generate.segmentation.segment_dataset">segment_dataset</a> function will run over all images in our dataset and will pass the images to a function we define for segmentation. We pass in the name of our <code class="docutils literal notranslate"><span class="pre">validation_dataset</span></code> so that only the images in this dataset will be segmented.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -645,10 +649,10 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/it]
+Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.71s/it]
 </pre></div></div>
 </div>
-<p>We can use PyDicer’s <code class="docutils literal notranslate"><span class="pre">visualisation</span></code> module to produce snapshots of the auto-segmentations produced.</p>
+<p>We can use PyDicer’s <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/VisualiseData.html">visualisation module</a> to produce snapshots of the auto-segmentations produced.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -662,13 +666,13 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 29/29 [00:08&lt;00:00,  3.25objects/s, visualise]
+100%|██████████| 29/29 [00:09&lt;00:00,  3.16objects/s, visualise]
 </pre></div></div>
 </div>
 </section>
 <section id="Read-Segmentation-Logs">
 <h2>Read Segmentation Logs<a class="headerlink" href="#Read-Segmentation-Logs" title="Permalink to this heading">#</a></h2>
-<p>After running the auto-segmentation on across the dataset, we can fetch the logs to confirm that everything went well. This will also let us inspect the runtime of the segmentation. In case something went wrong, we can use these logs to help debug the issue.</p>
+<p>After running the auto-segmentation on across the dataset, we can fetch the logs to confirm that everything went well using the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/generate.html#pydicer.generate.segmentation.read_all_segmentation_logs">read_all_segmentation_logs</a> function. This will also let us inspect the runtime of the segmentation. In case something went wrong, we can use these logs to help debug the issue.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -715,100 +719,100 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
   <tbody>
     <tr>
       <th>0</th>
-      <td>LCTSC-Train-S1-005</td>
+      <td>LCTSC-Train-S1-007</td>
       <td>atlas</td>
-      <td>738c1a</td>
-      <td>2023-12-13 23:27:09.741273</td>
-      <td>2023-12-13 23:27:15.733587</td>
-      <td>5.992314</td>
+      <td>5adf40</td>
+      <td>2024-01-08 14:41:21.985560</td>
+      <td>2024-01-08 14:41:28.608101</td>
+      <td>6.622541</td>
       <td>True</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>LCTSC-Train-S1-007</td>
+      <td>LCTSC-Train-S1-008</td>
       <td>atlas</td>
-      <td>5adf40</td>
-      <td>2023-12-13 23:27:15.755648</td>
-      <td>2023-12-13 23:27:22.705840</td>
-      <td>6.950192</td>
+      <td>dd0026</td>
+      <td>2024-01-08 14:41:28.631249</td>
+      <td>2024-01-08 14:41:34.929255</td>
+      <td>6.298006</td>
       <td>True</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>LCTSC-Train-S1-008</td>
+      <td>LCTSC-Train-S1-002</td>
       <td>atlas</td>
-      <td>dd0026</td>
-      <td>2023-12-13 23:27:22.731186</td>
-      <td>2023-12-13 23:27:28.980814</td>
-      <td>6.249628</td>
+      <td>aa38e6</td>
+      <td>2024-01-08 14:41:34.951248</td>
+      <td>2024-01-08 14:41:42.396610</td>
+      <td>7.445362</td>
       <td>True</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>LCTSC-Train-S1-002</td>
+      <td>LCTSC-Train-S1-004</td>
       <td>atlas</td>
-      <td>aa38e6</td>
-      <td>2023-12-13 23:27:29.005241</td>
-      <td>2023-12-13 23:27:36.457284</td>
-      <td>7.452043</td>
+      <td>d91c84</td>
+      <td>2024-01-08 14:41:42.418737</td>
+      <td>2024-01-08 14:41:49.498544</td>
+      <td>7.079807</td>
       <td>True</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>LCTSC-Train-S1-003</td>
+      <td>LCTSC-Test-S1-101</td>
       <td>atlas</td>
-      <td>2bf2f9</td>
-      <td>2023-12-13 23:27:36.480165</td>
-      <td>2023-12-13 23:27:43.318003</td>
-      <td>6.837838</td>
+      <td>666be6</td>
+      <td>2024-01-08 14:41:49.520307</td>
+      <td>2024-01-08 14:41:55.889103</td>
+      <td>6.368796</td>
       <td>True</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>LCTSC-Train-S1-004</td>
+      <td>LCTSC-Train-S1-006</td>
       <td>atlas</td>
-      <td>d91c84</td>
-      <td>2023-12-13 23:27:43.343426</td>
-      <td>2023-12-13 23:27:50.217949</td>
-      <td>6.874523</td>
+      <td>88c5ef</td>
+      <td>2024-01-08 14:41:55.913366</td>
+      <td>2024-01-08 14:42:02.464759</td>
+      <td>6.551393</td>
       <td>True</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>LCTSC-Train-S1-006</td>
+      <td>LCTSC-Train-S1-005</td>
       <td>atlas</td>
-      <td>88c5ef</td>
-      <td>2023-12-13 23:27:50.240941</td>
-      <td>2023-12-13 23:27:56.801092</td>
-      <td>6.560151</td>
+      <td>738c1a</td>
+      <td>2024-01-08 14:42:02.486512</td>
+      <td>2024-01-08 14:42:08.583984</td>
+      <td>6.097472</td>
       <td>True</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>LCTSC-Test-S1-101</td>
+      <td>LCTSC-Test-S1-102</td>
       <td>atlas</td>
-      <td>666be6</td>
-      <td>2023-12-13 23:27:56.822677</td>
-      <td>2023-12-13 23:28:03.084702</td>
-      <td>6.262025</td>
+      <td>914d57</td>
+      <td>2024-01-08 14:42:08.609333</td>
+      <td>2024-01-08 14:42:15.487156</td>
+      <td>6.877823</td>
       <td>True</td>
       <td>NaN</td>
     </tr>
     <tr>
       <th>8</th>
-      <td>LCTSC-Test-S1-102</td>
+      <td>LCTSC-Train-S1-003</td>
       <td>atlas</td>
-      <td>914d57</td>
-      <td>2023-12-13 23:28:03.108498</td>
-      <td>2023-12-13 23:28:09.992805</td>
-      <td>6.884307</td>
+      <td>2bf2f9</td>
+      <td>2024-01-08 14:42:15.511136</td>
+      <td>2024-01-08 14:42:22.314428</td>
+      <td>6.803292</td>
       <td>True</td>
       <td>NaN</td>
     </tr>
@@ -876,10 +880,10 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
   <tbody>
     <tr>
       <th>atlas</th>
-      <td>6.673669</td>
-      <td>0.450054</td>
-      <td>7.452043</td>
-      <td>5.992314</td>
+      <td>6.682721</td>
+      <td>0.418605</td>
+      <td>7.445362</td>
+      <td>6.097472</td>
       <td>9</td>
     </tr>
   </tbody>
@@ -946,17 +950,6 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
   <tbody>
     <tr>
       <th>1</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
-      <td>68d663</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-005</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
-      <td>lctsc_autoseg/data/LCTSC-Train-S1-005/structur...</td>
-    </tr>
-    <tr>
-      <th>4</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.284338872489...</td>
       <td>ed6686</td>
       <td>RTSTRUCT</td>
@@ -967,7 +960,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>lctsc_autoseg/data/LCTSC-Train-S1-007/structur...</td>
     </tr>
     <tr>
-      <th>7</th>
+      <th>4</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.225487254421...</td>
       <td>48a970</td>
       <td>RTSTRUCT</td>
@@ -978,7 +971,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>lctsc_autoseg/data/LCTSC-Train-S1-008/structur...</td>
     </tr>
     <tr>
-      <th>10</th>
+      <th>7</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.291449913947...</td>
       <td>f036b8</td>
       <td>RTSTRUCT</td>
@@ -989,18 +982,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>lctsc_autoseg/data/LCTSC-Train-S1-002/structur...</td>
     </tr>
     <tr>
-      <th>13</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
-      <td>8e34f9</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-003</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
-      <td>lctsc_autoseg/data/LCTSC-Train-S1-003/structur...</td>
-    </tr>
-    <tr>
-      <th>16</th>
+      <th>10</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.595315284787...</td>
       <td>61758b</td>
       <td>RTSTRUCT</td>
@@ -1011,18 +993,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>lctsc_autoseg/data/LCTSC-Train-S1-004/structur...</td>
     </tr>
     <tr>
-      <th>19</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
-      <td>ceb111</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-006</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
-      <td>lctsc_autoseg/data/LCTSC-Train-S1-006/structur...</td>
-    </tr>
-    <tr>
-      <th>22</th>
+      <th>13</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.929007819506...</td>
       <td>cc682f</td>
       <td>RTSTRUCT</td>
@@ -1033,7 +1004,29 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>lctsc_autoseg/data/LCTSC-Test-S1-101/structure...</td>
     </tr>
     <tr>
-      <th>25</th>
+      <th>16</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
+      <td>ceb111</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-006</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.161109536301...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-006/structur...</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>68d663</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.214803404117...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-005/structur...</td>
+    </tr>
+    <tr>
+      <th>22</th>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.110977663386...</td>
       <td>6c6ea4</td>
       <td>RTSTRUCT</td>
@@ -1042,6 +1035,17 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.408067568497...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
       <td>lctsc_autoseg/data/LCTSC-Test-S1-102/structure...</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>8e34f9</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.127494043495...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-003/structur...</td>
     </tr>
   </tbody>
 </table>
@@ -1091,17 +1095,6 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
   <tbody>
     <tr>
       <th>2</th>
-      <td>atlas_738c1a</td>
-      <td>atlas_738c1a</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-005</td>
-      <td>atlas_738c1a</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
-      <td>lctsc_autoseg/data/LCTSC-Train-S1-005/structur...</td>
-    </tr>
-    <tr>
-      <th>5</th>
       <td>atlas_5adf40</td>
       <td>atlas_5adf40</td>
       <td>RTSTRUCT</td>
@@ -1112,7 +1105,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>lctsc_autoseg/data/LCTSC-Train-S1-007/structur...</td>
     </tr>
     <tr>
-      <th>8</th>
+      <th>5</th>
       <td>atlas_dd0026</td>
       <td>atlas_dd0026</td>
       <td>RTSTRUCT</td>
@@ -1123,7 +1116,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>lctsc_autoseg/data/LCTSC-Train-S1-008/structur...</td>
     </tr>
     <tr>
-      <th>11</th>
+      <th>8</th>
       <td>atlas_aa38e6</td>
       <td>atlas_aa38e6</td>
       <td>RTSTRUCT</td>
@@ -1134,18 +1127,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>lctsc_autoseg/data/LCTSC-Train-S1-002/structur...</td>
     </tr>
     <tr>
-      <th>14</th>
-      <td>atlas_2bf2f9</td>
-      <td>atlas_2bf2f9</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-003</td>
-      <td>atlas_2bf2f9</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
-      <td>lctsc_autoseg/data/LCTSC-Train-S1-003/structur...</td>
-    </tr>
-    <tr>
-      <th>17</th>
+      <th>11</th>
       <td>atlas_d91c84</td>
       <td>atlas_d91c84</td>
       <td>RTSTRUCT</td>
@@ -1156,18 +1138,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>lctsc_autoseg/data/LCTSC-Train-S1-004/structur...</td>
     </tr>
     <tr>
-      <th>20</th>
-      <td>atlas_88c5ef</td>
-      <td>atlas_88c5ef</td>
-      <td>RTSTRUCT</td>
-      <td>LCTSC-Train-S1-006</td>
-      <td>atlas_88c5ef</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
-      <td>lctsc_autoseg/data/LCTSC-Train-S1-006/structur...</td>
-    </tr>
-    <tr>
-      <th>23</th>
+      <th>14</th>
       <td>atlas_666be6</td>
       <td>atlas_666be6</td>
       <td>RTSTRUCT</td>
@@ -1178,7 +1149,29 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>lctsc_autoseg/data/LCTSC-Test-S1-101/structure...</td>
     </tr>
     <tr>
-      <th>26</th>
+      <th>17</th>
+      <td>atlas_88c5ef</td>
+      <td>atlas_88c5ef</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-006</td>
+      <td>atlas_88c5ef</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.325217978839...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.263565217029...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-006/structur...</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>atlas_738c1a</td>
+      <td>atlas_738c1a</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-005</td>
+      <td>atlas_738c1a</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.964812114328...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.140943693489...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-005/structur...</td>
+    </tr>
+    <tr>
+      <th>23</th>
       <td>atlas_914d57</td>
       <td>atlas_914d57</td>
       <td>RTSTRUCT</td>
@@ -1188,16 +1181,27 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
       <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.235489581364...</td>
       <td>lctsc_autoseg/data/LCTSC-Test-S1-102/structure...</td>
     </tr>
+    <tr>
+      <th>26</th>
+      <td>atlas_2bf2f9</td>
+      <td>atlas_2bf2f9</td>
+      <td>RTSTRUCT</td>
+      <td>LCTSC-Train-S1-003</td>
+      <td>atlas_2bf2f9</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.803594135292...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.7014.4598.159497309342...</td>
+      <td>lctsc_autoseg/data/LCTSC-Train-S1-003/structur...</td>
+    </tr>
   </tbody>
 </table>
 </div></div>
 </div>
 <section id="Compute-Similarity">
 <h3>Compute Similarity<a class="headerlink" href="#Compute-Similarity" title="Permalink to this heading">#</a></h3>
-<p>We use the <code class="docutils literal notranslate"><span class="pre">compute_contour_similarity_metrics</span></code> function to compute the metrics comparing our target structures to our reference structures.</p>
+<p>We use the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/analyse.html#pydicer.analyse.compare.compute_contour_similarity_metrics">compute_contour_similarity_metrics</a> function to compute the metrics comparing our target structures to our reference structures.</p>
 <p>We can specify which metrics we want to compute, in this example we compute the Dice Similarity Coefficient (DSC), Hausdorff Distance, Mean Surface Distance and the Surface DSC.</p>
 <blockquote>
-<div><p>Structure names must match exactly, so we use a structure name mapping to standardise our structure names prior to computing the similarity metrics.</p>
+<div><p>Structure names must match exactly, so we use a <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/WorkingWithStructures.html#Add-Structure-Name-Mapping">structure name mapping</a> to standardise our structure names prior to computing the similarity metrics.</p>
 </div></blockquote>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
@@ -1233,7 +1237,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 9/9 [00:20&lt;00:00,  2.29s/structure sets, Compare Structures]
+100%|██████████| 9/9 [00:21&lt;00:00,  2.40s/structure sets, Compare Structures]
 </pre></div></div>
 </div>
 </section>
@@ -1488,7 +1492,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
 </section>
 <section id="Perform-Analysis">
 <h3>Perform Analysis<a class="headerlink" href="#Perform-Analysis" title="Permalink to this heading">#</a></h3>
-<p>There are various plots and visualisations you may wish to produce following computation of similarity metrics. The <code class="docutils literal notranslate"><span class="pre">prepare_similarity_metric_analysis</span></code> will generate several useful plots which will serve as a useful starting point when analysing your auto-segmentation results.</p>
+<p>There are various plots and visualisations you may wish to produce following computation of similarity metrics. The <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/analyse.html#pydicer.analyse.compare.prepare_similarity_metric_analysis">prepare_similarity_metric_analysis</a> function will generate several useful plots which will serve as a useful starting point when analysing your auto-segmentation results.</p>
 <p>Plots are generated in a directory you provide. In this example, plots and tables (<code class="docutils literal notranslate"><span class="pre">.csv</span></code>) are output in the <code class="docutils literal notranslate"><span class="pre">testdata_lctsc/analysis/atlas</span></code> directory. Run the following cell, then navigate to that directory to explore the results.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
@@ -1578,7 +1582,7 @@ Segmentation: 100%|██████████| 9/9 [01:00&lt;00:00,  6.70s/i
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>

@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Generation" href="generate.html" /><link rel="prev" title="Dataset Preparation" href="dataset.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>Analyse - PyDicer 0.1.0 documentation</title>
+        <title>Analyse - PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="index.html"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -402,6 +402,89 @@ be excluded. Defaults to ‘default’.</p></li>
 
 </dd></dl>
 
+<span class="target" id="module-pydicer.analyse.compare"></span><dl class="py function">
+<dt class="sig sig-object py" id="pydicer.analyse.compare.compute_contour_similarity_metrics">
+<span class="sig-prename descclassname"><span class="pre">pydicer.analyse.compare.</span></span><span class="sig-name descname"><span class="pre">compute_contour_similarity_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.analyse.compare.compute_contour_similarity_metrics" title="Permalink to this definition">#</a></dt>
+<dd><p>Computes structure similarity metrics between corresponding entries in a target DataFrame
+and reference DataFrame. Targets are matched to reference using the referenced_sop_instance_uid
+which is the image to which these structure sets are attached.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_target</strong> (<em>pd.DataFrame</em>) – DataFrame containing structure set rows to use as target for
+similarity metric computation.</p></li>
+<li><p><strong>df_reference</strong> (<em>pd.DataFrame</em>) – DataFrame containing structure set rows to use as reference
+for similarity metric computation. Each row in reference will be match to target which
+reference the same referenced_sop_instance_uid (image to which they are attached).</p></li>
+<li><p><strong>segment_id</strong> (<em>str</em>) – ID to reference the segmentation for which these metrics are computed.</p></li>
+<li><p><strong>mapping_id</strong> (<em>str</em><em>, </em><em>optional</em>) – The mapping ID to use for structure name mapping. Defaults to
+DEFAULT_MAPPING_ID.</p></li>
+<li><p><strong>compute_metrics</strong> (<em>list</em><em>, </em><em>optional</em>) – _description_. Defaults to [“DSC”, “hausdorffDistance”,
+“meanSurfaceDistance”, “surfaceDSC”].</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, metrics will be recomputed even if they have been
+previously computed. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.analyse.compare.get_all_similarity_metrics_for_dataset">
+<span class="sig-prename descclassname"><span class="pre">pydicer.analyse.compare.</span></span><span class="sig-name descname"><span class="pre">get_all_similarity_metrics_for_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_mapping_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.analyse.compare.get_all_similarity_metrics_for_dataset" title="Permalink to this definition">#</a></dt>
+<dd><p>Return a DataFrame of similarity metrics computed for this dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the dataset for which to extract metrics.
+Defaults to CONVERTED_DIR_NAME.</p></li>
+<li><p><strong>patient</strong> (<em>list</em><em>|</em><em>str</em><em>, </em><em>optional</em>) – A patient ID (or list of patient IDs) to fetch metrics for.
+Defaults to None.</p></li>
+<li><p><strong>segment_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Only extract similarity metrics for segment ID. If none is
+supplied then all similarity metrics will be fetched. Defaults to None.</p></li>
+<li><p><strong>structure_mapping_id</strong> (<em>str</em><em>, </em><em>optional</em>) – ID of a structure mapping to load computed metrics
+for. Defaults to DEFAULT_MAPPING_ID.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The DataFrame of all radiomics computed for dataset</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydicer.analyse.compare.prepare_similarity_metric_analysis">
+<span class="sig-prename descclassname"><span class="pre">pydicer.analyse.compare.</span></span><span class="sig-name descname"><span class="pre">prepare_similarity_metric_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_output_directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_mapping_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.analyse.compare.prepare_similarity_metric_analysis" title="Permalink to this definition">#</a></dt>
+<dd><p>Prepare the similarity metric analysis and stores raw metrics and statistics as .csv files
+within the analysis_output_directory. Plots and statistics are also saved as .png files within
+this directory for inspection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_directory</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>]</em>) – The working directory of the PyDicer project.</p></li>
+<li><p><strong>analysis_output_directory</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>]</em><em>, </em><em>optional</em>) – The directory in which to store the
+output. If none is provided analysis will be generated in a directory named
+similarity_analysis within the working_directory. Defaults to None.</p></li>
+<li><p><strong>df</strong> (<em>pd.DataFrame</em><em>, </em><em>optional</em>) – A DataFrame generated using the
+get_all_similarity_metrics_for_dataset function. This might be useful if you wish to
+further filter the DataFrame prior to generating analysis. If none is provided the
+get_all_similarity_metrics_for_dataset will be used to generate the DataFrame. Defaults
+to None.</p></li>
+<li><p><strong>dataset_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the dataset to analyse similarity metrics for.
+Defaults to CONVERTED_DIR_NAME.</p></li>
+<li><p><strong>patient</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>list</em><em>]</em><em>, </em><em>optional</em>) – The patients to analyse similarity metrics for.
+Defaults to None.</p></li>
+<li><p><strong>segment_id</strong> (<em>str</em><em>, </em><em>optional</em>) – The segment ID to analyse similarity metrics for. Defaults to
+None.</p></li>
+<li><p><strong>structure_mapping_id</strong> (<em>str</em><em>, </em><em>optional</em>) – ID of a structure mapping to load computed metrics
+for. Defaults to DEFAULT_MAPPING_ID.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
         </article>
@@ -433,7 +516,7 @@ be excluded. Defaults to ‘default’.</p></li>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>
@@ -467,6 +550,9 @@ be excluded. Defaults to ‘default’.</p></li>
 <li><a class="reference internal" href="#pydicer.analyse.data.AnalyseData.get_all_dvhs_for_dataset"><code class="docutils literal notranslate"><span class="pre">AnalyseData.get_all_dvhs_for_dataset()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#pydicer.analyse.compare.compute_contour_similarity_metrics"><code class="docutils literal notranslate"><span class="pre">compute_contour_similarity_metrics()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.analyse.compare.get_all_similarity_metrics_for_dataset"><code class="docutils literal notranslate"><span class="pre">get_all_similarity_metrics_for_dataset()</span></code></a></li>
+<li><a class="reference internal" href="#pydicer.analyse.compare.prepare_similarity_metric_analysis"><code class="docutils literal notranslate"><span class="pre">prepare_similarity_metric_analysis()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Auto-segmentation Inference &amp; Analysis" href="AutoSegmentation.html" /><link rel="prev" title="Dose Metrics" href="DoseMetrics.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>Dataset Preparation - PyDicer 0.1.0 documentation</title>
+        <title>Dataset Preparation - PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -484,11 +484,14 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Dataset-Preparation">
 <h1>Dataset Preparation<a class="headerlink" href="#Dataset-Preparation" title="Permalink to this heading">#</a></h1>
+<p><a class="reference external" href="https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/DatasetPreparation.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
 <p>When working with real-world DICOM datasets, you will often need to tackle the task of cleaning the dataset. Often you will have several image series, structure set and even dose grids for each patient. However you typically want to select one relevant DICOM object in each category.</p>
-<p>To help solve this, PyDicer provides a <code class="docutils literal notranslate"><span class="pre">dataset</span> <span class="pre">preparation</span></code> module which can be used to extract a subset of data from your overall set. Two example use cases where this might be useful are:</p>
-<p><strong>Analysing dose to structures for a radiotherapy treatment</strong> You will want to extract the dose grid which was calculated from the plan used to treat the patient, as well as the linked structure set and planning CT image.</p>
-<p><strong>Validating an Auto-segmentation tool</strong> A structure set may have been prepared for the purposes of validation and saved off with a specific <code class="docutils literal notranslate"><span class="pre">SeriesDescription</span></code>. You select the latest structure set with that description as well as the linked image series to perform the auto-segmentation validation.</p>
-<p>As you will see in the examples below, you can provide your own logic to extract subsets of data using PyDicer.</p>
+<p>To help solve this, PyDicer provides a <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/dataset.html">dataset preparation module</a> which can be used to extract a subset of data from your overall set. Two example use cases where this might be useful are:</p>
+<ul class="simple">
+<li><p><strong>Analysing dose to structures for a radiotherapy treatment</strong>: You will want to extract the dose grid which was calculated from the plan used to treat the patient, as well as the linked structure set and planning CT image.</p></li>
+<li><p><strong>Validating an Auto-segmentation tool</strong>: A structure set may have been prepared for the purposes of validation and saved off with a specific <code class="docutils literal notranslate"><span class="pre">SeriesDescription</span></code>. You select the latest structure set with that description as well as the linked image series to perform the auto-segmentation validation.</p></li>
+</ul>
+<p>As you will see in the examples below, you can also provide your own logic to extract subsets of data using PyDicer.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -522,7 +525,7 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="Explore-data">
 <h2>Explore data<a class="headerlink" href="#Explore-data" title="Permalink to this heading">#</a></h2>
-<p>When we use the <code class="docutils literal notranslate"><span class="pre">read_converted_data</span></code> function, by default it will return all data which has been converted and is stored in the <code class="docutils literal notranslate"><span class="pre">testdata_hnscc/data</span></code> directory.</p>
+<p>When we use the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/utils.html#pydicer.utils.read_converted_data">read_converted_data</a> function, by default it will return all data which has been converted and is stored in the <code class="docutils literal notranslate"><span class="pre">testdata_hnscc/data</span></code> directory.</p>
 <p>Let’s use this function and output the entire DataFrame of converted data to see what we have available in this dataset.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -569,116 +572,6 @@ div.rendered_html tbody tr:hover {
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
-      <td>c4ffd0</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.151938046710...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
-      <td>NaN</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/images/c4ffd0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.107072817915...</td>
-      <td>8e0da9</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.176143398282...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.216161306702...</td>
-      <td>NaN</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/images/8e0da9</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.133948865586...</td>
-      <td>ec4aec</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.192899726585...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.216161306702...</td>
-      <td>NaN</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/images/ec4aec</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.469610481459...</td>
-      <td>33c44a</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.244362210503...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.310630617866...</td>
-      <td>NaN</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/images/33c44a</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.169033525924...</td>
-      <td>833a74</td>
-      <td>RTDOSE</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.279793773343...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/doses/833a74</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.267291308489...</td>
-      <td>bf3fba</td>
-      <td>RTDOSE</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.283706688235...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.566662631858...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.173917268454...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/doses/bf3fba</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.173917268454...</td>
-      <td>6f7db7</td>
-      <td>RTPLAN</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120111576192...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.566662631858...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.323156708629...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/plans/6f7db7</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
-      <td>a6b346</td>
-      <td>RTPLAN</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.318927873561...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/plans/a6b346</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
-      <td>cbbf5b</td>
-      <td>RTSTRUCT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.276897558084...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/structures/c...</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.323156708629...</td>
-      <td>6d2934</td>
-      <td>RTSTRUCT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.495627765798...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.310630617866...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.469610481459...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/structures/6...</td>
-    </tr>
-    <tr>
-      <th>10</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.240263316258...</td>
       <td>72b0f9</td>
       <td>CT</td>
@@ -689,7 +582,7 @@ div.rendered_html tbody tr:hover {
       <td>testdata_hnscc/data/HNSCC-01-0199/images/72b0f9</td>
     </tr>
     <tr>
-      <th>11</th>
+      <th>1</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.264264397186...</td>
       <td>c16e76</td>
       <td>RTDOSE</td>
@@ -700,7 +593,7 @@ div.rendered_html tbody tr:hover {
       <td>testdata_hnscc/data/HNSCC-01-0199/doses/c16e76</td>
     </tr>
     <tr>
-      <th>12</th>
+      <th>2</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.287865632112...</td>
       <td>664e96</td>
       <td>RTPLAN</td>
@@ -711,7 +604,7 @@ div.rendered_html tbody tr:hover {
       <td>testdata_hnscc/data/HNSCC-01-0199/plans/664e96</td>
     </tr>
     <tr>
-      <th>13</th>
+      <th>3</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.166429645421...</td>
       <td>06e49c</td>
       <td>RTSTRUCT</td>
@@ -720,6 +613,116 @@ div.rendered_html tbody tr:hover {
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.870916135819...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.240263316258...</td>
       <td>testdata_hnscc/data/HNSCC-01-0199/structures/0...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
+      <td>c4ffd0</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.151938046710...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
+      <td>NaN</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/images/c4ffd0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.107072817915...</td>
+      <td>8e0da9</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.176143398282...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.216161306702...</td>
+      <td>NaN</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/images/8e0da9</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.133948865586...</td>
+      <td>ec4aec</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.192899726585...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.216161306702...</td>
+      <td>NaN</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/images/ec4aec</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.469610481459...</td>
+      <td>33c44a</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.244362210503...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.310630617866...</td>
+      <td>NaN</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/images/33c44a</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.169033525924...</td>
+      <td>833a74</td>
+      <td>RTDOSE</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.279793773343...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/doses/833a74</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.267291308489...</td>
+      <td>bf3fba</td>
+      <td>RTDOSE</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.283706688235...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.566662631858...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.173917268454...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/doses/bf3fba</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.173917268454...</td>
+      <td>6f7db7</td>
+      <td>RTPLAN</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120111576192...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.566662631858...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.323156708629...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/plans/6f7db7</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
+      <td>a6b346</td>
+      <td>RTPLAN</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.318927873561...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/plans/a6b346</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
+      <td>cbbf5b</td>
+      <td>RTSTRUCT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.276897558084...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/structures/c...</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.323156708629...</td>
+      <td>6d2934</td>
+      <td>RTSTRUCT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.495627765798...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.310630617866...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.469610481459...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/structures/6...</td>
     </tr>
     <tr>
       <th>14</th>
@@ -772,8 +775,8 @@ div.rendered_html tbody tr:hover {
 </section>
 <section id="Prepare-dose-data">
 <h2>Prepare dose data<a class="headerlink" href="#Prepare-dose-data" title="Permalink to this heading">#</a></h2>
-<p>Here we use the <code class="docutils literal notranslate"><span class="pre">dataset</span> <span class="pre">preparation</span></code> module to extract the latest dose grid by date. We refer to this subset of data as <code class="docutils literal notranslate"><span class="pre">dose_project</span></code>.</p>
-<p>We use the built in data extraction function, named <code class="docutils literal notranslate"><span class="pre">`rt_latest_dose</span></code> &lt;<a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/dataset.html#pydicer.dataset.functions.rt_latest_dose">https://australiancancerdatanetwork.github.io/pydicer/dataset.html#pydicer.dataset.functions.rt_latest_dose</a>&gt;`__.</p>
+<p>Here we use the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/dataset.html">dataset preparation module</a> to extract the latest dose grid by date along with the linked structure sets and planning image series. We refer to this subset of data as <code class="docutils literal notranslate"><span class="pre">dose_project</span></code>.</p>
+<p>We use the built in data extraction function, named <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/dataset.html#pydicer.dataset.functions.rt_latest_dose">rt_latest_dose</a>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -837,50 +840,6 @@ the folder structure remains easy to navigate.</p>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.169033525924...</td>
-      <td>833a74</td>
-      <td>RTDOSE</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.279793773343...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/doses/833a74</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
-      <td>a6b346</td>
-      <td>RTPLAN</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.318927873561...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/plans/a6b346</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
-      <td>cbbf5b</td>
-      <td>RTSTRUCT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.276897558084...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/structures/c...</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
-      <td>c4ffd0</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.151938046710...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
-      <td>NaN</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/images/c4ffd0</td>
-    </tr>
-    <tr>
-      <th>4</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.264264397186...</td>
       <td>c16e76</td>
       <td>RTDOSE</td>
@@ -891,7 +850,7 @@ the folder structure remains easy to navigate.</p>
       <td>testdata_hnscc/data/HNSCC-01-0199/doses/c16e76</td>
     </tr>
     <tr>
-      <th>5</th>
+      <th>1</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.287865632112...</td>
       <td>664e96</td>
       <td>RTPLAN</td>
@@ -902,7 +861,7 @@ the folder structure remains easy to navigate.</p>
       <td>testdata_hnscc/data/HNSCC-01-0199/plans/664e96</td>
     </tr>
     <tr>
-      <th>6</th>
+      <th>2</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.166429645421...</td>
       <td>06e49c</td>
       <td>RTSTRUCT</td>
@@ -913,7 +872,7 @@ the folder structure remains easy to navigate.</p>
       <td>testdata_hnscc/data/HNSCC-01-0199/structures/0...</td>
     </tr>
     <tr>
-      <th>7</th>
+      <th>3</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.240263316258...</td>
       <td>72b0f9</td>
       <td>CT</td>
@@ -922,6 +881,50 @@ the folder structure remains easy to navigate.</p>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.870916135819...</td>
       <td>NaN</td>
       <td>testdata_hnscc/data/HNSCC-01-0199/images/72b0f9</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.169033525924...</td>
+      <td>833a74</td>
+      <td>RTDOSE</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.279793773343...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/doses/833a74</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
+      <td>a6b346</td>
+      <td>RTPLAN</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.318927873561...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/plans/a6b346</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
+      <td>cbbf5b</td>
+      <td>RTSTRUCT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.276897558084...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/structures/c...</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
+      <td>c4ffd0</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.151938046710...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
+      <td>NaN</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/images/c4ffd0</td>
     </tr>
     <tr>
       <th>8</th>
@@ -976,7 +979,7 @@ the folder structure remains easy to navigate.</p>
 <section id="Prepare-Structure-Dataset">
 <h2>Prepare Structure Dataset<a class="headerlink" href="#Prepare-Structure-Dataset" title="Permalink to this heading">#</a></h2>
 <p>In the next example, we are only want to extract structure sets and their associated images. This might be useful when training or validating an auto-segmentation model.</p>
-<p>In this example, we not only select the latest structure set by date, but we specify the <code class="docutils literal notranslate"><span class="pre">StudyDescription</span></code> values of the DICOM metadata of the data objects we want to select. To achieve this, we use the build in <code class="docutils literal notranslate"><span class="pre">`rt_latest_struct</span></code> &lt;<a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/dataset.html#pydicer.dataset.functions.rt_latest_struct">https://australiancancerdatanetwork.github.io/pydicer/dataset.html#pydicer.dataset.functions.rt_latest_struct</a>&gt;`__ function.</p>
+<p>In this example, we not only select the latest structure set by date, but we specify the <code class="docutils literal notranslate"><span class="pre">StudyDescription</span></code> values of the DICOM metadata of the data objects we want to select. To achieve this, we use the build in <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/dataset.html#pydicer.dataset.functions.rt_latest_struct">rt_latest_struct</a> function which will also extract the image series linked to the structure set selected.</p>
 <p>Observe the output of the following cell and explore the <code class="docutils literal notranslate"><span class="pre">testdata_hnscc</span></code> directory. We not have one structure set and the linked image for each patient.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -1038,28 +1041,6 @@ the folder structure remains easy to navigate.</p>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
-      <td>cbbf5b</td>
-      <td>RTSTRUCT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.276897558084...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/structures/c...</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
-      <td>c4ffd0</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.151938046710...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
-      <td>NaN</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/images/c4ffd0</td>
-    </tr>
-    <tr>
-      <th>2</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.166429645421...</td>
       <td>06e49c</td>
       <td>RTSTRUCT</td>
@@ -1070,7 +1051,7 @@ the folder structure remains easy to navigate.</p>
       <td>testdata_hnscc/data/HNSCC-01-0199/structures/0...</td>
     </tr>
     <tr>
-      <th>3</th>
+      <th>1</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.240263316258...</td>
       <td>72b0f9</td>
       <td>CT</td>
@@ -1079,6 +1060,28 @@ the folder structure remains easy to navigate.</p>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.870916135819...</td>
       <td>NaN</td>
       <td>testdata_hnscc/data/HNSCC-01-0199/images/72b0f9</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
+      <td>cbbf5b</td>
+      <td>RTSTRUCT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.276897558084...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/structures/c...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
+      <td>c4ffd0</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.151938046710...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
+      <td>NaN</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/images/c4ffd0</td>
     </tr>
     <tr>
       <th>4</th>
@@ -1166,6 +1169,17 @@ the folder structure remains easy to navigate.</p>
   <tbody>
     <tr>
       <th>0</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.240263316258...</td>
+      <td>72b0f9</td>
+      <td>CT</td>
+      <td>HNSCC-01-0199</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.261759476368...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.870916135819...</td>
+      <td>NaN</td>
+      <td>testdata_hnscc/data/HNSCC-01-0199/images/72b0f9</td>
+    </tr>
+    <tr>
+      <th>1</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
       <td>c4ffd0</td>
       <td>CT</td>
@@ -1176,7 +1190,7 @@ the folder structure remains easy to navigate.</p>
       <td>testdata_hnscc/data/HNSCC-01-0176/images/c4ffd0</td>
     </tr>
     <tr>
-      <th>1</th>
+      <th>2</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.107072817915...</td>
       <td>8e0da9</td>
       <td>CT</td>
@@ -1187,7 +1201,7 @@ the folder structure remains easy to navigate.</p>
       <td>testdata_hnscc/data/HNSCC-01-0176/images/8e0da9</td>
     </tr>
     <tr>
-      <th>2</th>
+      <th>3</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.133948865586...</td>
       <td>ec4aec</td>
       <td>CT</td>
@@ -1198,7 +1212,7 @@ the folder structure remains easy to navigate.</p>
       <td>testdata_hnscc/data/HNSCC-01-0176/images/ec4aec</td>
     </tr>
     <tr>
-      <th>3</th>
+      <th>4</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.469610481459...</td>
       <td>33c44a</td>
       <td>CT</td>
@@ -1207,17 +1221,6 @@ the folder structure remains easy to navigate.</p>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.310630617866...</td>
       <td>NaN</td>
       <td>testdata_hnscc/data/HNSCC-01-0176/images/33c44a</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.240263316258...</td>
-      <td>72b0f9</td>
-      <td>CT</td>
-      <td>HNSCC-01-0199</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.261759476368...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.870916135819...</td>
-      <td>NaN</td>
-      <td>testdata_hnscc/data/HNSCC-01-0199/images/72b0f9</td>
     </tr>
     <tr>
       <th>5</th>
@@ -1390,39 +1393,6 @@ the folder structure remains easy to navigate.</p>
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
-      <td>c4ffd0</td>
-      <td>CT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.151938046710...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
-      <td>NaN</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/images/c4ffd0</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
-      <td>cbbf5b</td>
-      <td>RTSTRUCT</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.276897558084...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/structures/c...</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.169033525924...</td>
-      <td>833a74</td>
-      <td>RTDOSE</td>
-      <td>HNSCC-01-0176</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.279793773343...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
-      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
-      <td>testdata_hnscc/data/HNSCC-01-0176/doses/833a74</td>
-    </tr>
-    <tr>
-      <th>3</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.240263316258...</td>
       <td>72b0f9</td>
       <td>CT</td>
@@ -1433,7 +1403,7 @@ the folder structure remains easy to navigate.</p>
       <td>testdata_hnscc/data/HNSCC-01-0199/images/72b0f9</td>
     </tr>
     <tr>
-      <th>4</th>
+      <th>1</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.166429645421...</td>
       <td>06e49c</td>
       <td>RTSTRUCT</td>
@@ -1444,7 +1414,7 @@ the folder structure remains easy to navigate.</p>
       <td>testdata_hnscc/data/HNSCC-01-0199/structures/0...</td>
     </tr>
     <tr>
-      <th>5</th>
+      <th>2</th>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.264264397186...</td>
       <td>c16e76</td>
       <td>RTDOSE</td>
@@ -1453,6 +1423,39 @@ the folder structure remains easy to navigate.</p>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.870916135819...</td>
       <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.287865632112...</td>
       <td>testdata_hnscc/data/HNSCC-01-0199/doses/c16e76</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
+      <td>c4ffd0</td>
+      <td>CT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.151938046710...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
+      <td>NaN</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/images/c4ffd0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.403955456521...</td>
+      <td>cbbf5b</td>
+      <td>RTSTRUCT</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.276897558084...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.120880328745...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.334001018535...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/structures/c...</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.169033525924...</td>
+      <td>833a74</td>
+      <td>RTDOSE</td>
+      <td>HNSCC-01-0176</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.279793773343...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.706719210726...</td>
+      <td>1.3.6.1.4.1.14519.5.2.1.1706.8040.470253980284...</td>
+      <td>testdata_hnscc/data/HNSCC-01-0176/doses/833a74</td>
     </tr>
   </tbody>
 </table>
@@ -1498,7 +1501,7 @@ the folder structure remains easy to navigate.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>

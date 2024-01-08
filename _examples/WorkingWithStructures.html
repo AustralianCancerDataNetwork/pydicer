@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Generating Data Objects" href="ObjectGeneration.html" /><link rel="prev" title="Working with Data" href="WorkingWithData.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>Working with Structures - PyDicer 0.1.0 documentation</title>
+        <title>Working with Structures - PyDicer documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">PyDicer 0.1.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">PyDicer  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">PyDicer 0.1.0 documentation</span>
+  <span class="sidebar-brand-text">PyDicer  documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -484,9 +484,10 @@ div.rendered_html tbody tr:hover {
 </style>
 <section id="Working-with-Structures">
 <h1>Working with Structures<a class="headerlink" href="#Working-with-Structures" title="Permalink to this heading">#</a></h1>
+<p><a class="reference external" href="https://colab.research.google.com/github/AustralianCancerDataNetwork/pydicer/blob/main/examples/WorkingWithStructures.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
 <p>In PyDicer, structure sets which have been converted from the DICOM <code class="docutils literal notranslate"><span class="pre">RTSTRUCT</span></code> modality are stored within the directory structure. One common issue when working with real world datasets is that structure names are often inconsistent requiring standardisation of names prior to analysing data.</p>
-<p>In PyDicer, structure name standardisation is achieved by defining structure mapping dictionaries which can be stored globally (applied to all structure sets) or locally (specific mapping per structure set or per patient).</p>
-<p>In this guide we present some examples on how to define such structure name mappings and will introduce the <code class="docutils literal notranslate"><span class="pre">StructureSet</span></code> class which simplifies loading and working with structure objects.</p>
+<p>In PyDicer, structure name standardisation is achieved by <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/utils.html#pydicer.utils.add_structure_name_mapping">defining structure mapping dictionaries</a> which can be stored globally (applied to all structure sets) or locally (specific mapping per structure set or per patient).</p>
+<p>In this guide we present some examples on how to define such structure name mappings and will introduce the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/dataset.html#module-pydicer.dataset.structureset">StructureSet class</a> which simplifies loading and working with structure objects.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -559,12 +560,12 @@ Working directory %s aready exists, won&#39;t download test data.
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;L_Lung&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
-Mask voxel sum for Esophagus: 1275
-Mask voxel sum for Heart: 30685
-Mask voxel sum for L_Lung: 66538
-Mask voxel sum for Lung_R: 86254
-Mask voxel sum for SpinalCord: 2645
+Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+Mask voxel sum for Lung_R: 68074
+Mask voxel sum for SpinalCord: 4157
+Mask voxel sum for Heart: 23857
+Mask voxel sum for Lung_L: 52528
+Mask voxel sum for Esophagus: 1151
 </pre></div></div>
 </div>
 <p>In the next cell, we iterate over all our structure sets, and print out the names of the structures available. Notice that for some structure sets, structures aren’t named consistently. In the next section we will resolve this with a structure name mapping.</p>
@@ -589,32 +590,32 @@ Mask voxel sum for SpinalCord: 2645
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Patient: LCTSC-Train-S1-005, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;L_Lung&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+Patient: LCTSC-Train-S1-007, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Patient: LCTSC-Train-S1-007, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-008, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Patient: LCTSC-Train-S1-008, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-002, Structure names: [&#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_Left&#39;, &#39;Esophagus&#39;, &#39;Lung_Right&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Patient: LCTSC-Train-S1-002, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_Left&#39;, &#39;Lung_Right&#39;, &#39;SpinalCord&#39;]
+Patient: LCTSC-Train-S1-004, Structure names: [&#39;Lung_R&#39;, &#39;SC&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Patient: LCTSC-Train-S1-003, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-001, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Patient: LCTSC-Train-S1-004, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;SC&#39;, &#39;Lung_R&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Test-S1-101, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Patient: LCTSC-Train-S1-001, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-006, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Patient: LCTSC-Train-S1-006, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-005, Structure names: [&#39;L_Lung&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Patient: LCTSC-Test-S1-101, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Test-S1-102, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id default
-Patient: LCTSC-Test-S1-102, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-003, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 </pre></div></div>
 </div>
 </section>
 <section id="Add-Structure-Name-Mapping">
 <h2>Add Structure Name Mapping<a class="headerlink" href="#Add-Structure-Name-Mapping" title="Permalink to this heading">#</a></h2>
 <p>Structure name mappings are defined as Python dictionaries, with the standardised structure name as the key, and the value a list of name variations which should map to the standardised name.</p>
-<p>Use the <code class="docutils literal notranslate"><span class="pre">add_structure_name_mapping</span></code> to add a mapping. A <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code> may be supplied to refer to different mappings. If no <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code> is supplied, a default mapping id is used.</p>
+<p>Use the <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/utils.html#pydicer.utils.add_structure_name_mapping">add_structure_name_mapping</a> to add a mapping. A <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code> may be supplied to refer to different mappings. If no <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code> is supplied, a default mapping id is used.</p>
 <p>If a <code class="docutils literal notranslate"><span class="pre">structure_set_row</span></code> or <code class="docutils literal notranslate"><span class="pre">patient_id</span></code> is supplied, then the mapping will be stored at the corresponding level. If neither is supplied, the mapping will be stored globally for all structure sets in the datasets.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -666,25 +667,25 @@ pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
-Patient: LCTSC-Train-S1-005, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
-pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
 Patient: LCTSC-Train-S1-007, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
 Patient: LCTSC-Train-S1-008, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
 Patient: LCTSC-Train-S1-002, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
-Patient: LCTSC-Train-S1-003, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
-pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
 Patient: LCTSC-Train-S1-004, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
 Patient: LCTSC-Train-S1-001, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
-Patient: LCTSC-Train-S1-006, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
-pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
 Patient: LCTSC-Test-S1-101, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-006, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-005, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
 Patient: LCTSC-Test-S1-102, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/default.json
+Patient: LCTSC-Train-S1-003, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
 </pre></div></div>
 </div>
 </section>
@@ -719,25 +720,25 @@ Patient: LCTSC-Test-S1-102, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#3
 <div class="highlight"><pre>
 pydicer.utils - INFO - Adding mapping for project in testdata_lctsc/.pydicer
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
-Patient: LCTSC-Train-S1-005, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
-pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
 Patient: LCTSC-Train-S1-007, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
 Patient: LCTSC-Train-S1-008, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
 Patient: LCTSC-Train-S1-002, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
-Patient: LCTSC-Train-S1-003, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
-pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
 Patient: LCTSC-Train-S1-004, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
 Patient: LCTSC-Train-S1-001, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
-Patient: LCTSC-Train-S1-006, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
-pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
 Patient: LCTSC-Test-S1-101, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-006, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-005, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
 Patient: LCTSC-Test-S1-102, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
+pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/.pydicer/.structure_set_mappings/struct_subset.json
+Patient: LCTSC-Train-S1-003, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;]
 </pre></div></div>
 </div>
 </section>
@@ -782,32 +783,33 @@ Patient: LCTSC-Test-S1-102, Structure names: [&#39;Lung_L&#39;, &#39;Lung_R&#39;
 pydicer.utils - INFO - Adding mapping local_mapping for structure set f036b8
 pydicer.utils - INFO - Adding mapping for stucture_set in testdata_lctsc/data/LCTSC-Train-S1-002/structures/f036b8
 pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
-Patient: LCTSC-Train-S1-005, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;L_Lung&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
+Patient: LCTSC-Train-S1-007, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
-Patient: LCTSC-Train-S1-007, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
-pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
-Patient: LCTSC-Train-S1-008, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-008, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - DEBUG - Using mapping file in testdata_lctsc/data/LCTSC-Train-S1-002/structures/f036b8/.structure_set_mappings/local_mapping.json
 Patient: LCTSC-Train-S1-002, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
-Patient: LCTSC-Train-S1-003, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-004, Structure names: [&#39;Lung_R&#39;, &#39;SC&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
-Patient: LCTSC-Train-S1-004, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;SC&#39;, &#39;Lung_R&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-001, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
-Patient: LCTSC-Train-S1-001, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Test-S1-101, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
-Patient: LCTSC-Train-S1-006, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-006, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
-Patient: LCTSC-Test-S1-101, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Train-S1-005, Structure names: [&#39;L_Lung&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Esophagus&#39;]
 pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
-Patient: LCTSC-Test-S1-102, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#39;, &#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Lung_L&#39;]
+Patient: LCTSC-Test-S1-102, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
+pydicer.dataset.structureset - WARNING - No mapping file found with id local_mapping
+Patient: LCTSC-Train-S1-003, Structure names: [&#39;Lung_R&#39;, &#39;SpinalCord&#39;, &#39;Heart&#39;, &#39;Lung_L&#39;, &#39;Esophagus&#39;]
 </pre></div></div>
 </div>
 <p>Notice that mapping has only been applied to the structure set for patient <code class="docutils literal notranslate"><span class="pre">LCTSC-Train-S1-002</span></code></p>
 </section>
 <section id="Using-Mappings-in-PyDicer">
 <h2>Using Mappings in PyDicer<a class="headerlink" href="#Using-Mappings-in-PyDicer" title="Permalink to this heading">#</a></h2>
-<p>Once mappings are defined, these can be used when you: - Compute Dose Metrics - Fetch Radiomics Features - Analyse Auto-segmentations - Prepare data for nnUNet training</p>
+<p>Once mappings are defined, these can be used when you: - <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/DoseMetrics.html">Compute Dose Metrics</a> - <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/Radiomics.html">Fetch Radiomics Features</a> - <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/AutoSegmentation.html">Analyse Auto-segmentations</a> - <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/_examples/nnUNet.html">Prepare data for nnUNet
+training</a></p>
 <p>Check out the documentation for those modules to see where you can supply your <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code> to have the structure set standardisation applied. If you have used the default <code class="docutils literal notranslate"><span class="pre">mapping_id</span></code>, the standardisation will be applied automatically.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -849,7 +851,7 @@ Patient: LCTSC-Test-S1-102, Structure names: [&#39;Esophagus&#39;, &#39;Heart&#3
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Ingham Medical Physics
+                Copyright &#169; 2024, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>
