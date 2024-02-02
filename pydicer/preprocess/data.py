@@ -149,7 +149,7 @@ class PreprocessData:
         return None
 
     def preprocess(
-        self, input_directory: Union(Path, list), force: bool = True
+        self, input_directory: Union[Path, list], force: bool = True
     ) -> pd.DataFrame:
         """
         Function to preprocess information regarding the data located in an Input working directory
