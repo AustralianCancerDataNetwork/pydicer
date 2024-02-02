@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 from pathlib import Path
 import SimpleITK as sitk
 import matplotlib
@@ -31,7 +32,12 @@ class VisualiseData:
         self.working_directory = Path(working_directory)
         self.output_directory = self.working_directory.joinpath(CONVERTED_DIR_NAME)
 
-    def visualise(self, dataset_name=CONVERTED_DIR_NAME, patient=None, force=True):
+    def visualise(
+        self,
+        dataset_name: str = CONVERTED_DIR_NAME,
+        patient: Union[list, str] = None,
+        force: bool = True,
+    ):
         """Visualise the data in the working directory. PNG files are generates providing a
         snapshot of the various data objects.
 

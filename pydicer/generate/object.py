@@ -1,4 +1,6 @@
 import logging
+from typing import Union
+from pathlib import Path
 
 import pandas as pd
 import SimpleITK as sitk
@@ -10,14 +12,14 @@ logger = logging.getLogger(__name__)
 
 
 def add_object(
-    working_directory,
-    object_id,
-    patient_id,
-    object_type,
-    modality,
-    for_uid=None,
-    referenced_sop_instance_uid=None,
-    datasets=None,
+    working_directory: Path,
+    object_id: str,
+    patient_id: str,
+    object_type: str,
+    modality: str,
+    for_uid: str = None,
+    referenced_sop_instance_uid: str = None,
+    datasets: Union[str, list] = None,
 ):
     """Add a generated object to the project.
 
@@ -155,7 +157,9 @@ def add_object(
         df_converted.to_csv(patient_directory.joinpath("converted.csv"))
 
 
-def get_linked_for_and_ref_uid(working_directory, patient_id, linked_obj):
+def get_linked_for_and_ref_uid(
+    working_directory: Path, patient_id: str, linked_obj: Union[str, pd.Series] = None
+) -> tuple:
     """Determine the linked frame of reference UID and SOP instance UID
 
     Args:
@@ -194,14 +198,14 @@ def get_linked_for_and_ref_uid(working_directory, patient_id, linked_obj):
 
 
 def add_image_object(
-    working_directory,
-    image,
-    image_id,
-    modality,
-    patient_id,
-    linked_image=None,
-    for_uid=None,
-    datasets=None,
+    working_directory: Path,
+    image: sitk.Image,
+    image_id: str,
+    modality: str,
+    patient_id: str,
+    linked_image: pd.Series = None,
+    for_uid: str = None,
+    datasets: Union[list, str] = None,
 ):
     """Add a generated image object to the project.
 
@@ -259,13 +263,13 @@ def add_image_object(
 
 
 def add_structure_object(
-    working_directory,
-    structures,
-    structure_id,
-    patient_id,
-    linked_image=None,
-    for_uid=None,
-    datasets=None,
+    working_directory: Path,
+    structures: dict,
+    structure_id: str,
+    patient_id: str,
+    linked_image: Union[str, pd.Series] = None,
+    for_uid: str = None,
+    datasets: Union[list, str] = None,
 ):
     """Add a generated structure object to the project.
 
@@ -325,13 +329,13 @@ def add_structure_object(
 
 
 def add_dose_object(
-    working_directory,
-    dose,
-    dose_id,
-    patient_id,
-    linked_plan=None,
-    for_uid=None,
-    datasets=None,
+    working_directory: Path,
+    dose: sitk.Image,
+    dose_id: str,
+    patient_id: str,
+    linked_plan: Union[str, pd.Series] = None,
+    for_uid: str = None,
+    datasets: Union[list, str] = None,
 ):
     """Add a generated dose object to the project.
 

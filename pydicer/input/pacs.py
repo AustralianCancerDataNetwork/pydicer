@@ -1,4 +1,7 @@
 import os
+from pathlib import Path
+from typing import Union
+
 import pydicom
 
 from platipy.dicom.communication.connector import DicomConnector
@@ -7,7 +10,13 @@ from pydicer.input.base import InputBase
 
 
 class DICOMPACSInput(InputBase):
-    def __init__(self, host, port, ae_title=None, working_directory=None):
+    def __init__(
+        self,
+        host: str,
+        port: str,
+        ae_title: str = None,
+        working_directory: Union[str, Path] = None,
+    ):
         """Class for fetching files from DICOM PACS. Currently only supports C-GET commands to
         fetch the data.
 
@@ -26,13 +35,18 @@ class DICOMPACSInput(InputBase):
         super().__init__(working_directory)
 
         self.dicom_connector = DicomConnector(
-            host=host, port=port, ae_title=ae_title, output_directory=self.working_directory
+            host=host,
+            port=port,
+            ae_title=ae_title,
+            output_directory=self.working_directory,
         )
 
         if not self.dicom_connector.verify():
             raise ConnectionError("Unable to connect to DICOM PACS.")
 
-    def fetch_data(self, patients, modalities=None):
+    def fetch_data(
+        self, patients: Union[list, str], modalities: Union[list, str] = None
+    ):
         """Download the DICOM data from the PACS.
 
         Args:
@@ -52,7 +66,6 @@ class DICOMPACSInput(InputBase):
             modalities = [modalities]
 
         for patient in patients:
-
             dataset = pydicom.Dataset()
             dataset.PatientID = patient
             dataset.PatientName = ""

@@ -1,8 +1,11 @@
+from pathlib import Path
+from typing import Union
+
 from pydicer.input.base import InputBase
 
 
 class FileSystemInput(InputBase):
-    def __init__(self, directory):
+    def __init__(self, directory: Union[str, Path]):
         """
         Class for inputing files from the file system
 

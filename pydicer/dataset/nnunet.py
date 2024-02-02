@@ -45,7 +45,7 @@ class NNUNetDataset:
         nnunet_description: str = "",
         dataset_name: str = CONVERTED_DIR_NAME,
         image_modality: str = "CT",
-        mapping_id=DEFAULT_MAPPING_ID,
+        mapping_id: str = DEFAULT_MAPPING_ID,
     ):
         """Prepare a dataset to train models using nnUNet.
 
@@ -219,12 +219,16 @@ class NNUNetDataset:
         """
 
         if len(self.training_cases) == 0:
-            raise SystemError("training_cases are empty, run split_dataset function first.")
+            raise SystemError(
+                "training_cases are empty, run split_dataset function first."
+            )
 
         img_stats = []
 
         df = read_converted_data(self.working_directory, dataset_name=self.dataset_name)
-        df_images = df[(df.modality == "CT") | (df.modality == "MR") | (df.modality == "PT")]
+        df_images = df[
+            (df.modality == "CT") | (df.modality == "MR") | (df.modality == "PT")
+        ]
 
         for case in self.training_cases + self.testing_cases:
             df_pat = df_images[df_images.patient_id == case]
@@ -252,7 +256,9 @@ class NNUNetDataset:
 
         # Check to see if we have any duplicate image spacing and sizes, if so inspect these
         # further
-        duplicated_rows = df_img_stats.duplicated(subset=["spacing", "size"], keep=False)
+        duplicated_rows = df_img_stats.duplicated(
+            subset=["spacing", "size"], keep=False
+        )
         df_img_stats["voxel_sum"] = df_img_stats.apply(
             lambda row: sitk.GetArrayFromImage(sitk.ReadImage(row.img_path)).sum()
             if row.name in duplicated_rows.index
@@ -342,7 +348,9 @@ class NNUNetDataset:
                 print(f"Structure {s} is missing for patients: {missing_pats}")
 
                 incomplete_structures.append(s)
-                incomplete_patients += [p for p in missing_pats if not p in incomplete_patients]
+                incomplete_patients += [
+                    p for p in missing_pats if not p in incomplete_patients
+                ]
 
         if incomplete_structures:
             print(
@@ -383,7 +391,8 @@ class NNUNetDataset:
                     structure_name_j = structure_names[sj]
 
                     structure_sum = (
-                        structure_set[structure_name_i] + structure_set[structure_name_j]
+                        structure_set[structure_name_i]
+                        + structure_set[structure_name_j]
                     )
                     arr = sitk.GetArrayFromImage(structure_sum)
                     if arr.max() > 1:
@@ -444,7 +453,9 @@ class NNUNetDataset:
         """
 
         if len(self.training_cases) == 0:
-            raise SystemError("training_cases are empty, run split_dataset function first.")
+            raise SystemError(
+                "training_cases are empty, run split_dataset function first."
+            )
 
         # First check that all cases (in training set) have the structures which are to be learnt
         df_structures = self.check_structure_names()
@@ -571,7 +582,9 @@ class NNUNetDataset:
             raise FileNotFoundError(
                 "Ensure that the folder in which to generate the script exists."
             )
-        script_path = script_directory.joinpath(f"train_{self.nnunet_id}_{self.nnunet_name}.sh")
+        script_path = script_directory.joinpath(
+            f"train_{self.nnunet_id}_{self.nnunet_name}.sh"
+        )
 
         if isinstance(folds, str):
             folds = [folds]
@@ -637,7 +650,9 @@ class NNUNetDataset:
         """
         # Make sure the script folder exists
         script_directory = Path(script_directory)
-        script_path = script_directory.joinpath(f"train_{self.nnunet_id}_{self.nnunet_name}.sh")
+        script_path = script_directory.joinpath(
+            f"train_{self.nnunet_id}_{self.nnunet_name}.sh"
+        )
 
         if not script_path.exists():
             raise FileNotFoundError(

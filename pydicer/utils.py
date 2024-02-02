@@ -8,6 +8,7 @@ import zipfile
 import shutil
 from datetime import datetime
 from pathlib import Path
+from typing import Union
 
 import pandas as pd
 import SimpleITK as sitk
@@ -20,7 +21,7 @@ from pydicer.constants import CONVERTED_DIR_NAME, PYDICER_DIR_NAME, DEFAULT_MAPP
 logger = logging.getLogger(__name__)
 
 
-def hash_uid(uid, truncate=6):
+def hash_uid(uid: str, truncate: int = 6) -> str:
     """Hash a UID and truncate it
 
     Args:
@@ -36,7 +37,7 @@ def hash_uid(uid, truncate=6):
     return hash_sha.hexdigest()[:truncate]
 
 
-def determine_dcm_datetime(ds, require_time=False):
+def determine_dcm_datetime(ds: pydicom.Dataset, require_time: bool = False) -> datetime:
     """Get a date/time value from a DICOM dataset. Will attempt to pull from SeriesDate/SeriesTime
     field first. Will fallback to StudyDate/StudyTime or InstanceCreationDate/InstanceCreationTime
     if not available.
@@ -70,7 +71,11 @@ def determine_dcm_datetime(ds, require_time=False):
     return None
 
 
-def load_object_metadata(row: pd.Series, keep_tags=None, remove_tags=None):
+def load_object_metadata(
+    row: pd.Series,
+    keep_tags: Union[str, list] = None,
+    remove_tags: Union[str, list] = None,
+) -> pydicom.Dataset:
     """Loads the object's metadata
 
     Args:
@@ -147,7 +152,7 @@ def load_object_metadata(row: pd.Series, keep_tags=None, remove_tags=None):
     return pydicom.Dataset.from_json(ds_dict, bulk_data_uri_handler=lambda _: None)
 
 
-def load_dvh(row, struct_hash=None):
+def load_dvh(row: pd.Series, struct_hash: Union[list, str] = None) -> pd.DataFrame:
     """Loads an object's Dose Volume Histogram (DVH)
 
     Args:
@@ -201,7 +206,7 @@ def load_dvh(row, struct_hash=None):
     return df_result
 
 
-def read_preprocessed_data(working_directory: Path):
+def read_preprocessed_data(working_directory: Path) -> pd.DataFrame:
     """Reads the pydicer preprocessed data
 
     Args:
@@ -230,10 +235,10 @@ def read_preprocessed_data(working_directory: Path):
 
 def read_converted_data(
     working_directory: Path,
-    dataset_name=CONVERTED_DIR_NAME,
-    patients=None,
-    join_working_directory=True,
-):
+    dataset_name: str = CONVERTED_DIR_NAME,
+    patients: list = None,
+    join_working_directory: bool = True,
+) -> pd.DataFrame:
     """Read the converted data frame from the supplied data directory.
 
     Args:
@@ -287,7 +292,7 @@ def read_converted_data(
     return df.reset_index(drop=True)
 
 
-def parse_patient_kwarg(patient):
+def parse_patient_kwarg(patient: Union[list, str]) -> list:
     """Helper function to prepare patient list from kwarg used in functions throughout pydicer.
 
     Args:
@@ -317,7 +322,7 @@ def parse_patient_kwarg(patient):
     return patient
 
 
-def read_simple_itk_image(row):
+def read_simple_itk_image(row: pd.Series) -> sitk.Image:
     """Reads the SimpleITK Image object given a converted dataframe row.
 
     Args:
@@ -338,7 +343,9 @@ def read_simple_itk_image(row):
     return sitk.ReadImage(str(nifti_path))
 
 
-def get_iterator(iterable, length=None, unit="it", name=None):
+def get_iterator(
+    iterable, length: int = None, unit: str = "it", name: str = None
+):
     """Get the appropriate iterator based on the level of verbosity configured.
 
     Args:
@@ -369,7 +376,7 @@ def get_iterator(iterable, length=None, unit="it", name=None):
     return iterator
 
 
-def map_structure_name(struct_name, struct_map_dict):
+def map_structure_name(struct_name: str, struct_map_dict: dict) -> str:
     """Function to map a structure's name according to a mapping dictionary
 
     Args:
@@ -534,7 +541,7 @@ def add_structure_name_mapping(
         json.dump(mapping_dict, structures_map_file, ensure_ascii=False, indent=4)
 
 
-def download_and_extract_zip_file(zip_url, output_directory):
+def download_and_extract_zip_file(zip_url: str, output_directory: Union[str, Path]):
     """Downloads a zip file from the URL specified and extracts the contents to the output
     directory.
 
@@ -555,7 +562,9 @@ def download_and_extract_zip_file(zip_url, output_directory):
             zip_ref.extractall(output_directory)
 
 
-def fetch_converted_test_data(working_directory=None, dataset="HNSCC"):
+def fetch_converted_test_data(
+    working_directory: Union[str, Path] = None, dataset: str = "HNSCC"
+) -> Path:
     """Fetch some public data which has already been converted using PyDicer.
     Useful for unit testing as well as examples.
 

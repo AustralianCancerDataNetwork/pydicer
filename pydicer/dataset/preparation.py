@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Union
 
 import pandas as pd
 
@@ -22,7 +22,7 @@ class PrepareDataset:
             Defaults to ".".
     """
 
-    def __init__(self, working_directory="."):
+    def __init__(self, working_directory: Union[str, Path] = "."):
         self.working_directory = Path(working_directory)
 
     def add_object_to_dataset(self, dataset_name: str, data_object_row: pd.Series):

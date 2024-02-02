@@ -9,11 +9,11 @@ import pydicom
 QUARATINE_DICOM_KEYS = ["PatientID", "Modality", "SOPInstanceUID", "SeriesDescription"]
 
 
-def copy_file_to_quarantine(file, working_directory, error_msg):
+def copy_file_to_quarantine(file: Path, working_directory: Path, error_msg: str):
     """Move a DICOM file that couldn't be processed into the quarantine directory
 
     Args:
-        file (Path): DICOM path to be moved into quarantine
+        file (pathlib.Path): DICOM path to be moved into quarantine
         working_directory (pathlib.Path): Main working directory for pydicer
         error_msg (str): error message associated with the quarantined file
     """
@@ -61,7 +61,7 @@ def copy_file_to_quarantine(file, working_directory, error_msg):
     df_summary.to_csv(summary_file)
 
 
-def read_quarantined_data(working_directory: Path):
+def read_quarantined_data(working_directory: Path) -> pd.DataFrame:
     """A function to read the data from the quarantine summary.
 
     Args:

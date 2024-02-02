@@ -1,4 +1,6 @@
 import logging
+from pathlib import Path
+from typing import Union
 
 from pydicer.input.base import InputBase
 from pydicer.utils import download_and_extract_zip_file
@@ -7,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class WebInput(InputBase):
-    def __init__(self, data_url, working_directory=None):
+    def __init__(self, data_url: str, working_directory: Union[str, Path] = None):
         """
         Class for downloading and saving input data off the internet
 

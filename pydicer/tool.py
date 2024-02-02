@@ -2,6 +2,7 @@ import sys
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from typing import Union
 
 import pandas as pd
 
@@ -84,7 +85,7 @@ class PyDicer:
         self.dataset = PrepareDataset(self.working_directory)
         self.analyse = AnalyseData(self.working_directory)
 
-    def set_verbosity(self, verbosity):
+    def set_verbosity(self, verbosity: int):
         """Set's the verbosity of the tool to the std out (console). When 0 (not set) the tool will
         display a progress bar. Other values indicate Python's build in logging levels:
         - DEBUG: 10
@@ -137,7 +138,7 @@ class PyDicer:
             console_handler.setLevel(verbosity)
             logger.addHandler(console_handler)
 
-    def add_input(self, input_obj):
+    def add_input(self, input_obj: Union[str, Path, InputBase]):
         """Add an input location containing DICOM data. Must a str, pathlib.Path or InputBase
         object, such as:
         - FileSystemInput
@@ -163,7 +164,7 @@ class PyDicer:
                 "input_obj must be of type str, pathlib.Path or inherit InputBase"
             )
 
-    def preprocess(self, force=True):
+    def preprocess(self, force: bool = True):
         """Preprocess the DICOM data in preparation for conversion
 
         Args:
@@ -181,7 +182,7 @@ class PyDicer:
 
         self.preprocessed_data = read_preprocessed_data(self.working_directory)
 
-    def run_pipeline(self, patient=None, force=True):
+    def run_pipeline(self, patient: Union[str, list] = None, force: bool = True):
         """Runs the entire conversion pipeline, including computation of DVHs and first-order
         radiomics.
 

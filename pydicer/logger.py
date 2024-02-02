@@ -23,12 +23,13 @@ class PatientLogger:
             df_pat_log = pd.DataFrame(columns=SUMMARY_CSV_COLS)
             df_pat_log.to_csv(self.summary_csv_path, index=False)
 
-    def log_module_error(self, module, hashed_uid, error_log):
+    def log_module_error(self, module: str, hashed_uid: str, error_log: str):
         """Function to log errors for a specific pydicer module
 
         Args:
             module (str): pydicer module to log error for in CSV
-            error (str): error to log in CSV
+            hashed_uid (str): hashed UID of the patient being logged to the error CSV
+            error_log (str): error to log in CSV
         """
         end_time = dt.now()
         df_error = pd.DataFrame(
@@ -37,11 +38,12 @@ class PatientLogger:
         )
         df_error.to_csv(self.summary_csv_path, header=False, mode="a", index=False)
 
-    def eval_module_process(self, module, hashed_uid):
+    def eval_module_process(self, module: str, hashed_uid: str):
         """Function to log if any patient had issues for a specific pydicer module
 
         Args:
             module (str): pydicer module to check if no errors were generated for all patients
+            hashed_uid (str): hashed UID of the patient being logged to the error CSV
         """
 
         end_time = dt.now()
@@ -53,7 +55,8 @@ class PatientLogger:
         ]
         if len(df_summary_mod) == 0:
             df_final_summary = pd.DataFrame(
-                [[module, hashed_uid, 0, "", self.start_time, end_time]], columns=SUMMARY_CSV_COLS
+                [[module, hashed_uid, 0, "", self.start_time, end_time]],
+                columns=SUMMARY_CSV_COLS,
             )
             df_final_summary.to_csv(
                 self.summary_csv_path,

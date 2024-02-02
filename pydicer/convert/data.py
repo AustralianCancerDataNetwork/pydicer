@@ -3,6 +3,8 @@ import tempfile
 import copy
 import shutil
 from pathlib import Path
+from typing import Union
+
 import pandas as pd
 import numpy as np
 import SimpleITK as sitk
@@ -51,7 +53,7 @@ DATA_OBJECT_COLUMNS = [
 ]
 
 
-def get_object_type(sop_class_uid):
+def get_object_type(sop_class_uid: str) -> str:
     """Get the type of the object (used for the output path)
 
     Args:
@@ -69,7 +71,9 @@ def get_object_type(sop_class_uid):
     return object_type
 
 
-def handle_missing_slice(files, ignore_duplicates=False):
+def handle_missing_slice(
+    files: Union[pd.DataFrame, list], ignore_duplicates: bool = False
+) -> list:
     """function to interpolate missing slices in an image
 
     Example usage:
@@ -98,6 +102,8 @@ def handle_missing_slice(files, ignore_duplicates=False):
     Args:
         df_files (pd.DataFrame|list): the DataFrame which was produced by PreprocessData
         or list of filepaths to dicom slices
+        ignore_duplicates (booleanbool, optional): specifices whether the function is to ignore
+        duplicate slices when handling missing ones
 
     Returns:
         file_paths(list): a list of the interpolated file paths
@@ -231,7 +237,7 @@ def handle_missing_slice(files, ignore_duplicates=False):
     return df_files.file_path.tolist()
 
 
-def link_via_frame_of_reference(for_uid, df_preprocess):
+def link_via_frame_of_reference(for_uid: str, df_preprocess: pd.DataFrame) -> pd.DataFrame:
     """Find the image series linked to this FOR
 
     Args:
@@ -271,7 +277,7 @@ class ConvertData:
         self.pydicer_directory = working_directory.joinpath(PYDICER_DIR_NAME)
         self.output_directory = working_directory.joinpath(CONVERTED_DIR_NAME)
 
-    def add_entry(self, entry):
+    def add_entry(self, entry: dict):
         """Add an entry of a converted data object to the patient's converted dataframe.
 
         Args:
@@ -308,7 +314,7 @@ class ConvertData:
         df_pat_data = df_pat_data.reset_index(drop=True)
         df_pat_data.to_csv(converted_df_path)
 
-    def convert(self, patient=None, force=True):
+    def convert(self, patient: Union[str, list]=None, force: bool=True):
         """Converts the DICOM which was preprocessed into the pydicer output directory.
 
         Args:

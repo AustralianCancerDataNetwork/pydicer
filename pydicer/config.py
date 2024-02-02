@@ -15,7 +15,13 @@ PYDICER_CONFIG = {
         "available in the .pydicer directory.",
         "type": int,
         "default": 0,
-        "choices": [logging.NOTSET, logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR],
+        "choices": [
+            logging.NOTSET,
+            logging.DEBUG,
+            logging.INFO,
+            logging.WARNING,
+            logging.ERROR,
+        ],
     },
     "for_fallback_linkage": {
         "module": "general",
@@ -80,7 +86,6 @@ PYDICER_CONFIG = {
 class PyDicerConfig:
     class __PyDicerConfig:  # pylint: disable=invalid-name
         def __init__(self, working_dir=None):
-
             if working_dir is None:
                 raise ValueError("working_dir must be set on config init")
             self.working_dir = Path(working_dir)
@@ -128,7 +133,7 @@ class PyDicerConfig:
         """
         return self.instance.working_dir
 
-    def get_config(self, name):
+    def get_config(self, name: str) -> object:
         """Get the value of the config item with the specified name
 
         Args:
@@ -146,7 +151,7 @@ class PyDicerConfig:
 
         return self.instance.pydicer_config[name]
 
-    def set_config(self, name, value):
+    def set_config(self, name: str, value: object):
         """Set the value for the config with the given name
 
         Args:
@@ -163,7 +168,8 @@ class PyDicerConfig:
 
         if not isinstance(value, PYDICER_CONFIG[name]["type"]) and not value is None:
             raise ValueError(
-                f"Config {name} must be of type " f"{type(self.instance.pydicer_config[name])}"
+                f"Config {name} must be of type "
+                f"{type(self.instance.pydicer_config[name])}"
             )
 
         self.instance.pydicer_config[name] = value

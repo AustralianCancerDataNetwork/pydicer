@@ -7,7 +7,7 @@ from pydicer.utils import load_object_metadata, determine_dcm_datetime
 logger = logging.getLogger(__name__)
 
 
-def rt_latest_struct(df, **kwargs):
+def rt_latest_struct(df: pd.DataFrame, **kwargs) -> pd.DataFrame:
     """Select the latest Structure set and the image which it is linked to. You can specify keyword
     arguments to for a match on any top level DICOM attributes. You may also supply lists of values
     to these, one of which should match to select that series.
@@ -91,18 +91,24 @@ def rt_latest_struct(df, **kwargs):
         keep_rows.append(struct_row.name)  # Track index of row to keep
 
         # Find the linked image
-        df_linked_img = df[df["sop_instance_uid"] == struct_row.referenced_sop_instance_uid]
+        df_linked_img = df[
+            df["sop_instance_uid"] == struct_row.referenced_sop_instance_uid
+        ]
 
         if len(df_linked_img) == 0:
-            logger.warning("No linked images found for structure: %s", struct_row.hashed_uid)
+            logger.warning(
+                "No linked images found for structure: %s", struct_row.hashed_uid
+            )
             continue
 
-        keep_rows.append(df_linked_img.iloc[0].name)  # Keep the index of the row of the image too
+        keep_rows.append(
+            df_linked_img.iloc[0].name
+        )  # Keep the index of the row of the image too
 
     return df.loc[keep_rows]
 
 
-def rt_latest_dose(df, **kwargs):
+def rt_latest_dose(df: pd.DataFrame, **kwargs) -> pd.DataFrame:
     """Select the latest RTDOSE and the image, structure and plan which it is linked to. You can
     specify keyword arguments to for a match on any top level DICOM attributes. You may also supply
     lists of values to these, one of which should match to select that series.
@@ -191,16 +197,22 @@ def rt_latest_dose(df, **kwargs):
         keep_rows.append(dose_row.name)  # Track index of row of dose to keep
 
         # Find the linked plan
-        df_linked_plan = df[df["sop_instance_uid"] == dose_row.referenced_sop_instance_uid]
+        df_linked_plan = df[
+            df["sop_instance_uid"] == dose_row.referenced_sop_instance_uid
+        ]
 
         if len(df_linked_plan) == 0:
-            logger.warning("No linked plans found for dose: %s", dose_row.sop_instance_uid)
+            logger.warning(
+                "No linked plans found for dose: %s", dose_row.sop_instance_uid
+            )
             continue
 
         # Find the linked structure set
         plan_row = df_linked_plan.iloc[0]
         keep_rows.append(plan_row.name)  # Keep the index of the row of the plan
-        df_linked_struct = df[df["sop_instance_uid"] == plan_row.referenced_sop_instance_uid]
+        df_linked_struct = df[
+            df["sop_instance_uid"] == plan_row.referenced_sop_instance_uid
+        ]
 
         if len(df_linked_struct) == 0:
             # Try to link via Frame of Reference instead
@@ -209,18 +221,26 @@ def rt_latest_dose(df, **kwargs):
             ]
 
         if len(df_linked_struct) == 0:
-            logger.warning("No structures found for plan: %s", plan_row.sop_instance_uid)
+            logger.warning(
+                "No structures found for plan: %s", plan_row.sop_instance_uid
+            )
             continue
 
         # Find the linked image
         struct_row = df_linked_struct.iloc[0]
         keep_rows.append(struct_row.name)  # Keep the index of the row of the structure
-        df_linked_img = df[df["sop_instance_uid"] == struct_row.referenced_sop_instance_uid]
+        df_linked_img = df[
+            df["sop_instance_uid"] == struct_row.referenced_sop_instance_uid
+        ]
 
         if len(df_linked_img) == 0:
-            logger.warning("No linked images found for structure: %s", struct_row.hashed_uid)
+            logger.warning(
+                "No linked images found for structure: %s", struct_row.hashed_uid
+            )
             continue
 
-        keep_rows.append(df_linked_img.iloc[0].name)  # Keep the index of the row of the image too
+        keep_rows.append(
+            df_linked_img.iloc[0].name
+        )  # Keep the index of the row of the image too
 
     return df.loc[keep_rows]
