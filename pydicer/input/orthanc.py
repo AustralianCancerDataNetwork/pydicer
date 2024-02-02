@@ -1,7 +1,7 @@
 from io import BytesIO
 import logging
 from typing import Union
-from Pathlib import Path
+from pathlib import Path
 
 import pydicom
 from pyorthanc.deprecated.client import Orthanc
