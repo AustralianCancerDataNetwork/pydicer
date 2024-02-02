@@ -241,7 +241,7 @@ Defaults to “.”.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydicer.convert.data.ConvertData.add_entry">
-<span class="sig-name descname"><span class="pre">add_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.ConvertData.add_entry" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.ConvertData.add_entry" title="Permalink to this definition">#</a></dt>
 <dd><p>Add an entry of a converted data object to the patient’s converted dataframe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -252,7 +252,7 @@ Defaults to “.”.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydicer.convert.data.ConvertData.convert">
-<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.ConvertData.convert" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.ConvertData.convert" title="Permalink to this definition">#</a></dt>
 <dd><p>Converts the DICOM which was preprocessed into the pydicer output directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -270,7 +270,7 @@ already exist. Defaults to True.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicer.convert.data.get_object_type">
-<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">get_object_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sop_class_uid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.get_object_type" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">get_object_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sop_class_uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydicer.convert.data.get_object_type" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the type of the object (used for the output path)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -287,7 +287,7 @@ already exist. Defaults to True.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicer.convert.data.handle_missing_slice">
-<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">handle_missing_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_duplicates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.handle_missing_slice" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">handle_missing_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_duplicates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#pydicer.convert.data.handle_missing_slice" title="Permalink to this definition">#</a></dt>
 <dd><p>function to interpolate missing slices in an image</p>
 <p>Example usage:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicer.convert.data</span> <span class="kn">import</span> <span class="n">handle_missing_slice</span>
@@ -315,6 +315,8 @@ already exist. Defaults to True.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df_files</strong> (<em>pd.DataFrame</em><em>|</em><em>list</em>) – the DataFrame which was produced by PreprocessData</p></li>
 <li><p><strong>slices</strong> (<em>or list</em><em> of </em><em>filepaths to dicom</em>) – </p></li>
+<li><p><strong>ignore_duplicates</strong> (<em>booleanbool</em><em>, </em><em>optional</em>) – specifices whether the function is to ignore</p></li>
+<li><p><strong>ones</strong> (<em>duplicate slices when handling missing</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -328,7 +330,7 @@ already exist. Defaults to True.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicer.convert.data.link_via_frame_of_reference">
-<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">link_via_frame_of_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_uid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_preprocess</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.data.link_via_frame_of_reference" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.data.</span></span><span class="sig-name descname"><span class="pre">link_via_frame_of_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">for_uid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_preprocess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pydicer.convert.data.link_via_frame_of_reference" title="Permalink to this definition">#</a></dt>
 <dd><p>Find the image series linked to this FOR</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -351,7 +353,7 @@ already exist. Defaults to True.</p></li>
 <span id="header-conversion"></span><h2>Header Conversion<a class="headerlink" href="#module-pydicer.convert.headers" title="Permalink to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicer.convert.headers.convert_dicom_headers">
-<span class="sig-prename descclassname"><span class="pre">pydicer.convert.headers.</span></span><span class="sig-name descname"><span class="pre">convert_dicom_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcm_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.headers.convert_dicom_headers" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicer.convert.headers.</span></span><span class="sig-name descname"><span class="pre">convert_dicom_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dcm_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydicer.convert.headers.convert_dicom_headers" title="Permalink to this definition">#</a></dt>
 <dd><p>Save the DICOM Headers as a JSON file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
