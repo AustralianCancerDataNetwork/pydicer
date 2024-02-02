@@ -1,5 +1,6 @@
 import tempfile
 import logging
+from typing import Union
 
 import abc
 from pathlib import Path
@@ -9,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class InputBase(abc.ABC):
-    def __init__(self, working_directory=None):
+    def __init__(self, working_directory: Union[str, Path] = None):
         """
         Base class for input modules.
 

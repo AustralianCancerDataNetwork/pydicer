@@ -10,7 +10,9 @@ from pydicer.constants import DEFAULT_MAPPING_ID
 logger = logging.getLogger(__name__)
 
 
-def get_mapping_for_structure_set(structure_set_row: pd.Series, mapping_id: str):
+def get_mapping_for_structure_set(
+    structure_set_row: pd.Series, mapping_id: str
+) -> dict:
     """Searches the folder hierarchy to find a structure name mapping file with the given ID.
 
     Args:
@@ -52,7 +54,8 @@ class StructureSet(dict):
         self.structure_set_id = structure_set_row.hashed_uid
 
         self.structure_names = [
-            s.name.replace(".nii.gz", "") for s in self.structure_set_path.glob("*.nii.gz")
+            s.name.replace(".nii.gz", "")
+            for s in self.structure_set_path.glob("*.nii.gz")
         ]
         self.unmapped_structure_names = self.structure_names
 
@@ -61,7 +64,9 @@ class StructureSet(dict):
         # Check if we can find a mapping for this structure set, if not we'll just used the
         # unmapped structure names
         if mapping_id is not None:
-            self.structure_mapping = get_mapping_for_structure_set(structure_set_row, mapping_id)
+            self.structure_mapping = get_mapping_for_structure_set(
+                structure_set_row, mapping_id
+            )
 
             if self.structure_mapping is None:
                 logger.warning("No mapping file found with id %s", mapping_id)
@@ -71,7 +76,7 @@ class StructureSet(dict):
 
         self.cache = {}
 
-    def get_mapped_structure_name(self, item):
+    def get_mapped_structure_name(self, item: str) -> str:
         """Get the structure set specific name for a structure that may have been mapped.
 
         Args:
@@ -86,7 +91,9 @@ class StructureSet(dict):
         if self.structure_mapping is not None:
             if item in self.structure_mapping:
                 for variation in self.structure_mapping[item]:
-                    variation_path = self.structure_set_path.joinpath(f"{variation}.nii.gz")
+                    variation_path = self.structure_set_path.joinpath(
+                        f"{variation}.nii.gz"
+                    )
                     if variation_path.exists():
                         # Found variation, let's use that file...
                         # TODO an issue would occur if there were multiple files that would match
@@ -96,7 +103,7 @@ class StructureSet(dict):
 
         return structure_name
 
-    def get_standardised_structure_name(self, item):
+    def get_standardised_structure_name(self, item: str) -> str:
         """Get the standardised name for a structure that is present in this structure set.
 
         Args:
@@ -150,7 +157,7 @@ class StructureSet(dict):
     def items(self):
         return [(s, self[s]) for s in self.structure_names]
 
-    def get_unmapped_structures(self):
+    def get_unmapped_structures(self) -> list:
         """Get a list of structures for which no structure was found based on the mapping. If no
         mapping is being used this will always be empty.
 
@@ -160,7 +167,9 @@ class StructureSet(dict):
         missing_mappings = []
         for k in self.keys():
             structure_name = self.get_mapped_structure_name(k)
-            structure_path = self.structure_set_path.joinpath(f"{structure_name}.nii.gz")
+            structure_path = self.structure_set_path.joinpath(
+                f"{structure_name}.nii.gz"
+            )
             if not structure_path.exists():
                 missing_mappings.append(k)
 

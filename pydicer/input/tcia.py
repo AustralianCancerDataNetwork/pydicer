@@ -1,10 +1,18 @@
+from typing import Union
+
 from platipy.dicom.download import tcia
 
 from pydicer.input.base import InputBase
 
 
 class TCIAInput(InputBase):
-    def __init__(self, collection, patient_ids, modalities=None, working_directory=None):
+    def __init__(
+        self,
+        collection: str,
+        patient_ids: list,
+        modalities: list = None,
+        working_directory: Union[str, list] = None,
+    ):
         """
         Input class that interfaces with the TCIA API
 
@@ -14,7 +22,7 @@ class TCIAInput(InputBase):
                 fetched
             modalities (list, optional): A list of strings defining the modalites to fetch. Will
                                         fetch all modalities available if not specified.
-            working_directory (str): (str|pathlib.Path, optional): The working directory in which
+            working_directory (str|pathlib.Path, optional): The working directory in which
                 to store the data fetched. Defaults to a temp directory.
         """
         super().__init__(working_directory)

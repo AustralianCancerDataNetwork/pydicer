@@ -1,11 +1,16 @@
 import logging
 import json
+from typing import Union
+from pathlib import Path
+
 import pydicom
 
 logger = logging.getLogger(__name__)
 
 
-def convert_dicom_headers(dcm_file, binary_path, json_file):
+def convert_dicom_headers(
+    dcm_file: Union[str, Path], binary_path: str, json_file: Union[str, Path]
+):
     """Save the DICOM Headers as a JSON file
 
     Args:

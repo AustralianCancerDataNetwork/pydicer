@@ -1,10 +1,12 @@
+from typing import Union
+
 from pydicer.input.web import WebInput
 
 
 class TestInput(WebInput):
     __test__ = False  # pytest will try to use this as a test class without this
 
-    def __init__(self, working_directory=None):
+    def __init__(self, working_directory: Union[str, list] = None):
         """
         A test input class to download example data from zenodo
 

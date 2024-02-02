@@ -117,7 +117,7 @@ def read_all_segmentation_logs(
     dataset_name: str = CONVERTED_DIR_NAME,
     segment_id: str = None,
     modality: str = None,
-):
+) -> pd.DataFrame:
     """Read all auto-segmentation logs in a dataset.
     Args:
         dataset_name (str): The name of the dataset to read for.

@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 from pathlib import Path
 
 import pandas as pd
@@ -36,7 +37,7 @@ class PreprocessData:
         self.pydicer_directory = working_directory.joinpath(PYDICER_DIR_NAME)
         self.pydicer_directory.mkdir(exist_ok=True)
 
-    def scan_file(self, file):
+    def scan_file(self, file: Union[str, Path]) -> dict:
         """Scan a DICOM file.
 
         Args:
@@ -147,7 +148,9 @@ class PreprocessData:
 
         return None
 
-    def preprocess(self, input_directory, force=True):
+    def preprocess(
+        self, input_directory: Union(Path, list), force: bool = True
+    ) -> pd.DataFrame:
         """
         Function to preprocess information regarding the data located in an Input working directory
 
