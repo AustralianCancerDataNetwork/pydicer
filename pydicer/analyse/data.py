@@ -448,10 +448,10 @@ class AnalyseData:
                             continue
 
                     # Add normalisation of image after resampling
-                    normalizeImage = settings.get("normalizeImage")
-                    normalizeScale = settings.get("normalizeScale")
+                    normalize_image = settings.get("normalizeImage")
+                    normalize_scale = settings.get("normalizeScale")
 
-                    if normalizeImage is not False and normalizeScale is not None:
+                    if normalize_image is not False and normalize_scale is not None:
                         try:
                             image = imageoperations.normalizeImage(image, **settings)
                         except ValueError as e:
@@ -524,13 +524,22 @@ class AnalyseData:
                         meta_data_cols.append(col_key)
 
                 #add normalisation and resampling details
-
-                output_frame.insert(loc=0, column="NormalisationScale", value=settings["normalizeScale"])
-                
+                output_frame.insert(
+                    loc=0, 
+                    column="NormalisationScale", 
+                    value=settings["normalizeScale"]
+                )
                 if settings["resampledPixelSpacing"] is not None:
-                    output_frame.insert(loc=0, column="ResampledPixelSpacing", value=settings["resampledPixelSpacing"][0])
+                    output_frame.insert(
+                        loc=0, 
+                        column="ResampledPixelSpacing", 
+                        value=settings["resampledPixelSpacing"][0]
+                )
                 else:
-                    output_frame.insert(loc=0, column="ResampledPixelSpacing", value=settings["resampledPixelSpacing"])
+                    output_frame.insert(
+                        loc=0, column="ResampledPixelSpacing", 
+                        value=settings["resampledPixelSpacing"]
+                )
 
                 output_frame.insert(loc=0, column="StructHashedUID", value=struct_row.hashed_uid)
                 output_frame.insert(loc=0, column="ImageHashedUID", value=img_row.hashed_uid)
