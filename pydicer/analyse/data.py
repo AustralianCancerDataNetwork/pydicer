@@ -525,21 +525,18 @@ class AnalyseData:
 
                 #add normalisation and resampling details
                 output_frame.insert(
-                    loc=0, 
-                    column="NormalisationScale", 
-                    value=settings["normalizeScale"]
+                    loc=0, column="NormalisationScale", value=settings["normalizeScale"]
                 )
                 if settings["resampledPixelSpacing"] is not None:
                     output_frame.insert(
-                        loc=0, 
-                        column="ResampledPixelSpacing", 
+                        loc=0,column="ResampledPixelSpacing",
                         value=settings["resampledPixelSpacing"][0]
-                )
+                    )
                 else:
                     output_frame.insert(
-                        loc=0, column="ResampledPixelSpacing", 
+                        loc=0, column="ResampledPixelSpacing",
                         value=settings["resampledPixelSpacing"]
-                )
+                    )
 
                 output_frame.insert(loc=0, column="StructHashedUID", value=struct_row.hashed_uid)
                 output_frame.insert(loc=0, column="ImageHashedUID", value=img_row.hashed_uid)
