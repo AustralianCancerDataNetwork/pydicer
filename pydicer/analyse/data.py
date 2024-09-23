@@ -62,6 +62,8 @@ PYRAD_DEFAULT_SETTINGS = {
     "interpolator": "sitkNearestNeighbor",
     "verbose": True,
     "removeOutliers": 10000,
+    "normalizeImage": False,
+    "normalizeScale": None,
 }
 
 
@@ -433,9 +435,6 @@ class AnalyseData:
                     interpolator = settings.get("interpolator")
                     resample_pixel_spacing = settings.get("resampledPixelSpacing")
 
-                    resample_pixel_spacing = list(image.GetSpacing())
-                    settings["resampledPixelSpacing"] = resample_pixel_spacing
-
                     if resample_to_image:
                         resample_pixel_spacing = list(image.GetSpacing())
                         settings["resampledPixelSpacing"] = resample_pixel_spacing
@@ -446,6 +445,18 @@ class AnalyseData:
                         except ValueError as e:
                             logger.exception(e)
                             logger.error("Error during resampling")
+                            continue
+
+                    # Add normalisation of image after resampling
+                    normalize_image = settings.get("normalizeImage")
+                    normalize_scale = settings.get("normalizeScale")
+
+                    if normalize_image is not False and normalize_scale is not None:
+                        try:
+                            image = imageoperations.normalizeImage(image, **settings)
+                        except ValueError as e:
+                            logger.exception(e)
+                            logger.error("Error during nomalisation")
                             continue
 
                     df_contour = pd.DataFrame()
@@ -511,6 +522,21 @@ class AnalyseData:
 
                     if col_key not in meta_data_cols:
                         meta_data_cols.append(col_key)
+
+                #add normalisation and resampling details
+                output_frame.insert(
+                    loc=0, column="NormalisationScale", value=settings["normalizeScale"]
+                )
+                if settings["resampledPixelSpacing"] is not None:
+                    output_frame.insert(
+                        loc=0,column="ResampledPixelSpacing",
+                        value=settings["resampledPixelSpacing"][0]
+                    )
+                else:
+                    output_frame.insert(
+                        loc=0, column="ResampledPixelSpacing",
+                        value=settings["resampledPixelSpacing"]
+                    )
 
                 output_frame.insert(loc=0, column="StructHashedUID", value=struct_row.hashed_uid)
                 output_frame.insert(loc=0, column="ImageHashedUID", value=img_row.hashed_uid)
