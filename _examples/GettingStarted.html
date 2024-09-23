@@ -564,11 +564,11 @@ Histograms</a> (results are stored alongside converted dose data)</p>
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 1309/1309 [00:03&lt;00:00, 419.98files/s, preprocess]
-100%|██████████| 4/4 [00:50&lt;00:00, 12.58s/objects, convert]
-100%|██████████| 3/3 [00:15&lt;00:00,  5.14s/objects, visualise]
-100%|██████████| 1/1 [00:17&lt;00:00, 17.93s/objects, Compute Radiomics]
-100%|██████████| 1/1 [00:09&lt;00:00,  9.78s/objects, Compute DVH]
+100%|██████████| 1309/1309 [00:03&lt;00:00, 411.24files/s, preprocess]
+100%|██████████| 4/4 [00:50&lt;00:00, 12.70s/objects, convert]
+100%|██████████| 3/3 [00:15&lt;00:00,  5.13s/objects, visualise]
+100%|██████████| 1/1 [00:14&lt;00:00, 14.94s/objects, Compute Radiomics]
+100%|██████████| 1/1 [00:09&lt;00:00,  9.80s/objects, Compute DVH]
 </pre></div></div>
 </div>
 </section>
@@ -627,12 +627,12 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <th>Patient</th>
       <th>ImageHashedUID</th>
       <th>StructHashedUID</th>
+      <th>ResampledPixelSpacing</th>
+      <th>NormalisationScale</th>
       <th>firstorder|10Percentile</th>
       <th>firstorder|90Percentile</th>
       <th>firstorder|Energy</th>
       <th>firstorder|Entropy</th>
-      <th>firstorder|InterquartileRange</th>
-      <th>firstorder|Kurtosis</th>
       <th>...</th>
       <th>firstorder|Mean</th>
       <th>firstorder|Median</th>
@@ -648,17 +648,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
   </thead>
   <tbody>
     <tr>
-      <th>13</th>
+      <th>16</th>
       <td>+1</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-999.0</td>
       <td>339.0</td>
       <td>5.178130e+11</td>
       <td>4.785593</td>
-      <td>407.00</td>
-      <td>4.227583</td>
       <td>...</td>
       <td>-127.630179</td>
       <td>18.0</td>
@@ -672,17 +672,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>302955.835075</td>
     </tr>
     <tr>
-      <th>11</th>
+      <th>24</th>
       <td>-.3</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-68.0</td>
       <td>669.0</td>
       <td>1.587794e+11</td>
       <td>4.415742</td>
-      <td>73.00</td>
-      <td>9.756706</td>
       <td>...</td>
       <td>142.809678</td>
       <td>41.0</td>
@@ -696,17 +696,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>148482.826970</td>
     </tr>
     <tr>
-      <th>9</th>
+      <th>26</th>
       <td>Brain</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>24.0</td>
       <td>70.0</td>
       <td>6.420357e+08</td>
       <td>1.698910</td>
-      <td>21.00</td>
-      <td>266.544166</td>
       <td>...</td>
       <td>45.375629</td>
       <td>40.0</td>
@@ -720,17 +720,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>1283.403884</td>
     </tr>
     <tr>
-      <th>21</th>
+      <th>28</th>
       <td>Brainstem</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>14.0</td>
       <td>46.0</td>
       <td>1.860914e+07</td>
       <td>1.275139</td>
-      <td>17.00</td>
-      <td>133.476694</td>
       <td>...</td>
       <td>30.442222</td>
       <td>30.0</td>
@@ -744,17 +744,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>190.937232</td>
     </tr>
     <tr>
-      <th>24</th>
+      <th>7</th>
       <td>CTV63</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-65.0</td>
       <td>308.0</td>
       <td>1.346678e+10</td>
       <td>4.124500</td>
-      <td>60.00</td>
-      <td>10.650191</td>
       <td>...</td>
       <td>58.805603</td>
       <td>37.0</td>
@@ -768,17 +768,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>78938.289561</td>
     </tr>
     <tr>
-      <th>8</th>
+      <th>1</th>
       <td>CTV63_Sep</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-409.0</td>
       <td>498.2</td>
       <td>8.517524e+09</td>
       <td>5.069875</td>
-      <td>137.00</td>
-      <td>5.673825</td>
       <td>...</td>
       <td>37.578143</td>
       <td>32.0</td>
@@ -792,17 +792,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>165046.562407</td>
     </tr>
     <tr>
-      <th>0</th>
+      <th>18</th>
       <td>CTV70</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-34.0</td>
       <td>209.0</td>
       <td>5.101866e+09</td>
       <td>3.585289</td>
-      <td>46.00</td>
-      <td>16.344663</td>
       <td>...</td>
       <td>69.823863</td>
       <td>38.0</td>
@@ -816,17 +816,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>39966.337967</td>
     </tr>
     <tr>
-      <th>29</th>
+      <th>10</th>
       <td>Cord</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>5.0</td>
       <td>85.0</td>
       <td>5.136484e+07</td>
       <td>2.646141</td>
-      <td>34.00</td>
-      <td>25.991774</td>
       <td>...</td>
       <td>48.951795</td>
       <td>49.0</td>
@@ -840,17 +840,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>2656.829157</td>
     </tr>
     <tr>
-      <th>12</th>
+      <th>29</th>
       <td>Cord_EXPANDED</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>24.0</td>
       <td>754.0</td>
       <td>5.387667e+09</td>
       <td>4.928948</td>
-      <td>394.00</td>
-      <td>7.598874</td>
       <td>...</td>
       <td>276.231702</td>
       <td>123.0</td>
@@ -864,17 +864,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>97873.824272</td>
     </tr>
     <tr>
-      <th>6</th>
+      <th>2</th>
       <td>External</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-78.0</td>
       <td>582.0</td>
       <td>1.663208e+11</td>
       <td>4.426843</td>
-      <td>79.00</td>
-      <td>10.768368</td>
       <td>...</td>
       <td>121.129199</td>
       <td>37.0</td>
@@ -888,17 +888,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>137265.474901</td>
     </tr>
     <tr>
-      <th>28</th>
+      <th>14</th>
       <td>GTV1</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-3.0</td>
       <td>65.0</td>
       <td>3.553947e+08</td>
       <td>2.430806</td>
-      <td>27.00</td>
-      <td>68.304097</td>
       <td>...</td>
       <td>37.678033</td>
       <td>37.0</td>
@@ -912,17 +912,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>5560.934010</td>
     </tr>
     <tr>
-      <th>18</th>
+      <th>19</th>
       <td>LT_Parotid</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-76.0</td>
       <td>33.0</td>
       <td>6.793782e+06</td>
       <td>2.747940</td>
-      <td>58.00</td>
-      <td>2.454925</td>
       <td>...</td>
       <td>-19.772190</td>
       <td>-19.0</td>
@@ -936,17 +936,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>1667.158645</td>
     </tr>
     <tr>
-      <th>23</th>
+      <th>15</th>
       <td>Lt_Deep_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-70.0</td>
       <td>52.0</td>
       <td>4.208941e+06</td>
       <td>2.855015</td>
-      <td>59.75</td>
-      <td>2.396936</td>
       <td>...</td>
       <td>-9.347047</td>
       <td>-11.0</td>
@@ -960,17 +960,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>1949.874234</td>
     </tr>
     <tr>
-      <th>5</th>
+      <th>8</th>
       <td>Lt_Sup_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-80.0</td>
       <td>11.0</td>
       <td>2.932703e+06</td>
       <td>2.486043</td>
-      <td>58.00</td>
-      <td>2.072284</td>
       <td>...</td>
       <td>-31.238202</td>
       <td>-27.0</td>
@@ -984,17 +984,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>1220.955994</td>
     </tr>
     <tr>
-      <th>1</th>
+      <th>27</th>
       <td>Mandible</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>68.0</td>
       <td>1294.0</td>
       <td>1.492566e+10</td>
       <td>5.931930</td>
-      <td>846.00</td>
-      <td>1.803073</td>
       <td>...</td>
       <td>637.881065</td>
       <td>602.0</td>
@@ -1008,17 +1008,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>213150.151566</td>
     </tr>
     <tr>
-      <th>2</th>
+      <th>3</th>
       <td>Optic_Nerve</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-52.0</td>
       <td>121.0</td>
       <td>1.702145e+07</td>
       <td>3.379679</td>
-      <td>48.75</td>
-      <td>19.495663</td>
       <td>...</td>
       <td>27.759629</td>
       <td>17.0</td>
@@ -1032,17 +1032,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>11370.238228</td>
     </tr>
     <tr>
-      <th>20</th>
+      <th>9</th>
       <td>Oral_Avoid</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-64.0</td>
       <td>1044.0</td>
       <td>1.299995e+10</td>
       <td>5.093911</td>
-      <td>231.25</td>
-      <td>9.771181</td>
       <td>...</td>
       <td>257.075139</td>
       <td>56.0</td>
@@ -1056,17 +1056,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>294221.363063</td>
     </tr>
     <tr>
-      <th>10</th>
+      <th>30</th>
       <td>PTV57</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-83.0</td>
       <td>74.0</td>
       <td>2.141580e+09</td>
       <td>3.655007</td>
-      <td>86.00</td>
-      <td>16.404787</td>
       <td>...</td>
       <td>9.569312</td>
       <td>30.0</td>
@@ -1080,17 +1080,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>41822.111014</td>
     </tr>
     <tr>
-      <th>30</th>
+      <th>25</th>
       <td>PTV63</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-270.0</td>
       <td>429.0</td>
       <td>8.911092e+09</td>
       <td>4.852886</td>
-      <td>116.00</td>
-      <td>9.183075</td>
       <td>...</td>
       <td>36.173846</td>
       <td>32.0</td>
@@ -1104,17 +1104,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>146160.163747</td>
     </tr>
     <tr>
-      <th>19</th>
+      <th>22</th>
       <td>PTV70</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-55.0</td>
       <td>387.0</td>
       <td>1.495341e+10</td>
       <td>4.153192</td>
-      <td>58.00</td>
-      <td>12.552649</td>
       <td>...</td>
       <td>79.991129</td>
       <td>39.0</td>
@@ -1128,17 +1128,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>87418.493331</td>
     </tr>
     <tr>
-      <th>3</th>
+      <th>20</th>
       <td>Post_Neck</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-85.0</td>
       <td>216.5</td>
       <td>3.456349e+09</td>
       <td>3.744445</td>
-      <td>108.00</td>
-      <td>13.412510</td>
       <td>...</td>
       <td>68.016919</td>
       <td>27.0</td>
@@ -1152,17 +1152,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>51927.617163</td>
     </tr>
     <tr>
-      <th>17</th>
+      <th>0</th>
       <td>RT_Parotid</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-61.0</td>
       <td>27.0</td>
       <td>1.763875e+07</td>
       <td>2.571701</td>
-      <td>40.00</td>
-      <td>138.262468</td>
       <td>...</td>
       <td>-12.798874</td>
       <td>-16.0</td>
@@ -1176,17 +1176,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>3975.769687</td>
     </tr>
     <tr>
-      <th>7</th>
+      <th>21</th>
       <td>Ring</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-999.0</td>
       <td>339.0</td>
       <td>5.178130e+11</td>
       <td>4.785593</td>
-      <td>407.00</td>
-      <td>4.227583</td>
       <td>...</td>
       <td>-127.630179</td>
       <td>18.0</td>
@@ -1200,17 +1200,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>302955.835075</td>
     </tr>
     <tr>
-      <th>25</th>
+      <th>23</th>
       <td>Rt_Deep_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-72.6</td>
       <td>17.6</td>
       <td>1.353914e+07</td>
       <td>2.596270</td>
-      <td>40.00</td>
-      <td>108.510683</td>
       <td>...</td>
       <td>-15.225243</td>
       <td>-20.0</td>
@@ -1224,17 +1224,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>8531.391337</td>
     </tr>
     <tr>
-      <th>27</th>
+      <th>4</th>
       <td>Rt_Sup_Prtd</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-65.0</td>
       <td>27.0</td>
       <td>8.699281e+06</td>
       <td>2.627386</td>
-      <td>42.00</td>
-      <td>140.300056</td>
       <td>...</td>
       <td>-14.784448</td>
       <td>-17.0</td>
@@ -1248,17 +1248,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>2927.633827</td>
     </tr>
     <tr>
-      <th>15</th>
+      <th>6</th>
       <td>chiasm</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>7.0</td>
       <td>51.0</td>
       <td>1.122952e+07</td>
       <td>1.907659</td>
-      <td>14.00</td>
-      <td>103.384281</td>
       <td>...</td>
       <td>35.686332</td>
       <td>28.0</td>
@@ -1272,17 +1272,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>5285.781869</td>
     </tr>
     <tr>
-      <th>14</th>
+      <th>11</th>
       <td>cold</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>41.0</td>
       <td>287.0</td>
       <td>2.882986e+07</td>
       <td>3.265029</td>
-      <td>85.00</td>
-      <td>7.574952</td>
       <td>...</td>
       <td>119.388430</td>
       <td>75.0</td>
@@ -1296,17 +1296,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>12220.107157</td>
     </tr>
     <tr>
-      <th>22</th>
+      <th>13</th>
       <td>cool_off</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-88.0</td>
       <td>54.0</td>
       <td>8.915266e+06</td>
       <td>2.894287</td>
-      <td>83.25</td>
-      <td>2.074595</td>
       <td>...</td>
       <td>-28.218110</td>
       <td>-41.0</td>
@@ -1320,17 +1320,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>2713.685499</td>
     </tr>
     <tr>
-      <th>26</th>
+      <th>12</th>
       <td>ctv_57</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-78.0</td>
       <td>65.0</td>
       <td>9.135206e+08</td>
       <td>3.351470</td>
-      <td>83.00</td>
-      <td>20.605099</td>
       <td>...</td>
       <td>-7.309885</td>
       <td>27.0</td>
@@ -1344,17 +1344,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>29437.802764</td>
     </tr>
     <tr>
-      <th>4</th>
+      <th>5</th>
       <td>hotspot</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-187.3</td>
       <td>1282.3</td>
       <td>2.445281e+09</td>
       <td>6.115974</td>
-      <td>720.50</td>
-      <td>2.509780</td>
       <td>...</td>
       <td>375.515514</td>
       <td>196.0</td>
@@ -1368,17 +1368,17 @@ Histograms</a> (results are stored alongside converted dose data)</p>
       <td>295022.446264</td>
     </tr>
     <tr>
-      <th>16</th>
+      <th>17</th>
       <td>larynx_avoidance</td>
       <td>HNSCC-01-0019</td>
       <td>b281ea</td>
       <td>7cdcd9</td>
+      <td>NaN</td>
+      <td>NaN</td>
       <td>-975.0</td>
       <td>43.0</td>
       <td>4.655352e+08</td>
       <td>4.605136</td>
-      <td>894.50</td>
-      <td>1.451452</td>
       <td>...</td>
       <td>-369.268506</td>
       <td>-85.5</td>
@@ -1393,7 +1393,7 @@ Histograms</a> (results are stored alongside converted dose data)</p>
     </tr>
   </tbody>
 </table>
-<p>31 rows × 22 columns</p>
+<p>31 rows × 24 columns</p>
 </div></div>
 </div>
 <div class="nbinput docutils container">
