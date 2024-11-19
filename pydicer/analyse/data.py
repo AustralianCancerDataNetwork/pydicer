@@ -286,7 +286,9 @@ class AnalyseData:
         df = df_dvh[["patient", "struct_hash", "dose_hash", "label", "cc", "mean"]]
         df_d = calculate_d_x(df_dvh, d_point)
         df_v = calculate_v_x(df_dvh, v_point)
-        df_dcc = calculate_d_cc_x(df_dvh, d_cc_point)
+        df_dcc = calculate_d_cc_x(
+            df_dvh, d_cc_point, index_cols=["struct_hash", "dose_hash", "label"]
+        )
         df = pd.concat([df, df_d, df_v, df_dcc], axis=1)
         df = df.loc[:, ~df.columns.duplicated()]
 
