@@ -204,7 +204,10 @@ class VisualiseData:
                         for f in struct_dir.glob("*.nii.gz")
                     }
 
-                    masks = {k: masks[k] for k in masks if masks[k].GetPixelID() in render_mask_types}
+                    masks = {
+                        k: masks[k] for k in masks
+                        if masks[k].GetPixelID() in render_mask_types
+                    }
 
                     if len(masks) == 0:
                         logger.warning(
@@ -283,7 +286,10 @@ class VisualiseData:
                             f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
                             for f in struct_dir.glob("*.nii.gz")
                         }
-                        masks = {k: masks[k] for k in masks if masks[k].GetPixelID() in render_mask_types}
+                        masks = {
+                            k: masks[k] for k in masks
+                            if masks[k].GetPixelID() in render_mask_types
+                        }
 
                         if len(masks) == 0:
                             logger.warning(
