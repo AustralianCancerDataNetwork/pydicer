@@ -165,14 +165,17 @@ def handle_missing_slice(
         # find where the missing slices are
         missing_indices = np.where(slice_thickness_variations)[0]
 
+        # Track offset to load correct files since df_files changes during loop
+        ind_offset = 0
+
         for missing_index in missing_indices:
             num_missing_slices = (
                 int(slice_location_diffs[missing_index] / expected_slice_diff) - 1
             )
 
             # locate nearest DICOM files to the missing slices
-            prior_dcm_file = df_files.iloc[missing_index]["file_path"]
-            next_dcm_file = df_files.iloc[missing_index + 1]["file_path"]
+            prior_dcm_file = df_files.iloc[missing_index + ind_offset]["file_path"]
+            next_dcm_file = df_files.iloc[missing_index + ind_offset + 1]["file_path"]
 
             prior_dcm = pydicom.read_file(prior_dcm_file)
             next_dcm = pydicom.read_file(next_dcm_file)
@@ -233,6 +236,8 @@ def handle_missing_slice(
 
                 df_files = pd.concat([df_files, pd.DataFrame([interp_df_row])])
                 df_files.sort_values(by="slice_location", inplace=True)
+
+                ind_offset += 1
 
     return df_files.file_path.tolist()
 
