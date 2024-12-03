@@ -59,6 +59,7 @@ class VisualiseData:
         )
 
         visualise_modalities = ["CT", "MR", "RTSTRUCT", "RTDOSE", "PT"]
+        render_mask_types = [sitk.sitkUInt8, sitk.sitkUInt16, sitk.sitkUInt32, sitk.sitkUInt64]
         df_process = df_process[df_process.modality.isin(visualise_modalities)]
 
         for _, row in get_iterator(
@@ -203,6 +204,11 @@ class VisualiseData:
                         for f in struct_dir.glob("*.nii.gz")
                     }
 
+                    masks = {
+                        k: masks[k] for k in masks
+                        if masks[k].GetPixelID() in render_mask_types
+                    }
+
                     if len(masks) == 0:
                         logger.warning(
                             "No contours found in structure directory: %s", {struct_dir}
@@ -279,6 +285,10 @@ class VisualiseData:
                         masks = {
                             f.name.replace(".nii.gz", ""): sitk.ReadImage(str(f))
                             for f in struct_dir.glob("*.nii.gz")
+                        }
+                        masks = {
+                            k: masks[k] for k in masks
+                            if masks[k].GetPixelID() in render_mask_types
                         }
 
                         if len(masks) == 0:
