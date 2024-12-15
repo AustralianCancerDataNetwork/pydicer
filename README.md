@@ -1,5 +1,7 @@
 # PyDicer: PYthon Dicom Image ConvertER
 
+[![SoftwareX](https://img.shields.io/badge/SoftwareX-10.1016/j.softx.2024.102010-green.svg)](https://doi.org/10.1016/j.softx.2024.102010)
+
 Welcome to PyDicer, a tool to ease the process of converting Radiotherapy DICOM data objects into a format typically used for research purposes. In addition to data conversion, functionality is provided to help analyse the data. This includes computing radiomic features, radiotherapy dose metrics and auto-segmentation metrics. PyDicer uses the NIfTI format to store data is a well defined file system structure. Tracking of these data objects in CSV files, also stored on the file system, provides an easy and flexible way to work with the converted data in your research.
 
 The [PyDicer documentation](https://australiancancerdatanetwork.github.io/pydicer/index.html) provides several examples and guides to help you get started with the tool. Here are a few **PyDicer principles** to keep in mind as you get started:
@@ -37,6 +39,9 @@ PyDicer will place converted and intermediate files into a specific directory st
 - `[working]/quarantine`: Files which couldn't be preprocessed or converted will be placed in here for you to investigate further
 - `[working]/.pydicer`: Intermediate files as well as log output will be stored in here
 - `[working]/[dataset_name]`: Clean datasets prepared using the Dataset Preparation Module will be stored in a directory with their name and will symbolically link to converted in the `[working]/data` directory
+
+![PyDicer Working Directory structure](assets/pydicer-working-directory-structure.png)
+*PyDicer working directory structure ([Chlap, P. et al. SoftwareX](https://doi.org/10.1016/j.softx.2024.102010))*
 
 ## Pipeline
 
@@ -81,6 +86,12 @@ pydicer.add_input(dicom_directory)
 # Run the pipeline
 pydicer.run_pipeline()
 ```
+
+## How to Cite
+
+If you find PyDicer useful in your research work, please consider citing our SoftwareX paper:
+
+**Chlap P, Al Mouiee D, Finnegan RN, et al. PyDicer: An open-source python library for conversion and analysis of radiotherapy DICOM data. *SoftwareX*. 2025;[29:102010. doi:10.1016/j.softx.2024.102010](https://doi.org/10.1016/j.softx.2024.102010)**
 
 ## Contributing
 

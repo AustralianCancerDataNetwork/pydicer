@@ -4,8 +4,7 @@
 cff-version: 1.2.0
 title: PyDicer
 message: >-
-  If you use this software, please cite it using the
-  metadata from this file.
+  If you use this software, please cite our SoftwareX article.
 type: software
 authors:
   - given-names: Phillip
@@ -23,8 +22,6 @@ authors:
   - given-names: Xinyi
     family-names: Cui
     affiliation: University of New South Wales
-  - given-names: Shuchao
-    family-names: Pang
   - given-names: Shrikant
     family-names: Deshpande
     affiliation: South Western Sydney Local Health District
@@ -43,3 +40,31 @@ keywords:
 license: Apache-2.0
 version: 0.2.0
 date-released: "2023-12-20"
+preferred-citation:
+  authors:
+  - family-names: Chlap
+    given-names: Phillip
+    orcid: "https://orcid.org/0000-0002-6517-8745"
+  - given-names: Daniel
+    family-names: Al Mouiee
+  - family-names: Finnegan
+    given-names: Robert N.
+    orcid: "https://orcid.org/0000-0003-4728-8462"
+  - given-names: Janet
+    family-names: Cui
+  - given-names: Chin
+    family-names: Vicky
+  - given-names: Deshpande
+    family-names: Shrikant
+  - given-names: Holloway
+    family-names: Lois
+  date-published: "2024-12-14"
+  doi: 10.1016/j.softx.2024.102010
+  journal: SoftwareX
+  publisher:
+    name: Elsevier
+  title: "PyDicer: An open-source python library for conversion and analysis of radiotherapy DICOM data"
+  type: article
+  url: "https://doi.org/10.1016/j.softx.2024.102010"
+  volume: 29
+  year: 2025
