@@ -89,7 +89,7 @@ pydicer.run_pipeline()
 
 ## How to Cite
 
-If you find PyDicer useful in your research work, please consider citing our SoftwareX paper:
+If you make use of PyDicer within your research work, please consider citing our SoftwareX paper:
 
 **Chlap P, Al Mouiee D, Finnegan RN, et al. PyDicer: An open-source python library for conversion and analysis of radiotherapy DICOM data. *SoftwareX*. 2025;[29:102010. doi:10.1016/j.softx.2024.102010](https://doi.org/10.1016/j.softx.2024.102010)**
 
