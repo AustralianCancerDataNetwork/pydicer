@@ -93,3 +93,7 @@ shutil.copy("../examples/Configuration.ipynb", "_examples/Configuration.ipynb")
 shutil.copy("../examples/ObjectGeneration.ipynb", "_examples/ObjectGeneration.ipynb")
 shutil.copy("../examples/AutoSegmentation.ipynb", "_examples/AutoSegmentation.ipynb")
 shutil.copy("../examples/nnUNet.ipynb", "_examples/nnUNet.ipynb")
+
+shutil.rmtree("site/assets", ignore_errors=True)
+os.makedirs("site", exist_ok=True)
+shutil.copytree("../assets", "site/assets")
