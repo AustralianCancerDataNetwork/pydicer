@@ -227,6 +227,7 @@
         <article role="main">
           <section id="pydicer-python-dicom-image-converter">
 <h1>PyDicer: PYthon Dicom Image ConvertER<a class="headerlink" href="#pydicer-python-dicom-image-converter" title="Permalink to this heading">#</a></h1>
+<a class="reference external image-reference" href="https://doi.org/10.1016/j.softx.2024.102010"><img alt="SoftwareX" src="https://img.shields.io/badge/SoftwareX-10.1016/j.softx.2024.102010-green.svg" /></a>
 <p>Welcome to PyDicer, a tool to ease the process of converting Radiotherapy DICOM data objects into a format typically used for research purposes. In addition to data conversion, functionality is provided to help analyse the data. This includes computing radiomic features, radiotherapy dose metrics and auto-segmentation metrics. PyDicer uses the NIfTI format to store data is a well defined file system structure. Tracking of these data objects in CSV files, also stored on the file system, provides an easy and flexible way to work with the converted data in your research.</p>
 <p>The <a class="reference external" href="https://australiancancerdatanetwork.github.io/pydicer/index.html">PyDicer documentation</a> provides several examples and guides to help you get started with the tool. Here are a few <strong>PyDicer principles</strong> to keep in mind as you get started:</p>
 <ul class="simple">
@@ -264,6 +265,8 @@ environment using <code class="docutils literal notranslate"><span class="pre">p
 <li><p><code class="docutils literal notranslate"><span class="pre">[working]/.pydicer</span></code>: Intermediate files as well as log output will be stored in here</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">[working]/[dataset_name]</span></code>: Clean datasets prepared using the Dataset Preparation Module will be stored in a directory with their name and will symbolically link to converted in the <code class="docutils literal notranslate"><span class="pre">[working]/data</span></code> directory</p></li>
 </ul>
+<a class="reference external image-reference" href="assets/pydicer-working-directory-structure.png"><img alt="PyDicer Working Directory structure" src="assets/pydicer-working-directory-structure.png" /></a>
+<p><em>PyDicer working directory structure (`Chlap, P. et al. SoftwareX &lt;https://doi.org/10.1016/j.softx.2024.102010&gt;`_)</em></p>
 </section>
 <section id="pipeline">
 <h2>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this heading">#</a></h2>
@@ -303,6 +306,11 @@ environment using <code class="docutils literal notranslate"><span class="pre">p
 <span class="n">pydicer</span><span class="o">.</span><span class="n">run_pipeline</span><span class="p">()</span>
 </pre></div>
 </div>
+</section>
+<section id="how-to-cite">
+<h2>How to Cite<a class="headerlink" href="#how-to-cite" title="Permalink to this heading">#</a></h2>
+<p>If you make use of PyDicer within your research work, please consider citing our SoftwareX paper:</p>
+<p><a href="#id1"><span class="problematic" id="id2">**</span></a>Chlap P, Al Mouiee D, Finnegan RN, et al. PyDicer: An open-source python library for conversion and analysis of radiotherapy DICOM data. <em>SoftwareX</em>. 2025;<a class="reference external" href="https://doi.org/10.1016/j.softx.2024.102010">29:102010. doi:10.1016/j.softx.2024.102010</a>**</p>
 </section>
 <section id="contributing">
 <h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">#</a></h2>
@@ -384,6 +392,7 @@ environment using <code class="docutils literal notranslate"><span class="pre">p
 <li><a class="reference internal" href="#directory-structure">Directory Structure</a></li>
 <li><a class="reference internal" href="#pipeline">Pipeline</a></li>
 <li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#how-to-cite">How to Cite</a></li>
 <li><a class="reference internal" href="#contributing">Contributing</a></li>
 <li><a class="reference internal" href="#authors">Authors</a><ul>
 </ul>
