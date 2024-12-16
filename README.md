@@ -41,7 +41,7 @@ PyDicer will place converted and intermediate files into a specific directory st
 - `[working]/[dataset_name]`: Clean datasets prepared using the Dataset Preparation Module will be stored in a directory with their name and will symbolically link to converted in the `[working]/data` directory
 
 ![PyDicer Working Directory structure](assets/pydicer-working-directory-structure.png)
-*PyDicer working directory structure ([Chlap, P. et al. SoftwareX](https://doi.org/10.1016/j.softx.2024.102010))*
+PyDicer working directory structure. Ref. [Chlap, P. et al. SoftwareX](https://doi.org/10.1016/j.softx.2024.102010)
 
 ## Pipeline
 
@@ -91,7 +91,7 @@ pydicer.run_pipeline()
 
 If you make use of PyDicer within your research work, please consider citing our SoftwareX paper:
 
-**Chlap P, Al Mouiee D, Finnegan RN, et al. PyDicer: An open-source python library for conversion and analysis of radiotherapy DICOM data. *SoftwareX*. 2025;[29:102010. doi:10.1016/j.softx.2024.102010](https://doi.org/10.1016/j.softx.2024.102010)**
+Chlap P, Al Mouiee D, Finnegan RN, et al. PyDicer: An open-source python library for conversion and analysis of radiotherapy DICOM data. *SoftwareX*. 2025;29:102010. [doi:10.1016/j.softx.2024.102010](https://doi.org/10.1016/j.softx.2024.102010)
 
 ## Contributing
 

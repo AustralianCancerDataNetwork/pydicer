@@ -61,6 +61,7 @@ preferred-citation:
   date-published: "2024-12-14"
   doi: 10.1016/j.softx.2024.102010
   journal: SoftwareX
+  issn: 2352-7110
   publisher:
     name: Elsevier
   title: "PyDicer: An open-source python library for conversion and analysis of radiotherapy DICOM data"
