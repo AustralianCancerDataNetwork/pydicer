@@ -10,8 +10,10 @@ import numpy as np
 import SimpleITK as sitk
 import pydicom
 import matplotlib
+import pydicom
 
-from platipy.dicom.io.rtdose_to_nifti import convert_rtdose
+
+#from platipy.dicom.io.rtdose_to_nifti import convert_rtdose
 from pydicer.config import PyDicerConfig
 
 from pydicer.convert.pt import convert_dicom_to_nifti_pt
@@ -51,6 +53,34 @@ DATA_OBJECT_COLUMNS = [
     "referenced_sop_instance_uid",
     "path",
 ]
+
+
+
+## TODO
+# Call this function in the 'convert' function rather than platipy
+# Add Ali's summation logic
+def convert_rtdose(dcm_dose, force=False, dose_output_path=None):
+    """Convert DICOM RTDose to SimpleITK image, saving as NiFTI if needed.
+
+    Args:
+        dcm_dose (str|path): Path to DICOM dose file
+        force (bool): force flag to pass to pydicom
+        dose_output_path (str|path, optional): If set, NiFTI file will be written. Defaults to
+            None.
+
+    Returns:
+        SimpleITK.Image: The dose grid as a SimpleITK image
+    """
+
+    ds = pydicom.read_file(dcm_dose, force=force)
+    dose = sitk.ReadImage(str(dcm_dose))
+    dose = sitk.Cast(dose, sitk.sitkFloat32)
+    dose = dose * ds.DoseGridScaling
+
+    if dose_output_path is not None:
+        sitk.WriteImage(dose, str(dose_output_path))
+
+    return dose
 
 
 def get_object_type(sop_class_uid: str) -> str:
@@ -605,9 +635,21 @@ class ConvertData:
 
                 elif sop_class_uid == RT_DOSE_STORAGE_UID:
                     # If we have multiple doses with the same sop_instance_uid we'll just drop them
+                    # TODO 
+                    # check if dosegrids with the same sop_instance_uid are always duplicates
+
+
                     df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
 
+
                     # If there are multiple RTDOSEs in the same series then just save them all
+                    # TODO
+                    # check if multiple dose grids are linked to the same RT structure set (and base CT)
+                    # if so, then check time frames for cases such as exporting the plans within a day aprat (verifying
+                    # dates between dosegrids exports are within a certain timeframe) and double checking
+                    # to make sure that we are not adding largest dosegrid (upper and lowerbound in Ali's PDCP)
+
+
                     for _, rt_dose_file in df_files.iterrows():
                         sop_instance_hash = hash_uid(rt_dose_file.sop_instance_uid)
 
