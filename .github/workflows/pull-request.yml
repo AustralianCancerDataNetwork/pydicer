@@ -44,9 +44,10 @@ jobs:
         run: |
           if [[ "${{ matrix.python-version }}" == "3.9" ]]; then
             echo "Running Pytest with coverage..."
-            poetry run pip install pytest-cov
+            poetry run pip install pytest-cov coverage
             # Omit CLI from coverage report since it's not fully developed
             poetry run pytest --cov=pydicer --cov-report=xml --cov-config=.coveragerc
+            poetry run coverage report --fail-under=70 # Fail if coverage is less than 70%
           else
             echo "Running Pytest without coverage..."
             poetry run pytest
@@ -56,9 +57,7 @@ jobs:
       - name: Generate coverage and commit coverage badge
         if: github.ref == 'refs/heads/main' && matrix.python-version == '3.9'
         run: |
-          poetry run pip install coverage coverage-badge # These only work with python >=3.9
-          # (Optional) Show coverage in CLI
-          poetry run coverage report --fail-under=70 # Fail if coverage is less than 70%
+          poetry run pip install coverage-badge # These only work with python >=3.9
           # Generate an SVG coverage badge
           poetry run coverage-badge -o coverage.svg
 
