@@ -40,12 +40,13 @@ jobs:
         run: |
           poetry run pylint pydicer
       # Run tests with coverage & generate badge
-      - name: Pytest validation
+      - name: Conditional Pytest coverage
         run: |
           if [[ "${{ matrix.python-version }}" == "3.9" ]]; then
             echo "Running Pytest with coverage..."
             poetry run pip install pytest-cov
-            poetry run pytest --cov=pydicer --cov-report=xml --cov-omit="*/cli/* # Omit CLI from coverage report since not developed fully
+            # Omit CLI from coverage report since it's not fully developed
+            poetry run pytest --cov=pydicer --cov-report=xml --cov-omit="*/cli/*"
           else
             echo "Running Pytest without coverage..."
             poetry run pytest
