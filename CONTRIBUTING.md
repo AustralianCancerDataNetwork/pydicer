@@ -34,7 +34,7 @@ development and testing environment, without the need to perform overhead instal
 assumes that Docker and VSC are installed on your system.
 
 To set this up, you may perform the VSC shortcut `ctrl + shift + p` (or `cmd + shift p` on Mac) and
-select the `Reopen in devcontainer` option. This will create a Docker container with Python 3.8
+select the `Reopen in devcontainer` option. This will create a Docker container with Python 3.9
 and its dependencies installed, along with other tools we use for development (eg. git, pytest).
 
 ## Coding standards
