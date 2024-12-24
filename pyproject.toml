@@ -31,6 +31,7 @@ pyradiomics = ">=3.0.1"
 pylint = "^2.13.5"
 black = "^22.3.0"
 pytest = "6.2.5"
+mypy = "^1.14.0"
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^5.1.1"
