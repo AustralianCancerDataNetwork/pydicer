@@ -46,7 +46,7 @@ jobs:
             echo "Running Pytest with coverage..."
             poetry run pip install pytest-cov
             # Omit CLI from coverage report since it's not fully developed
-            poetry run pytest --cov=pydicer --cov-report=xml --cov-omit="*/cli/*"
+            poetry run pytest --cov=pydicer --cov-report=xml --cov-config=.coveragerc
           else
             echo "Running Pytest without coverage..."
             poetry run pytest
