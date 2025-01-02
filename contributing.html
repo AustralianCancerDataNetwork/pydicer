@@ -250,6 +250,15 @@ environment, use the <code class="docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 </section>
+<section id="vsc-devcontainer">
+<h2>VSC Devcontainer<a class="headerlink" href="#vsc-devcontainer" title="Permalink to this heading">#</a></h2>
+<p>You may setup a Visual Studio Code development container (Devcontainer) to ensure a standardised
+development and testing environment, without the need to perform overhead installation. This
+assumes that Docker and VSC are installed on your system.</p>
+<p>To set this up, you may perform the VSC shortcut <code class="docutils literal notranslate"><span class="pre">ctrl</span> <span class="pre">+</span> <span class="pre">shift</span> <span class="pre">+</span> <span class="pre">p</span></code> (or <code class="docutils literal notranslate"><span class="pre">cmd</span> <span class="pre">+</span> <span class="pre">shift</span> <span class="pre">p</span></code> on Mac) and
+select the <code class="docutils literal notranslate"><span class="pre">Reopen</span> <span class="pre">in</span> <span class="pre">devcontainer</span></code> option. This will create a Docker container with Python 3.9
+and its dependencies installed, along with other tools we use for development (eg. git, pytest).</p>
+</section>
 <section id="coding-standards">
 <h2>Coding standards<a class="headerlink" href="#coding-standards" title="Permalink to this heading">#</a></h2>
 <p>Code in PyDicer must conform to Python’s PEP-8 standards to ensure consistent formatting between contributors. To ensure this, pylint is used to check code conforms to these standards before a Pull Request can be merged. You can run pylint from the command line using the following command:</p>
@@ -299,7 +308,7 @@ environment, use the <code class="docutils literal notranslate"><span class="pre
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2024, Ingham Medical Physics
+                Copyright &#169; 2025, Ingham Medical Physics
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>
@@ -327,6 +336,7 @@ environment, use the <code class="docutils literal notranslate"><span class="pre
 <li><a class="reference internal" href="#">Contributing</a><ul>
 <li><a class="reference internal" href="#git">Git</a></li>
 <li><a class="reference internal" href="#poetry">Poetry</a></li>
+<li><a class="reference internal" href="#vsc-devcontainer">VSC Devcontainer</a></li>
 <li><a class="reference internal" href="#coding-standards">Coding standards</a></li>
 <li><a class="reference internal" href="#automated-tests">Automated tests</a></li>
 </ul>
