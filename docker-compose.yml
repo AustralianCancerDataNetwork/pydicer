@@ -1,0 +1,4 @@
+services:
+  pydicer-dev:
+    build:
+      context: .

@@ -27,6 +27,16 @@ environment, use the `poetry run` followed by what to run. For example, to run a
 poetry run python test.py
 ```
 
+## VSC Devcontainer
+
+You may setup a Visual Studio Code development container (Devcontainer) to ensure a standardised
+development and testing environment, without the need to perform overhead installation. This
+assumes that Docker and VSC are installed on your system.
+
+To set this up, you may perform the VSC shortcut `ctrl + shift + p` (or `cmd + shift p` on Mac) and
+select the `Reopen in devcontainer` option. This will create a Docker container with Python 3.9
+and its dependencies installed, along with other tools we use for development (eg. git, pytest).
+
 ## Coding standards
 
 Code in PyDicer must conform to Python's PEP-8 standards to ensure consistent formatting between contributors. To ensure this, pylint is used to check code conforms to these standards before a Pull Request can be merged. You can run pylint from the command line using the following command:

@@ -1,0 +1,4 @@
+[run]
+# Omit the CLI directory from coverage
+omit =
+    pydicer/cli/*
