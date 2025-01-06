@@ -4,12 +4,14 @@ import copy
 import shutil
 from pathlib import Path
 from typing import Union
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 import numpy as np
 import SimpleITK as sitk
 import pydicom
 import matplotlib
+from tqdm import tqdm
 
 from platipy.dicom.io.rtdose_to_nifti import convert_rtdose
 from pydicer.config import PyDicerConfig
@@ -319,7 +321,7 @@ class ConvertData:
         df_pat_data = df_pat_data.reset_index(drop=True)
         df_pat_data.to_csv(converted_df_path)
 
-    def convert(self, patient: Union[str, list]=None, force: bool=True):
+    def convert(self, patient: Union[str, list]=None, force: bool=True, max_workers: int=1):
         """Converts the DICOM which was preprocessed into the pydicer output directory.
 
         Args:
@@ -327,6 +329,8 @@ class ConvertData:
               None.
             force (bool, optional): When True objects will be converted even if the output files
               already exist. Defaults to True.
+            max_workers (int, optional): The maximum number of workers to use for the conversion.
+              Defaults to 1.
         """
 
         # Create the output directory if it hasn't already been created
@@ -342,12 +346,22 @@ class ConvertData:
                 patient = [patient]
 
             df_preprocess = df_preprocess[df_preprocess["patient_id"].isin(patient)]
+            
+            
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = []
+            total_tasks = len(df_preprocess.groupby(["patient_id", "modality", "series_uid"]))
+            
+            with tqdm(total=total_tasks, desc="Conversion Progress") as pbar:
+                for key, df_files in df_preprocess.groupby(["patient_id", "modality", "series_uid"]):
+                    futures.append(executor.submit(
+                        self.__convert_task, key, df_files, df_preprocess, force, config
+                    ))
+                
+                for future in as_completed(futures):
+                    pbar.update(1) 
 
-        for key, df_files in get_iterator(
-            df_preprocess.groupby(["patient_id", "modality", "series_uid"]),
-            unit="objects",
-            name="convert",
-        ):
+    def __convert_task(self, key, df_files, df_preprocess, force, config):
             patient_id, _, series_uid = key
 
             logger.info("Converting data for patient: %s", patient_id)
