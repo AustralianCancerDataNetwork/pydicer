@@ -1,0 +1,1303 @@
+{
+  "00080005": {
+    "vr": "CS",
+    "Value": [
+      "ISO_IR 192"
+    ]
+  },
+  "00080012": {
+    "vr": "DA",
+    "Value": [
+      "20240219"
+    ]
+  },
+  "00080013": {
+    "vr": "TM",
+    "Value": [
+      "152910"
+    ]
+  },
+  "00080016": {
+    "vr": "UI",
+    "Value": [
+      "1.2.840.10008.5.1.4.1.1.481.5"
+    ]
+  },
+  "00080018": {
+    "vr": "UI",
+    "Value": [
+      "1.2.246.352.71.5.76690441797.3107721.20240219144537"
+    ]
+  },
+  "00080020": {
+    "vr": "DA",
+    "Value": [
+      "20240219"
+    ]
+  },
+  "00080021": {
+    "vr": "DA",
+    "Value": [
+      "20240219"
+    ]
+  },
+  "00080030": {
+    "vr": "TM",
+    "Value": [
+      "143843.43"
+    ]
+  },
+  "00080031": {
+    "vr": "TM",
+    "Value": [
+      "144446.283"
+    ]
+  },
+  "00080050": {
+    "vr": "SH"
+  },
+  "00080060": {
+    "vr": "CS",
+    "Value": [
+      "RTPLAN"
+    ]
+  },
+  "00080070": {
+    "vr": "LO",
+    "Value": [
+      "Varian Medical Systems"
+    ]
+  },
+  "00080080": {
+    "vr": "LO",
+    "Value": [
+      "Blacktown"
+    ]
+  },
+  "00080081": {
+    "vr": "ST",
+    "Value": [
+      "Blacktown Road\r\n2148\r\nBlacktown\r\nNSW\r\nAustralia"
+    ]
+  },
+  "00080090": {
+    "vr": "PN"
+  },
+  "00081010": {
+    "vr": "SH",
+    "Value": [
+      "weshonc-adb0001"
+    ]
+  },
+  "0008103E": {
+    "vr": "LO",
+    "Value": [
+      "Plan1"
+    ]
+  },
+  "00081070": {
+    "vr": "PN",
+    "Value": [
+      {
+        "Alphabetic": "Sykes, Jonathan"
+      }
+    ]
+  },
+  "00081090": {
+    "vr": "LO",
+    "Value": [
+      "ARIA RadOnc"
+    ]
+  },
+  "00100010": {
+    "vr": "PN",
+    "Value": [
+      {
+        "Alphabetic": "Physics^JS"
+      }
+    ]
+  },
+  "00100020": {
+    "vr": "LO",
+    "Value": [
+      "Physics_JS"
+    ]
+  },
+  "00100030": {
+    "vr": "DA"
+  },
+  "00100040": {
+    "vr": "CS"
+  },
+  "00181000": {
+    "vr": "LO",
+    "Value": [
+      "76690441797"
+    ]
+  },
+  "00181020": {
+    "vr": "LO",
+    "Value": [
+      "16.1.5"
+    ]
+  },
+  "0020000D": {
+    "vr": "UI",
+    "Value": [
+      "1.2.246.352.221.4982993914505918535.11745086857528248454"
+    ]
+  },
+  "0020000E": {
+    "vr": "UI",
+    "Value": [
+      "1.2.246.352.71.2.76690441797.8983787.20240219144446"
+    ]
+  },
+  "00200010": {
+    "vr": "SH",
+    "Value": [
+      "S6"
+    ]
+  },
+  "00200011": {
+    "vr": "IS",
+    "Value": [
+      4
+    ]
+  },
+  "00200052": {
+    "vr": "UI",
+    "Value": [
+      "1.2.246.352.221.5578515729418422941.14053656397311698349"
+    ]
+  },
+  "00201040": {
+    "vr": "LO"
+  },
+  "300A0002": {
+    "vr": "SH",
+    "Value": [
+      "zD4 SCF"
+    ]
+  },
+  "300A0003": {
+    "vr": "LO",
+    "Value": [
+      "SCF"
+    ]
+  },
+  "300A0006": {
+    "vr": "DA",
+    "Value": [
+      "20240219"
+    ]
+  },
+  "300A0007": {
+    "vr": "TM",
+    "Value": [
+      "152434.173"
+    ]
+  },
+  "300A000A": {
+    "vr": "CS",
+    "Value": [
+      "CURATIVE"
+    ]
+  },
+  "300A000C": {
+    "vr": "CS",
+    "Value": [
+      "PATIENT"
+    ]
+  },
+  "300A0010": {
+    "vr": "SQ",
+    "Value": [
+      {
+        "300A0012": {
+          "vr": "IS",
+          "Value": [
+            1
+          ]
+        },
+        "300A0013": {
+          "vr": "UI",
+          "Value": [
+            "1.2.246.352.71.10.76690441797.983556.20240219144537"
+          ]
+        },
+        "300A0014": {
+          "vr": "CS",
+          "Value": [
+            "SITE"
+          ]
+        },
+        "300A0016": {
+          "vr": "LO",
+          "Value": [
+            "NE2571"
+          ]
+        },
+        "300A0020": {
+          "vr": "CS",
+          "Value": [
+            "TARGET"
+          ]
+        },
+        "32670010": {
+          "vr": "LO",
+          "Value": [
+            "Varian Medical Systems VISION 3267"
+          ]
+        },
+        "32671000": {
+          "vr": "UN",
+          "InlineBinary": "MjE="
+        }
+      },
+      {
+        "300A0012": {
+          "vr": "IS",
+          "Value": [
+            2
+          ]
+        },
+        "300A0013": {
+          "vr": "UI",
+          "Value": [
+            "1.2.246.352.71.10.76690441797.983566.20240219152005"
+          ]
+        },
+        "300A0014": {
+          "vr": "CS",
+          "Value": [
+            "COORDINATES"
+          ]
+        },
+        "300A0016": {
+          "vr": "LO",
+          "Value": [
+            "SCF_Iso"
+          ]
+        },
+        "300A0018": {
+          "vr": "DS",
+          "Value": [
+            50.000003333,
+            -49.999996667,
+            90.000003333
+          ]
+        },
+        "300A0020": {
+          "vr": "CS",
+          "Value": [
+            "ORGAN_AT_RISK"
+          ]
+        },
+        "32670010": {
+          "vr": "LO",
+          "Value": [
+            "Varian Medical Systems VISION 3267"
+          ]
+        },
+        "32671000": {
+          "vr": "UN",
+          "InlineBinary": "U0NGX0lzbyA="
+        }
+      }
+    ]
+  },
+  "300A0070": {
+    "vr": "SQ",
+    "Value": [
+      {
+        "300A0071": {
+          "vr": "IS",
+          "Value": [
+            1
+          ]
+        },
+        "300A0078": {
+          "vr": "IS",
+          "Value": [
+            15
+          ]
+        },
+        "300A0080": {
+          "vr": "IS",
+          "Value": [
+            2
+          ]
+        },
+        "300A00A0": {
+          "vr": "IS",
+          "Value": [
+            0
+          ]
+        },
+        "300C0004": {
+          "vr": "SQ",
+          "Value": [
+            {
+              "300A0082": {
+                "vr": "DS",
+                "Value": [
+                  50.000003333,
+                  -49.999996667,
+                  90.000003333
+                ]
+              },
+              "300A0083": {
+                "vr": "UI",
+                "Value": [
+                  "1.2.246.352.71.10.76690441797.983566.20240219152005"
+                ]
+              },
+              "300A0084": {
+                "vr": "DS",
+                "Value": [
+                  2.00024129134398
+                ]
+              },
+              "300A0086": {
+                "vr": "DS",
+                "Value": [
+                  219.813728551591
+                ]
+              },
+              "300C0006": {
+                "vr": "IS",
+                "Value": [
+                  1
+                ]
+              },
+              "32490010": {
+                "vr": "LO",
+                "Value": [
+                  "Varian Medical Systems VISION 3249"
+                ]
+              },
+              "32491010": {
+                "vr": "UN",
+                "InlineBinary": "MS4yLjI0Ni4zNTIuNzEuMTAuNzY2OTA0NDE3OTcuOTgzNTY2LjIwMjQwMjE5MTUyMDA1AA=="
+              }
+            },
+            {
+              "300A0082": {
+                "vr": "DS",
+                "Value": [
+                  50.000003333,
+                  -49.999996667,
+                  90.000003333
+                ]
+              },
+              "300A0083": {
+                "vr": "UI",
+                "Value": [
+                  "1.2.246.352.71.10.76690441797.983566.20240219152005"
+                ]
+              },
+              "300A0084": {
+                "vr": "DS",
+                "Value": [
+                  0.66642537532268
+                ]
+              },
+              "300A0086": {
+                "vr": "DS",
+                "Value": [
+                  112.126222559996
+                ]
+              },
+              "300C0006": {
+                "vr": "IS",
+                "Value": [
+                  2
+                ]
+              },
+              "32490010": {
+                "vr": "LO",
+                "Value": [
+                  "Varian Medical Systems VISION 3249"
+                ]
+              },
+              "32491010": {
+                "vr": "UN",
+                "InlineBinary": "MS4yLjI0Ni4zNTIuNzEuMTAuNzY2OTA0NDE3OTcuOTgzNTY2LjIwMjQwMjE5MTUyMDA1AA=="
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "300A00B0": {
+    "vr": "SQ",
+    "Value": [
+      {
+        "00080070": {
+          "vr": "LO",
+          "Value": [
+            "Varian Medical Systems"
+          ]
+        },
+        "00080080": {
+          "vr": "LO",
+          "Value": [
+            "Westmead"
+          ]
+        },
+        "00081040": {
+          "vr": "LO",
+          "Value": [
+            "Oncology"
+          ]
+        },
+        "00081090": {
+          "vr": "LO",
+          "Value": [
+            "TDS"
+          ]
+        },
+        "00181000": {
+          "vr": "LO",
+          "Value": [
+            "2972"
+          ]
+        },
+        "30020050": {
+          "vr": "SQ",
+          "Value": [
+            {
+              "30020051": {
+                "vr": "CS",
+                "Value": [
+                  "STANDARD"
+                ]
+              }
+            }
+          ]
+        },
+        "300A00B2": {
+          "vr": "SH",
+          "Value": [
+            "LA317"
+          ]
+        },
+        "300A00B3": {
+          "vr": "CS",
+          "Value": [
+            "MU"
+          ]
+        },
+        "300A00B4": {
+          "vr": "DS",
+          "Value": [
+            1000.0
+          ]
+        },
+        "300A00B6": {
+          "vr": "SQ",
+          "Value": [
+            {
+              "300A00B8": {
+                "vr": "CS",
+                "Value": [
+                  "X"
+                ]
+              },
+              "300A00BC": {
+                "vr": "IS",
+                "Value": [
+                  1
+                ]
+              }
+            },
+            {
+              "300A00B8": {
+                "vr": "CS",
+                "Value": [
+                  "Y"
+                ]
+              },
+              "300A00BC": {
+                "vr": "IS",
+                "Value": [
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        "300A00C0": {
+          "vr": "IS",
+          "Value": [
+            1
+          ]
+        },
+        "300A00C2": {
+          "vr": "LO",
+          "Value": [
+            "Field 1"
+          ]
+        },
+        "300A00C4": {
+          "vr": "CS",
+          "Value": [
+            "STATIC"
+          ]
+        },
+        "300A00C6": {
+          "vr": "CS",
+          "Value": [
+            "PHOTON"
+          ]
+        },
+        "300A00CE": {
+          "vr": "CS",
+          "Value": [
+            "TREATMENT"
+          ]
+        },
+        "300A00D0": {
+          "vr": "IS",
+          "Value": [
+            0
+          ]
+        },
+        "300A00E0": {
+          "vr": "IS",
+          "Value": [
+            0
+          ]
+        },
+        "300A00ED": {
+          "vr": "IS",
+          "Value": [
+            0
+          ]
+        },
+        "300A00F0": {
+          "vr": "IS",
+          "Value": [
+            0
+          ]
+        },
+        "300A010E": {
+          "vr": "DS",
+          "Value": [
+            1.0
+          ]
+        },
+        "300A0110": {
+          "vr": "IS",
+          "Value": [
+            2
+          ]
+        },
+        "300A0111": {
+          "vr": "SQ",
+          "Value": [
+            {
+              "300A0112": {
+                "vr": "IS",
+                "Value": [
+                  0
+                ]
+              },
+              "300A0114": {
+                "vr": "DS",
+                "Value": [
+                  6.0
+                ]
+              },
+              "300A0115": {
+                "vr": "DS",
+                "Value": [
+                  500.0
+                ]
+              },
+              "300A011A": {
+                "vr": "SQ",
+                "Value": [
+                  {
+                    "300A00B8": {
+                      "vr": "CS",
+                      "Value": [
+                        "X"
+                      ]
+                    },
+                    "300A011C": {
+                      "vr": "DS",
+                      "Value": [
+                        -50.0,
+                        50.0
+                      ]
+                    }
+                  },
+                  {
+                    "300A00B8": {
+                      "vr": "CS",
+                      "Value": [
+                        "Y"
+                      ]
+                    },
+                    "300A011C": {
+                      "vr": "DS",
+                      "Value": [
+                        -50.0,
+                        50.0
+                      ]
+                    }
+                  }
+                ]
+              },
+              "300A011E": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A011F": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300A0120": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0121": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300A0122": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0123": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300A0125": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0126": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300A0128": {
+                "vr": "DS"
+              },
+              "300A0129": {
+                "vr": "DS"
+              },
+              "300A012A": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A012C": {
+                "vr": "DS",
+                "Value": [
+                  50.0,
+                  -50.0,
+                  94.0
+                ]
+              },
+              "300A0134": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0140": {
+                "vr": "FL",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0142": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300A0144": {
+                "vr": "FL",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0146": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300C0050": {
+                "vr": "SQ",
+                "Value": [
+                  {
+                    "300A010C": {
+                      "vr": "DS",
+                      "Value": [
+                        0.0
+                      ]
+                    },
+                    "300C0051": {
+                      "vr": "IS",
+                      "Value": [
+                        2
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "300A0112": {
+                "vr": "IS",
+                "Value": [
+                  1
+                ]
+              },
+              "300A0134": {
+                "vr": "DS",
+                "Value": [
+                  1.0
+                ]
+              },
+              "300C0050": {
+                "vr": "SQ",
+                "Value": [
+                  {
+                    "300A010C": {
+                      "vr": "DS",
+                      "Value": [
+                        1.0
+                      ]
+                    },
+                    "300C0051": {
+                      "vr": "IS",
+                      "Value": [
+                        2
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "300C006A": {
+          "vr": "IS",
+          "Value": [
+            1
+          ]
+        },
+        "32850010": {
+          "vr": "LO",
+          "Value": [
+            "Varian Medical Systems VISION 3285"
+          ]
+        },
+        "32851000": {
+          "vr": "UN",
+          "InlineBinary": "/v8A4DoAAACFMhAAIgAAAFZhcmlhbiBNZWRpY2FsIFN5c3RlbXMgVklTSU9OIDMyODWFMgEQCAAAAFNUQU5EQVJE"
+        }
+      },
+      {
+        "00080070": {
+          "vr": "LO",
+          "Value": [
+            "Varian Medical Systems"
+          ]
+        },
+        "00080080": {
+          "vr": "LO",
+          "Value": [
+            "Westmead"
+          ]
+        },
+        "00081040": {
+          "vr": "LO",
+          "Value": [
+            "Oncology"
+          ]
+        },
+        "00081090": {
+          "vr": "LO",
+          "Value": [
+            "TDS"
+          ]
+        },
+        "00181000": {
+          "vr": "LO",
+          "Value": [
+            "2972"
+          ]
+        },
+        "30020050": {
+          "vr": "SQ",
+          "Value": [
+            {
+              "30020051": {
+                "vr": "CS",
+                "Value": [
+                  "STANDARD"
+                ]
+              }
+            }
+          ]
+        },
+        "300A00B2": {
+          "vr": "SH",
+          "Value": [
+            "LA317"
+          ]
+        },
+        "300A00B3": {
+          "vr": "CS",
+          "Value": [
+            "MU"
+          ]
+        },
+        "300A00B4": {
+          "vr": "DS",
+          "Value": [
+            1000.0
+          ]
+        },
+        "300A00B6": {
+          "vr": "SQ",
+          "Value": [
+            {
+              "300A00B8": {
+                "vr": "CS",
+                "Value": [
+                  "X"
+                ]
+              },
+              "300A00BC": {
+                "vr": "IS",
+                "Value": [
+                  1
+                ]
+              }
+            },
+            {
+              "300A00B8": {
+                "vr": "CS",
+                "Value": [
+                  "Y"
+                ]
+              },
+              "300A00BC": {
+                "vr": "IS",
+                "Value": [
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        "300A00C0": {
+          "vr": "IS",
+          "Value": [
+            2
+          ]
+        },
+        "300A00C2": {
+          "vr": "LO",
+          "Value": [
+            "Field 2"
+          ]
+        },
+        "300A00C4": {
+          "vr": "CS",
+          "Value": [
+            "STATIC"
+          ]
+        },
+        "300A00C6": {
+          "vr": "CS",
+          "Value": [
+            "PHOTON"
+          ]
+        },
+        "300A00CE": {
+          "vr": "CS",
+          "Value": [
+            "TREATMENT"
+          ]
+        },
+        "300A00D0": {
+          "vr": "IS",
+          "Value": [
+            0
+          ]
+        },
+        "300A00E0": {
+          "vr": "IS",
+          "Value": [
+            0
+          ]
+        },
+        "300A00ED": {
+          "vr": "IS",
+          "Value": [
+            0
+          ]
+        },
+        "300A00F0": {
+          "vr": "IS",
+          "Value": [
+            0
+          ]
+        },
+        "300A010E": {
+          "vr": "DS",
+          "Value": [
+            1.0
+          ]
+        },
+        "300A0110": {
+          "vr": "IS",
+          "Value": [
+            2
+          ]
+        },
+        "300A0111": {
+          "vr": "SQ",
+          "Value": [
+            {
+              "300A0112": {
+                "vr": "IS",
+                "Value": [
+                  0
+                ]
+              },
+              "300A0114": {
+                "vr": "DS",
+                "Value": [
+                  6.0
+                ]
+              },
+              "300A0115": {
+                "vr": "DS",
+                "Value": [
+                  500.0
+                ]
+              },
+              "300A011A": {
+                "vr": "SQ",
+                "Value": [
+                  {
+                    "300A00B8": {
+                      "vr": "CS",
+                      "Value": [
+                        "X"
+                      ]
+                    },
+                    "300A011C": {
+                      "vr": "DS",
+                      "Value": [
+                        -50.0,
+                        50.0
+                      ]
+                    }
+                  },
+                  {
+                    "300A00B8": {
+                      "vr": "CS",
+                      "Value": [
+                        "Y"
+                      ]
+                    },
+                    "300A011C": {
+                      "vr": "DS",
+                      "Value": [
+                        -50.0,
+                        50.0
+                      ]
+                    }
+                  }
+                ]
+              },
+              "300A011E": {
+                "vr": "DS",
+                "Value": [
+                  180.0
+                ]
+              },
+              "300A011F": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300A0120": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0121": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300A0122": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0123": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300A0125": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0126": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300A0128": {
+                "vr": "DS"
+              },
+              "300A0129": {
+                "vr": "DS"
+              },
+              "300A012A": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A012C": {
+                "vr": "DS",
+                "Value": [
+                  50.0,
+                  -50.0,
+                  94.0
+                ]
+              },
+              "300A0134": {
+                "vr": "DS",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0140": {
+                "vr": "FL",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0142": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300A0144": {
+                "vr": "FL",
+                "Value": [
+                  0.0
+                ]
+              },
+              "300A0146": {
+                "vr": "CS",
+                "Value": [
+                  "NONE"
+                ]
+              },
+              "300C0050": {
+                "vr": "SQ",
+                "Value": [
+                  {
+                    "300A010C": {
+                      "vr": "DS",
+                      "Value": [
+                        0.0
+                      ]
+                    },
+                    "300C0051": {
+                      "vr": "IS",
+                      "Value": [
+                        2
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "300A0112": {
+                "vr": "IS",
+                "Value": [
+                  1
+                ]
+              },
+              "300A0134": {
+                "vr": "DS",
+                "Value": [
+                  1.0
+                ]
+              },
+              "300C0050": {
+                "vr": "SQ",
+                "Value": [
+                  {
+                    "300A010C": {
+                      "vr": "DS",
+                      "Value": [
+                        1.0
+                      ]
+                    },
+                    "300C0051": {
+                      "vr": "IS",
+                      "Value": [
+                        2
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "300C006A": {
+          "vr": "IS",
+          "Value": [
+            2
+          ]
+        },
+        "32850010": {
+          "vr": "LO",
+          "Value": [
+            "Varian Medical Systems VISION 3285"
+          ]
+        },
+        "32851000": {
+          "vr": "UN",
+          "InlineBinary": "/v8A4DoAAACFMhAAIgAAAFZhcmlhbiBNZWRpY2FsIFN5c3RlbXMgVklTSU9OIDMyODWFMgEQCAAAAFNUQU5EQVJE"
+        }
+      }
+    ]
+  },
+  "300A0180": {
+    "vr": "SQ",
+    "Value": [
+      {
+        "00185100": {
+          "vr": "CS",
+          "Value": [
+            "HFS"
+          ]
+        },
+        "300A0182": {
+          "vr": "IS",
+          "Value": [
+            1
+          ]
+        },
+        "300A01B0": {
+          "vr": "CS",
+          "Value": [
+            "ISOCENTRIC"
+          ]
+        }
+      },
+      {
+        "00185100": {
+          "vr": "CS",
+          "Value": [
+            "HFS"
+          ]
+        },
+        "300A0182": {
+          "vr": "IS",
+          "Value": [
+            2
+          ]
+        },
+        "300A01B0": {
+          "vr": "CS",
+          "Value": [
+            "ISOCENTRIC"
+          ]
+        }
+      }
+    ]
+  },
+  "300C0060": {
+    "vr": "SQ",
+    "Value": [
+      {
+        "00081150": {
+          "vr": "UI",
+          "Value": [
+            "1.2.840.10008.5.1.4.1.1.481.3"
+          ]
+        },
+        "00081155": {
+          "vr": "UI",
+          "Value": [
+            "1.2.246.352.71.4.76690441797.620525.20240219151440"
+          ]
+        }
+      }
+    ]
+  },
+  "300E0002": {
+    "vr": "CS",
+    "Value": [
+      "UNAPPROVED"
+    ]
+  },
+  "32530010": {
+    "vr": "LO",
+    "Value": [
+      "Varian Medical Systems VISION 3253"
+    ]
+  },
+  "32531000": {
+    "vr": "UN",
+    "InlineBinary": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48RXh0ZW5kZWRWQVBsYW5JbnRlcmZhY2UgVmVyc2lvbj0iMSI+PEJlYW1zPjxCZWFtPjxSZWZlcmVuY2VkQmVhbU51bWJlcj4xPC9SZWZlcmVuY2VkQmVhbU51bWJlcj48QmVhbUV4dGVuc2lvbj48RmllbGRPcmRlcj4xPC9GaWVsZE9yZGVyPjxHYW50cnlSdG5FeHRlbmRlZFN0YXJ0PmZhbHNlPC9HYW50cnlSdG5FeHRlbmRlZFN0YXJ0PjxHYW50cnlSdG5FeHRlbmRlZFN0b3A+ZmFsc2U8L0dhbnRyeVJ0bkV4dGVuZGVkU3RvcD48L0JlYW1FeHRlbnNpb24+PC9CZWFtPjxCZWFtPjxSZWZlcmVuY2VkQmVhbU51bWJlcj4yPC9SZWZlcmVuY2VkQmVhbU51bWJlcj48QmVhbUV4dGVuc2lvbj48RmllbGRPcmRlcj4yPC9GaWVsZE9yZGVyPjxHYW50cnlSdG5FeHRlbmRlZFN0YXJ0PmZhbHNlPC9HYW50cnlSdG5FeHRlbmRlZFN0YXJ0PjxHYW50cnlSdG5FeHRlbmRlZFN0b3A+ZmFsc2U8L0dhbnRyeVJ0bkV4dGVuZGVkU3RvcD48L0JlYW1FeHRlbnNpb24+PC9CZWFtPjwvQmVhbXM+PFRvbGVyYW5jZVRhYmxlcyAvPjxEb3NlUmVmZXJlbmNlcz48RG9zZVJlZmVyZW5jZT48UmVmZXJlbmNlZERvc2VSZWZlcmVuY2VOdW1iZXI+MTwvUmVmZXJlbmNlZERvc2VSZWZlcmVuY2VOdW1iZXI+PERvc2VSZWZlcmVuY2VFeHRlbnNpb24gLz48L0Rvc2VSZWZlcmVuY2U+PERvc2VSZWZlcmVuY2U+PFJlZmVyZW5jZWREb3NlUmVmZXJlbmNlTnVtYmVyPjI8L1JlZmVyZW5jZWREb3NlUmVmZXJlbmNlTnVtYmVyPjxEb3NlUmVmZXJlbmNlRXh0ZW5zaW9uIC8+PC9Eb3NlUmVmZXJlbmNlPjwvRG9zZVJlZmVyZW5jZXM+PC9FeHRlbmRlZFZBUGxhbkludGVyZmFjZT4="
+  },
+  "32531001": {
+    "vr": "UN",
+    "InlineBinary": "ODU0IA=="
+  },
+  "32531002": {
+    "vr": "UN",
+    "InlineBinary": "RXh0ZW5kZWRJRg=="
+  }
+}
