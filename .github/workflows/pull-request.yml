@@ -39,7 +39,10 @@ jobs:
       - name: Lint with Pylint
         run: |
           poetry run pylint pydicer
-      # Run tests with coverage & generate badge
+      - name: MyPy type checking
+        run: |
+          # TODO poetry run mypy
+          echo "Skipping MyPy type checking..."
       - name: Conditional Pytest coverage
         run: |
           if [[ "${{ matrix.python-version }}" == "3.9" ]]; then
@@ -52,27 +55,26 @@ jobs:
             echo "Running Pytest without coverage..."
             poetry run pytest
           fi
-
       # Commit the coverage badge back to repo (only on main branch & for a specific Python version)
-      - name: Generate coverage and commit coverage badge
+      - name: Generate and commit coverage badge
         if: github.ref == 'refs/heads/main' && matrix.python-version == '3.9'
         run: |
           poetry run pip install coverage-badge # These only work with python >=3.9
           # Generate an SVG coverage badge
-          poetry run coverage-badge -o coverage.svg
+          # poetry run coverage-badge -o coverage.svg
 
-          # Configure git
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          # # Configure git
+          # git config user.name "github-actions"
+          # git config user.email "github-actions@github.com"
 
-          # Pull latest changes to avoid conflicts
-          git pull --rebase
+          # # Pull latest changes to avoid conflicts
+          # git pull --rebase
 
-          # Stage and commit coverage.svg
-          git add coverage.svg
-          git commit -m "Update coverage badge" || echo "No changes to commit"
+          # # Stage and commit coverage.svg
+          # git add coverage.svg
+          # git commit -m "Update coverage badge" || echo "No changes to commit"
 
-          # Push commit
-          git push
+          # # Push commit
+          # git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
