@@ -19,7 +19,7 @@ from pydicer.config import PyDicerConfig
 from pydicer.convert.pt import convert_dicom_to_nifti_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.convert.headers import convert_dicom_headers
-from pydicer.utils import hash_uid, read_preprocessed_data, get_iterator
+from pydicer.utils import hash_uid, read_preprocessed_data
 from pydicer.quarantine import copy_file_to_quarantine
 
 from pydicer.constants import (
