@@ -4,12 +4,14 @@ import copy
 import shutil
 from pathlib import Path
 from typing import Union
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 import numpy as np
 import SimpleITK as sitk
 import pydicom
 import matplotlib
+from tqdm import tqdm
 
 from platipy.dicom.io.rtdose_to_nifti import convert_rtdose
 from pydicer.config import PyDicerConfig
@@ -17,7 +19,7 @@ from pydicer.config import PyDicerConfig
 from pydicer.convert.pt import convert_dicom_to_nifti_pt
 from pydicer.convert.rtstruct import convert_rtstruct, write_nrrd_from_mask_directory
 from pydicer.convert.headers import convert_dicom_headers
-from pydicer.utils import hash_uid, read_preprocessed_data, get_iterator
+from pydicer.utils import hash_uid, read_preprocessed_data
 from pydicer.quarantine import copy_file_to_quarantine
 
 from pydicer.constants import (
@@ -242,7 +244,9 @@ def handle_missing_slice(
     return df_files.file_path.tolist()
 
 
-def link_via_frame_of_reference(for_uid: str, df_preprocess: pd.DataFrame) -> pd.DataFrame:
+def link_via_frame_of_reference(
+    for_uid: str, df_preprocess: pd.DataFrame
+) -> pd.DataFrame:
     """Find the image series linked to this FOR
 
     Args:
@@ -319,7 +323,9 @@ class ConvertData:
         df_pat_data = df_pat_data.reset_index(drop=True)
         df_pat_data.to_csv(converted_df_path)
 
-    def convert(self, patient: Union[str, list]=None, force: bool=True):
+    def convert(
+        self, patient: Union[str, list] = None, force: bool = True, max_workers: int = 1
+    ):
         """Converts the DICOM which was preprocessed into the pydicer output directory.
 
         Args:
@@ -327,6 +333,8 @@ class ConvertData:
               None.
             force (bool, optional): When True objects will be converted even if the output files
               already exist. Defaults to True.
+            max_workers (int, optional): The maximum number of workers to use for the conversion.
+              Defaults to 1.
         """
 
         # Create the output directory if it hasn't already been created
@@ -343,103 +351,93 @@ class ConvertData:
 
             df_preprocess = df_preprocess[df_preprocess["patient_id"].isin(patient)]
 
-        for key, df_files in get_iterator(
-            df_preprocess.groupby(["patient_id", "modality", "series_uid"]),
-            unit="objects",
-            name="convert",
-        ):
-            patient_id, _, series_uid = key
-
-            logger.info("Converting data for patient: %s", patient_id)
-
-            patient_directory = self.output_directory.joinpath(patient_id)
-
-            patient_logger = PatientLogger(
-                patient_id, self.output_directory, force=False
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = []
+            total_tasks = len(
+                df_preprocess.groupby(["patient_id", "modality", "series_uid"])
             )
 
-            # Grab the sop_class_uid, modality and for_uid (should be the same for all files in
-            # series)
-            sop_class_uid = df_files.sop_class_uid.unique()[0]
-            modality = df_files.modality.unique()[0]
-            for_uid = df_files.for_uid.unique()[0]
+            with tqdm(total=total_tasks, desc="Conversion Progress") as pbar:
+                for key, df_files in df_preprocess.groupby(
+                    ["patient_id", "modality", "series_uid"]
+                ):
+                    futures.append(
+                        executor.submit(
+                            self.__convert_task,
+                            key,
+                            df_files,
+                            df_preprocess,
+                            force,
+                            config,
+                        )
+                    )
 
-            # Use the SOPInstanceUID as a hash for the output object. In case of a series (where
-            # multiple DICOM objects make up the converted object) then use the SOPInstanceUID of
-            # the first object.
-            sop_instance_uid = df_files.sop_instance_uid.unique()[0]
-            sop_instance_hash = hash_uid(sop_instance_uid)
+                for _ in as_completed(futures):
+                    pbar.update(1)
 
-            # Determine the output type to decide in which directory the object should be placed
-            object_type = get_object_type(sop_class_uid)
+    def __convert_task(self, key, df_files, df_preprocess, force, config):
+        patient_id, _, series_uid = key
 
-            output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
+        logger.info("Converting data for patient: %s", patient_id)
 
-            entry = {
-                "sop_instance_uid": sop_instance_uid,
-                "hashed_uid": sop_instance_hash,
-                "modality": modality,
-                "patient_id": patient_id,
-                "series_uid": series_uid,
-                "for_uid": for_uid,
-            }
+        patient_directory = self.output_directory.joinpath(patient_id)
 
-            try:
-                if sop_class_uid == CT_IMAGE_STORAGE_UID:
-                    if not output_dir.exists() or force:
-                        # Only convert if it doesn't already exist or if force is True
+        patient_logger = PatientLogger(patient_id, self.output_directory, force=False)
 
-                        if config.get_config("interp_missing_slices"):
-                            series_files = handle_missing_slice(
-                                df_files,
-                                ignore_duplicates=config.get_config(
-                                    "ignore_duplicate_slices"
-                                ),
-                            )
-                        else:
-                            # TODO Handle inconsistent slice spacing
-                            error_log = """Slice Locations are not evenly spaced. Set
+        # Grab the sop_class_uid, modality and for_uid (should be the same for all files in
+        # series)
+        sop_class_uid = df_files.sop_class_uid.unique()[0]
+        modality = df_files.modality.unique()[0]
+        for_uid = df_files.for_uid.unique()[0]
+
+        # Use the SOPInstanceUID as a hash for the output object. In case of a series (where
+        # multiple DICOM objects make up the converted object) then use the SOPInstanceUID of
+        # the first object.
+        sop_instance_uid = df_files.sop_instance_uid.unique()[0]
+        sop_instance_hash = hash_uid(sop_instance_uid)
+
+        # Determine the output type to decide in which directory the object should be placed
+        object_type = get_object_type(sop_class_uid)
+
+        output_dir = patient_directory.joinpath(object_type, sop_instance_hash)
+
+        entry = {
+            "sop_instance_uid": sop_instance_uid,
+            "hashed_uid": sop_instance_hash,
+            "modality": modality,
+            "patient_id": patient_id,
+            "series_uid": series_uid,
+            "for_uid": for_uid,
+        }
+
+        try:
+            if sop_class_uid == CT_IMAGE_STORAGE_UID:
+                if not output_dir.exists() or force:
+                    # Only convert if it doesn't already exist or if force is True
+
+                    if config.get_config("interp_missing_slices"):
+                        series_files = handle_missing_slice(
+                            df_files,
+                            ignore_duplicates=config.get_config(
+                                "ignore_duplicate_slices"
+                            ),
+                        )
+                    else:
+                        # TODO Handle inconsistent slice spacing
+                        error_log = """Slice Locations are not evenly spaced. Set
                                 interp_missing_slices to True to interpolate slices."""
-                            patient_logger.log_module_error(
-                                "convert", sop_instance_hash, error_log
-                            )
-
-                        output_dir.mkdir(exist_ok=True, parents=True)
-
-                        series_files = [str(f) for f in series_files]
-                        series = sitk.ReadImage(series_files)
-
-                        nifti_file = output_dir.joinpath("CT.nii.gz")
-                        sitk.WriteImage(series, str(nifti_file))
-                        logger.debug("Writing CT Image Series to: %s", nifti_file)
-
-                        json_file = output_dir.joinpath("metadata.json")
-                        convert_dicom_headers(
-                            series_files[0],
-                            str(nifti_file.relative_to(self.output_directory)),
-                            json_file,
+                        patient_logger.log_module_error(
+                            "convert", sop_instance_hash, error_log
                         )
 
-                    entry["path"] = str(output_dir.relative_to(self.working_directory))
-
-                    self.add_entry(entry)
-
-                elif sop_class_uid == MR_IMAGE_STORAGE_UID:
-                    # TODO Handle inconsistent slice spacing
-                    if config.get_config("interp_missing_slices"):
-                        series_files = handle_missing_slice(df_files)
-                    else:
-                        raise ValueError("Slice Locations are not evenly spaced")
+                    output_dir.mkdir(exist_ok=True, parents=True)
 
                     series_files = [str(f) for f in series_files]
                     series = sitk.ReadImage(series_files)
 
-                    output_dir = patient_directory.joinpath("images", sop_instance_hash)
-                    output_dir.mkdir(exist_ok=True, parents=True)
-
-                    nifti_file = output_dir.joinpath("MR.nii.gz")
+                    nifti_file = output_dir.joinpath("CT.nii.gz")
                     sitk.WriteImage(series, str(nifti_file))
-                    logger.debug("Writing MR Image Series to: %s", nifti_file)
+                    logger.debug("Writing CT Image Series to: %s", nifti_file)
 
                     json_file = output_dir.joinpath("metadata.json")
                     convert_dicom_headers(
@@ -448,231 +446,249 @@ class ConvertData:
                         json_file,
                     )
 
+                entry["path"] = str(output_dir.relative_to(self.working_directory))
+
+                self.add_entry(entry)
+
+            elif sop_class_uid == MR_IMAGE_STORAGE_UID:
+                # TODO Handle inconsistent slice spacing
+                if config.get_config("interp_missing_slices"):
+                    series_files = handle_missing_slice(df_files)
+                else:
+                    raise ValueError("Slice Locations are not evenly spaced")
+
+                series_files = [str(f) for f in series_files]
+                series = sitk.ReadImage(series_files)
+
+                output_dir = patient_directory.joinpath("images", sop_instance_hash)
+                output_dir.mkdir(exist_ok=True, parents=True)
+
+                nifti_file = output_dir.joinpath("MR.nii.gz")
+                sitk.WriteImage(series, str(nifti_file))
+                logger.debug("Writing MR Image Series to: %s", nifti_file)
+
+                json_file = output_dir.joinpath("metadata.json")
+                convert_dicom_headers(
+                    series_files[0],
+                    str(nifti_file.relative_to(self.output_directory)),
+                    json_file,
+                )
+
+                entry["path"] = str(output_dir.relative_to(self.working_directory))
+
+                self.add_entry(entry)
+                patient_logger.eval_module_process("convert", sop_instance_hash)
+
+            elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
+                # If we have multiple structure sets with the same sop_instance_uid we'll just
+                # drop them
+                df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
+
+                rt_struct_file = df_files.iloc[0]
+
+                # Get the linked image
+                # Need to disable this pylint check here only, seems to be a bug in
+                # pylint/pandas
+                # pylint: disable=unsubscriptable-object
+                df_linked_series = df_preprocess[
+                    df_preprocess["series_uid"] == rt_struct_file.referenced_uid
+                ]
+
+                # If not linked via referenced UID, then try to link via FOR
+                if len(df_linked_series) == 0:
+                    for_uid = rt_struct_file.referenced_for_uid
+                    df_linked_series = link_via_frame_of_reference(
+                        for_uid, df_preprocess
+                    )
+
+                # Check that the linked series is available
+                # TODO handle rendering the masks even if we don't have an image series it's
+                # linked to
+                if len(df_linked_series) == 0:
+                    error_log = "Series Referenced by RTSTRUCT not found"
+                    patient_logger.log_module_error(
+                        "convert", sop_instance_hash, error_log
+                    )
+
+                if not output_dir.exists() or force:
+                    # Only convert if it doesn't already exist or if force is True
+                    output_dir.mkdir(exist_ok=True, parents=True)
+
+                    img_row = df_linked_series.iloc[0]
+                    hashed_linked_id = hash_uid(img_row.sop_instance_uid)
+                    linked_nifti_file = self.output_directory.joinpath(
+                        patient_id,
+                        "images",
+                        hashed_linked_id,
+                        f"{img_row.modality}.nii.gz",
+                    )
+                    img_file = sitk.ReadImage(str(linked_nifti_file))
+
+                    convert_rtstruct(
+                        img_file,
+                        rt_struct_file.file_path,
+                        prefix="",
+                        output_dir=output_dir,
+                        output_img=None,
+                        spacing=None,
+                    )
+
+                    if config.get_config("generate_nrrd"):
+                        nrrd_file = output_dir.joinpath("STRUCTURE_SET.nrrd")
+                        logger.info("Saving structures in nrrd format: %s", nrrd_file)
+                        write_nrrd_from_mask_directory(
+                            output_dir,
+                            nrrd_file,
+                            matplotlib.colormaps.get_cmap(
+                                config.get_config("nrrd_colormap")
+                            ),
+                        )
+
+                    # Save JSON
+                    json_file = output_dir.joinpath("metadata.json")
+                    convert_dicom_headers(
+                        rt_struct_file.file_path,
+                        str(output_dir.relative_to(self.output_directory)),
+                        json_file,
+                    )
+
+                entry["path"] = str(output_dir.relative_to(self.working_directory))
+                entry["for_uid"] = rt_struct_file.referenced_for_uid
+
+                # Find the SOP Instance UID of the CT image to link to
+                entry["referenced_sop_instance_uid"] = (
+                    df_linked_series.sop_instance_uid.unique()[0]
+                )
+
+                self.add_entry(entry)
+                patient_logger.eval_module_process(
+                    "convert",
+                    sop_instance_hash,
+                )
+
+            elif sop_class_uid == PET_IMAGE_STORAGE_UID:
+                if not output_dir.exists() or force:
+                    # Only convert if it doesn't already exist or if force is True
+                    # TODO allow this interp to be turned off...
+                    series_files = handle_missing_slice(df_files)
+
+                    output_dir.mkdir(exist_ok=True, parents=True)
+                    nifti_file = output_dir.joinpath("PT.nii.gz")
+
+                    convert_dicom_to_nifti_pt(
+                        series_files,
+                        nifti_file,
+                    )
+
+                    json_file = output_dir.joinpath("metadata.json")
+                    convert_dicom_headers(
+                        series_files[0],
+                        str(nifti_file.relative_to(self.output_directory)),
+                        json_file,
+                    )
+
+                entry["path"] = str(output_dir.relative_to(self.working_directory))
+
+                self.add_entry(entry)
+                patient_logger.eval_module_process("convert", sop_instance_hash)
+
+            elif sop_class_uid == RT_PLAN_STORAGE_UID:
+                # If we have multiple plans with the same sop_instance_uid we'll just drop them
+                df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
+
+                # No Nifti to create here, just save the JSON
+
+                # If there are multiple RTPLANs in the same series then just save them all
+                for _, rt_plan_file in df_files.iterrows():
+                    sop_instance_hash = hash_uid(rt_plan_file.sop_instance_uid)
+
+                    # Update the output directory for this plan
+                    output_dir = patient_directory.joinpath(
+                        object_type, sop_instance_hash
+                    )
+
+                    if not output_dir.exists() or force:
+                        # Only convert if it doesn't already exist or if force is True
+                        output_dir.mkdir(exist_ok=True, parents=True)
+
+                        json_file = output_dir.joinpath("metadata.json")
+
+                        convert_dicom_headers(rt_plan_file.file_path, "", json_file)
+
+                    entry["sop_instance_uid"] = rt_plan_file.sop_instance_uid
+                    entry["hashed_uid"] = sop_instance_hash
+                    entry["referenced_sop_instance_uid"] = rt_plan_file.referenced_uid
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                     self.add_entry(entry)
                     patient_logger.eval_module_process("convert", sop_instance_hash)
 
-                elif sop_class_uid == RT_STRUCTURE_STORAGE_UID:
-                    # If we have multiple structure sets with the same sop_instance_uid we'll just
-                    # drop them
-                    df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
+            elif sop_class_uid == RT_DOSE_STORAGE_UID:
+                # If we have multiple doses with the same sop_instance_uid we'll just drop them
+                df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
 
-                    rt_struct_file = df_files.iloc[0]
+                # If there are multiple RTDOSEs in the same series then just save them all
+                for _, rt_dose_file in df_files.iterrows():
+                    sop_instance_hash = hash_uid(rt_dose_file.sop_instance_uid)
 
-                    # Get the linked image
-                    # Need to disable this pylint check here only, seems to be a bug in
-                    # pylint/pandas
-                    # pylint: disable=unsubscriptable-object
-                    df_linked_series = df_preprocess[
-                        df_preprocess["series_uid"] == rt_struct_file.referenced_uid
-                    ]
-
-                    # If not linked via referenced UID, then try to link via FOR
-                    if len(df_linked_series) == 0:
-                        for_uid = rt_struct_file.referenced_for_uid
-                        df_linked_series = link_via_frame_of_reference(
-                            for_uid, df_preprocess
-                        )
-
-                    # Check that the linked series is available
-                    # TODO handle rendering the masks even if we don't have an image series it's
-                    # linked to
-                    if len(df_linked_series) == 0:
-                        error_log = "Series Referenced by RTSTRUCT not found"
-                        patient_logger.log_module_error(
-                            "convert", sop_instance_hash, error_log
-                        )
-
-                    if not output_dir.exists() or force:
-                        # Only convert if it doesn't already exist or if force is True
-                        output_dir.mkdir(exist_ok=True, parents=True)
-
-                        img_row = df_linked_series.iloc[0]
-                        hashed_linked_id = hash_uid(img_row.sop_instance_uid)
-                        linked_nifti_file = self.output_directory.joinpath(
-                            patient_id,
-                            "images",
-                            hashed_linked_id,
-                            f"{img_row.modality}.nii.gz",
-                        )
-                        img_file = sitk.ReadImage(str(linked_nifti_file))
-
-                        convert_rtstruct(
-                            img_file,
-                            rt_struct_file.file_path,
-                            prefix="",
-                            output_dir=output_dir,
-                            output_img=None,
-                            spacing=None,
-                        )
-
-                        if config.get_config("generate_nrrd"):
-                            nrrd_file = output_dir.joinpath("STRUCTURE_SET.nrrd")
-                            logger.info(
-                                "Saving structures in nrrd format: %s", nrrd_file
-                            )
-                            write_nrrd_from_mask_directory(
-                                output_dir,
-                                nrrd_file,
-                                matplotlib.colormaps.get_cmap(
-                                    config.get_config("nrrd_colormap")
-                                ),
-                            )
-
-                        # Save JSON
-                        json_file = output_dir.joinpath("metadata.json")
-                        convert_dicom_headers(
-                            rt_struct_file.file_path,
-                            str(output_dir.relative_to(self.output_directory)),
-                            json_file,
-                        )
-
-                    entry["path"] = str(output_dir.relative_to(self.working_directory))
-                    entry["for_uid"] = rt_struct_file.referenced_for_uid
-
-                    # Find the SOP Instance UID of the CT image to link to
-                    entry[
-                        "referenced_sop_instance_uid"
-                    ] = df_linked_series.sop_instance_uid.unique()[0]
-
-                    self.add_entry(entry)
-                    patient_logger.eval_module_process(
-                        "convert",
-                        sop_instance_hash,
+                    # Update the output directory for this plan
+                    output_dir = patient_directory.joinpath(
+                        object_type, sop_instance_hash
                     )
 
-                elif sop_class_uid == PET_IMAGE_STORAGE_UID:
                     if not output_dir.exists() or force:
                         # Only convert if it doesn't already exist or if force is True
-                        # TODO allow this interp to be turned off...
-                        series_files = handle_missing_slice(df_files)
-
                         output_dir.mkdir(exist_ok=True, parents=True)
-                        nifti_file = output_dir.joinpath("PT.nii.gz")
 
-                        convert_dicom_to_nifti_pt(
-                            series_files,
-                            nifti_file,
+                        nifti_file = output_dir.joinpath("RTDOSE.nii.gz")
+                        nifti_file.parent.mkdir(exist_ok=True, parents=True)
+                        logger.debug("Writing RTDOSE to: %s", nifti_file)
+                        convert_rtdose(
+                            rt_dose_file.file_path,
+                            force=True,
+                            dose_output_path=nifti_file,
                         )
 
                         json_file = output_dir.joinpath("metadata.json")
                         convert_dicom_headers(
-                            series_files[0],
+                            rt_dose_file.file_path,
                             str(nifti_file.relative_to(self.output_directory)),
                             json_file,
                         )
 
+                    entry["sop_instance_uid"] = rt_dose_file.sop_instance_uid
+                    entry["hashed_uid"] = sop_instance_hash
+                    entry["referenced_sop_instance_uid"] = rt_dose_file.referenced_uid
                     entry["path"] = str(output_dir.relative_to(self.working_directory))
 
                     self.add_entry(entry)
+
                     patient_logger.eval_module_process("convert", sop_instance_hash)
-
-                elif sop_class_uid == RT_PLAN_STORAGE_UID:
-                    # If we have multiple plans with the same sop_instance_uid we'll just drop them
-                    df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
-
-                    # No Nifti to create here, just save the JSON
-
-                    # If there are multiple RTPLANs in the same series then just save them all
-                    for _, rt_plan_file in df_files.iterrows():
-                        sop_instance_hash = hash_uid(rt_plan_file.sop_instance_uid)
-
-                        # Update the output directory for this plan
-                        output_dir = patient_directory.joinpath(
-                            object_type, sop_instance_hash
-                        )
-
-                        if not output_dir.exists() or force:
-                            # Only convert if it doesn't already exist or if force is True
-                            output_dir.mkdir(exist_ok=True, parents=True)
-
-                            json_file = output_dir.joinpath("metadata.json")
-
-                            convert_dicom_headers(rt_plan_file.file_path, "", json_file)
-
-                        entry["sop_instance_uid"] = rt_plan_file.sop_instance_uid
-                        entry["hashed_uid"] = sop_instance_hash
-                        entry[
-                            "referenced_sop_instance_uid"
-                        ] = rt_plan_file.referenced_uid
-                        entry["path"] = str(
-                            output_dir.relative_to(self.working_directory)
-                        )
-
-                        self.add_entry(entry)
-                        patient_logger.eval_module_process("convert", sop_instance_hash)
-
-                elif sop_class_uid == RT_DOSE_STORAGE_UID:
-                    # If we have multiple doses with the same sop_instance_uid we'll just drop them
-                    df_files = df_files.drop_duplicates(subset=["sop_instance_uid"])
-
-                    # If there are multiple RTDOSEs in the same series then just save them all
-                    for _, rt_dose_file in df_files.iterrows():
-                        sop_instance_hash = hash_uid(rt_dose_file.sop_instance_uid)
-
-                        # Update the output directory for this plan
-                        output_dir = patient_directory.joinpath(
-                            object_type, sop_instance_hash
-                        )
-
-                        if not output_dir.exists() or force:
-                            # Only convert if it doesn't already exist or if force is True
-                            output_dir.mkdir(exist_ok=True, parents=True)
-
-                            nifti_file = output_dir.joinpath("RTDOSE.nii.gz")
-                            nifti_file.parent.mkdir(exist_ok=True, parents=True)
-                            logger.debug("Writing RTDOSE to: %s", nifti_file)
-                            convert_rtdose(
-                                rt_dose_file.file_path,
-                                force=True,
-                                dose_output_path=nifti_file,
-                            )
-
-                            json_file = output_dir.joinpath("metadata.json")
-                            convert_dicom_headers(
-                                rt_dose_file.file_path,
-                                str(nifti_file.relative_to(self.output_directory)),
-                                json_file,
-                            )
-
-                        entry["sop_instance_uid"] = rt_dose_file.sop_instance_uid
-                        entry["hashed_uid"] = sop_instance_hash
-                        entry[
-                            "referenced_sop_instance_uid"
-                        ] = rt_dose_file.referenced_uid
-                        entry["path"] = str(
-                            output_dir.relative_to(self.working_directory)
-                        )
-
-                        self.add_entry(entry)
-
-                        patient_logger.eval_module_process("convert", sop_instance_hash)
-                else:
-                    raise NotImplementedError(
-                        "Unable to convert Series with SOP Class UID: {sop_class_uid} / "
-                        f"Modality: {modality}"
-                    )
-
-            except Exception as e:  # pylint: disable=broad-except
-                # Broad except ok here, since we will put these file into a
-                # quarantine location for further inspection.
-                logger.error(
-                    "Unable to convert series for patient: %s with UID: %s",
-                    patient_id,
-                    series_uid,
+            else:
+                raise NotImplementedError(
+                    "Unable to convert Series with SOP Class UID: {sop_class_uid} / "
+                    f"Modality: {modality}"
                 )
-                logger.exception(e)
 
-                # Remove the output_dir if it had already been created
-                if output_dir.exists():
-                    shutil.rmtree(output_dir)
+        except Exception as e:  # pylint: disable=broad-except
+            # Broad except ok here, since we will put these file into a
+            # quarantine location for further inspection.
+            logger.error(
+                "Unable to convert series for patient: %s with UID: %s",
+                patient_id,
+                series_uid,
+            )
+            logger.exception(e)
 
-                for f in df_files.file_path.tolist():
-                    logger.error(
-                        "Error parsing file %s: %s. Placing file into Quarantine folder...",
-                        f,
-                        e,
-                    )
-                    copy_file_to_quarantine(Path(f), self.working_directory, e)
-                patient_logger.log_module_error("convert", sop_instance_hash, e)
+            # Remove the output_dir if it had already been created
+            if output_dir.exists():
+                shutil.rmtree(output_dir)
+
+            for f in df_files.file_path.tolist():
+                logger.error(
+                    "Error parsing file %s: %s. Placing file into Quarantine folder...",
+                    f,
+                    e,
+                )
+                copy_file_to_quarantine(Path(f), self.working_directory, e)
+            patient_logger.log_module_error("convert", sop_instance_hash, e)
